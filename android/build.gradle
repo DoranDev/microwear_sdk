@@ -4,8 +4,10 @@ version = "1.0-SNAPSHOT"
 buildscript {
     ext.kotlin_version = "1.8.22"
     repositories {
-        google()
+        maven{url 'https://maven.aliyun.com/nexus/content/groups/public/'}
+        maven { url "https://jitpack.io" }
         mavenCentral()
+        google()
     }
 
     dependencies {
@@ -16,8 +18,10 @@ buildscript {
 
 allprojects {
     repositories {
-        google()
+        maven{url 'https://maven.aliyun.com/nexus/content/groups/public/'}
+        maven { url "https://jitpack.io" }
         mavenCentral()
+        google()
     }
 }
 
@@ -52,6 +56,9 @@ android {
     dependencies {
         testImplementation("org.jetbrains.kotlin:kotlin-test")
         testImplementation("org.mockito:mockito-core:5.0.0")
+        implementation 'com.github.SoarY:NJJBle:1.0.0'
+        implementation 'io.reactivex.rxjava2:rxjava:2.2.20'
+        implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     }
 
     testOptions {
