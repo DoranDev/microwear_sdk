@@ -3,23 +3,23 @@ package id.doran.microwear_sdk
 import android.app.Activity
 import android.content.Context
 import android.util.Log
-
+import com.njj.njjsdk.callback.*
+import com.njj.njjsdk.library.Code
+import com.njj.njjsdk.manger.NJJOtaManage
+import com.njj.njjsdk.manger.NjjProtocolHelper
+import com.njj.njjsdk.protocol.cmd.ruiyu.*
+import com.njj.njjsdk.protocol.entity.*
+import com.njj.njjsdk.utils.ApplicationProxy
+import com.njj.njjsdk.utils.LogUtil
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import io.flutter.plugin.common.EventChannel
-import java.util.ArrayList
 import java.util.Date
-
-import com.njj.njjsdk.callback.*
-import com.njj.njjsdk.manger.NjjProtocolHelper
-import com.njj.njjsdk.protocol.cmd.ruiyu.*
-import com.njj.njjsdk.protocol.entity.*
-import com.njj.njjsdk.utils.LogUtil
 
 /** MicrowearSdkPlugin */
 class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -681,9 +681,82 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     Log.d("MicrowearSdkPlugin","onDetachedFromActivity")
   }
 
+
+
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
     Log.d("MicrowearSdkPlugin","onAttachedToActivity")
     mActivity = binding.activity
+    NJJOtaManage.getInstance().init(mActivity.application)
+    ApplicationProxy.getInstance().setApplication(mActivity.application)
+    CallBackManager.getInstance().registerConnectStatuesCallBack("", object : ConnectStatuesCallBack.ICallBack {
+      override fun onConnected(mac: String?) {
+        LogUtil.e("Connection successful")
+      }
+
+      override fun onConnecting(mac: String?) {
+        LogUtil.e("Connecting")
+      }
+
+      override fun onDisConnected(mac: String?) {
+        LogUtil.e("Disconnect")
+      }
+
+      override fun onConnectFail(code: Int) {
+        LogUtil.e("Connection failed")
+      }
+
+      override fun onDiscoveredServices(code: Int) {
+        LogUtil.e("onDiscoveredServices")
+        if (code == Code.REQUEST_SUCCESS) {
+          LogUtil.e("onDiscoveredServices : REQUEST_SUCCESS")
+        }
+      }
+
+    })
+    CallBackManager.getInstance().registerSomatosensoryGameCallback(object :SomatosensoryGameCallback.ICallBack{
+      override fun onReceiveData(somatosensoryGame: SomatosensoryGame?) {
+        LogUtil.e(somatosensoryGame.toString())
+      }
+
+      override fun onReceiveStatus(status: Int) {
+        LogUtil.e("onReceiveStatus: $status")
+      }
+
+    })
+
+    NjjProtocolHelper.getInstance().registerSingleHeartOxBloodCallback(
+      object : NjjNotifyCallback {
+        override fun onBloodPressureData(systolicPressure: Int, diastolicPressure: Int) {
+          LogUtil.e("Single Blood Pressure: $systolicPressure/$diastolicPressure")
+        }
+
+        override fun onHeartRateData(rate: Int) {
+          LogUtil.e("Single Heart Rate: $rate")
+        }
+
+        override fun onOxyData(rate: Int) {
+          LogUtil.e("Single Blood Oxygen: $rate")
+        }
+
+        override fun takePhone(value: Int) {
+          LogUtil.e("Take Photo: $value")
+        }
+
+        override fun onStepData(njjStepData: NjjStepData?) {
+          LogUtil.e("Calories: ${njjStepData?.calData} Steps: ${njjStepData?.stepNum} Distance: ${njjStepData?.distance}")
+        }
+
+        override fun findPhone(value: Int) {
+          LogUtil.e("Find Phone: $value")
+        }
+
+        override fun endCallPhone(value: Int) {
+          if (value == 0) {
+            LogUtil.e("End Call")
+          }
+        }
+      })
+
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
