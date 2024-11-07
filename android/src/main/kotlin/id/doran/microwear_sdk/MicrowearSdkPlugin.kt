@@ -22,7 +22,6 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import java.util.Date
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 
 /** MicrowearSdkPlugin */
 class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -328,7 +327,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                   it?.let {
                     try {
                       val jsonResult = gson.toJson(it)
-                      syncHourStepSink?.success(jsonResult)
+                      syncHourStepSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
                     } catch (e: Exception) {
                       e.printStackTrace()
                       syncHourStepSink?.error("Serialization Error", "Failed to serialize result", e.message)
@@ -342,7 +341,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                   it?.let {
                     try {
                       val jsonResult = gson.toJson(it)
-                      syncWeekDaySportsSink?.success(jsonResult)
+                      syncWeekDaySportsSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
                     } catch (e: Exception) {
                       e.printStackTrace()
                       syncWeekDaySportsSink?.error("Serialization Error", "Failed to serialize result", e.message)
@@ -356,7 +355,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 it?.let {
                     try {
                       val jsonResult = gson.toJson(it)
-                      deviceConfigSink?.success(jsonResult)
+                      deviceConfigSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
                     } catch (e: Exception) {
                       e.printStackTrace()
                       deviceConfigSink?.error("Serialization Error", "Failed to serialize result", e.message)
@@ -370,7 +369,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                   it?.let {
                     try {
                       val jsonResult = gson.toJson(it)
-                      syncSleepDataSink?.success(jsonResult)
+                      syncSleepDataSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
                     } catch (e: Exception) {
                       e.printStackTrace()
                       syncSleepDataSink?.error("Serialization Error", "Failed to serialize result", e.message)
@@ -384,7 +383,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 it?.let {
                   try {
                     val jsonResult = gson.toJson(it)
-                    syncSportRecordSink?.success(jsonResult)
+                    syncSportRecordSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
                   } catch (e: Exception) {
                     e.printStackTrace()
                     syncSportRecordSink?.error("Serialization Error", "Failed to serialize result", e.message)
@@ -629,12 +628,12 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               val pos = 38
               when (pos) {
                 38 -> {
-                  NjjProtocolHelper.getInstance().getAlarmClockInfo().subscribe {
+                  NjjProtocolHelper.getInstance().alarmClockInfo.subscribe {
                     LogUtil.e("Get alarm data successful")
                     it?.let {
                       try {
                         val jsonResult = gson.toJson(it)
-                        getAlarmClockInfoSink?.success(jsonResult)
+                        getAlarmClockInfoSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
                       } catch (e: Exception) {
                         e.printStackTrace()
                         getAlarmClockInfoSink?.error("Serialization Error", "Failed to serialize result", e.message)
@@ -645,7 +644,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
                 else -> {
                   // Add default data if empty
-                  val infos: MutableList<NjjAlarmClockInfo> = ArrayList<NjjAlarmClockInfo>()
+                  val infos: MutableList<NjjAlarmClockInfo> = ArrayList()
                   val timeArr = intArrayOf(
                     6 * 3600,
                     95 * 360,
@@ -687,7 +686,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 it?.let {
                   try {
                     val jsonResult = gson.toJson(it)
-                    syncBloodPressureSink?.success(jsonResult)
+                    syncBloodPressureSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
                   } catch (e: Exception) {
                     e.printStackTrace()
                     syncBloodPressureSink?.error("Serialization Error", "Failed to serialize result", e.message)
@@ -702,7 +701,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 it?.let {
                   try {
                     val jsonResult = gson.toJson(it)
-                    syncHeartDataSink?.success(jsonResult)
+                    syncHeartDataSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
                   } catch (e: Exception) {
                     e.printStackTrace()
                     syncHeartDataSink?.error("Serialization Error", "Failed to serialize result", e.message)
@@ -716,7 +715,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 it?.let {
                   try {
                     val jsonResult = gson.toJson(it)
-                    syncOxDataSink?.success(jsonResult)
+                    syncOxDataSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
                   } catch (e: Exception) {
                     e.printStackTrace()
                     syncOxDataSink?.error("Serialization Error", "Failed to serialize result", e.message)
@@ -803,7 +802,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             EVT_TYPE_ANDROID_PHONE_CTRL -> {
-              val pos = 43;
+              val pos = 43 
               when (pos) {
                 43 -> NjjProtocolHelper.getInstance().handUpPhone(0, object : NjjWriteCallback {
                   override fun onWriteSuccess() {
@@ -840,7 +839,24 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                   njjBloodPressure: NjjBloodPressure,
                   njjBloodOxyData: NjjBloodOxyData
                 ) {
-                  LogUtil.e("njjStepData={${njjStepData.stepNum}}")
+                    try {
+                      val njjEcgDatajsonResult = gson.toJson(njjEcgData)
+                      val njjHeartDatajsonResult = gson.toJson(njjHeartData)
+                      val njjStepDatajsonResult = gson.toJson(njjStepData)
+                      val njjBloodPressurejsonResult = gson.toJson(njjBloodPressure)
+                      val njjBloodOxyDatajsonResult = gson.toJson(njjBloodOxyData)
+                      var map =   HashMap<String, Any?>()
+                      map["ecgData"] = gson.fromJson(njjEcgDatajsonResult, HashMap::class.java)
+                      map["heartData"] = gson.fromJson(njjHeartDatajsonResult, HashMap::class.java)
+                      map["stepData"] = gson.fromJson(njjStepDatajsonResult, HashMap::class.java)
+                      map["bloodPressure"] = gson.fromJson(njjBloodPressurejsonResult, HashMap::class.java)
+                      map["bloodOxyData"] = gson.fromJson(njjBloodOxyDatajsonResult, HashMap::class.java)
+                      syncHomeDataSink?.success(map)
+                    } catch (e: Exception) {
+                      e.printStackTrace()
+                      syncHomeDataSink?.error("Serialization Error", "Failed to serialize result", e.message)
+                    }
+
                 }
               })
             }
@@ -854,10 +870,30 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               NjjProtocolHelper.getInstance().syncRealTimeECG(false, object : NjjECGCallBack {
                 override fun onReceivePPGData(type: Int, time: Int, heart: Int) {
                   LogUtil.e("type=$type  heart=$heart")
+                  try {
+                    var map =   HashMap<String, Any?>()
+                    map["isOpen"] = false
+                    map["type"] = type
+                    map["time"] = time
+                    map["heart"] = heart
+                    syncRealTimeECGSink?.success(map)
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    syncRealTimeECGSink?.error("Serialization Error", "Failed to serialize result", e.message)
+                  }
                 }
 
                 override fun onECGReceiveEnd(type: Int) {
                   LogUtil.e("type=$type")
+                  try {
+                    var map =   HashMap<String, Any?>()
+                    map["isOpen"] = false
+                    map["type"] = type
+                    syncRealTimeECGSink?.success(map)
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    syncRealTimeECGSink?.error("Serialization Error", "Failed to serialize result", e.message)
+                  }
                 }
               })
             }
@@ -866,10 +902,30 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               NjjProtocolHelper.getInstance().syncRealTimeECG(true, object : NjjECGCallBack {
                 override fun onReceivePPGData(type: Int, time: Int, heart: Int) {
                   LogUtil.e("type=$type  heart=$heart")
+                  try {
+                    var map =   HashMap<String, Any?>()
+                    map["isOpen"] = true
+                    map["type"] = type
+                    map["time"] = time
+                    map["heart"] = heart
+                    syncRealTimeECGSink?.success(map)
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    syncRealTimeECGSink?.error("Serialization Error", "Failed to serialize result", e.message)
+                  }
                 }
 
                 override fun onECGReceiveEnd(type: Int) {
                   LogUtil.e("type=$type")
+                  try {
+                    var map =   HashMap<String, Any?>()
+                    map["isOpen"] = true
+                    map["type"] = type
+                    syncRealTimeECGSink?.success(map)
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    syncRealTimeECGSink?.error("Serialization Error", "Failed to serialize result", e.message)
+                  }
                 }
               })
             }
@@ -878,6 +934,13 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               NjjProtocolHelper.getInstance().getDeviceFun(object : NjjDeviceFunCallback {
                 override fun onDeviceFunSuccess(bleDeviceFun: BleDeviceFun) {
                   Log.e("fan", "fan$bleDeviceFun")
+                  try {
+                    val jsonResult = gson.toJson(bleDeviceFun)
+                    getDeviceFunSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    getDeviceFunSink?.error("Serialization Error", "Failed to serialize result", e.message)
+                  }
                 }
 
                 override fun onDeviceFunFail() {
@@ -887,34 +950,85 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
             EVT_TYPE_BAND_CONFIG1 -> {
               NjjProtocolHelper.getInstance().getDeviceConfig1(object : NjjConfig1CallBack {
+                var map =   HashMap<String, Any?>() 
                 override fun onWriteSuccess() {
+                  Log.e("onWriteSuccess", "getDeviceConfig1")
                 }
 
                 override fun onLongSitEntity(njjLongSitEntity: NjjLongSitEntity) {
                   LogUtil.e(njjLongSitEntity.toString())
+                  try {
+                    val jsonResult = gson.toJson(njjLongSitEntity)
+                    map["njjLongSitEntity"] = gson.fromJson(jsonResult, HashMap::class.java)
+                    getDeviceConfig1Sink?.success(map)
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    getDeviceConfig1Sink?.error("Serialization Error", "Failed to serialize result", e.message)
+                  }
                 }
 
                 override fun onNjjDrinkWaterEntity(njjDrinkWaterEntity: NjjDrinkWaterEntity) {
                   LogUtil.e(njjDrinkWaterEntity.toString())
+                  try{
+                    val jsonResult = gson.toJson(njjDrinkWaterEntity)
+                    map["njjDrinkWaterEntity"] = gson.fromJson(jsonResult, HashMap::class.java)
+                    getDeviceConfig1Sink?.success(map)
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    getDeviceConfig1Sink?.error("Serialization Error", "Failed to serialize result", e.message)
+                  }
                 }
 
                 override fun onNjjWashHandEntity(njjWashHandEntity: NjjWashHandEntity) {
                   LogUtil.e(njjWashHandEntity.toString())
+                  try{
+                    val jsonResult = gson.toJson(njjWashHandEntity)
+                    map["njjWashHandEntity"] = gson.fromJson(jsonResult, HashMap::class.java)
+                    getDeviceConfig1Sink?.success(map)
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    getDeviceConfig1Sink?.error("Serialization Error", "Failed to serialize result", e.message)
+                  }
                 }
 
                 override fun onNjjWristScreenEntity(njjWristScreenEntity: NjjWristScreenEntity) {
                   LogUtil.e(njjWristScreenEntity.toString())
+                  try{
+                    val jsonResult = gson.toJson(njjWristScreenEntity)
+                    map["njjWristScreenEntity"] = gson.fromJson(jsonResult, HashMap::class.java)
+                    getDeviceConfig1Sink?.success(map)
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    getDeviceConfig1Sink?.error("Serialization Error", "Failed to serialize result", e.message)
+                  }
                 }
 
                 override fun onNjjDisturbEntity(njjDisturbEntity: NjjDisturbEntity) {
                   LogUtil.e(njjDisturbEntity.toString())
+                  try{
+                    val jsonResult = gson.toJson(njjDisturbEntity)
+                    map["njjDisturbEntity"] = gson.fromJson(jsonResult, HashMap::class.java)
+                    getDeviceConfig1Sink?.success(map)
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    getDeviceConfig1Sink?.error("Serialization Error", "Failed to serialize result", e.message)
+                  }
                 }
 
                 override fun onNjjMedicineEntity(njjMedicineEntity: NjjMedicineEntity) {
                   LogUtil.e(njjMedicineEntity.toString())
+                  try{
+                    val jsonResult = gson.toJson(njjMedicineEntity)
+                    map["njjMedicineEntity"] = gson.fromJson(jsonResult, HashMap::class.java)
+                    getDeviceConfig1Sink?.success(map)
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    getDeviceConfig1Sink?.error("Serialization Error", "Failed to serialize result", e.message)
+                  }
                 }
 
                 override fun onFail() {
+                  Log.e("onFail", "getDeviceConfig1")
                 }
               })
             }
@@ -940,24 +1054,73 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     CallBackManager.getInstance().registerConnectStatuesCallBack("", object : ConnectStatuesCallBack.ICallBack {
       override fun onConnected(mac: String?) {
         LogUtil.e("Connection successful")
+        try{
+          if (mac != null) {
+            var map =   HashMap<String, Any?>()
+            map["status"] = "onConnected"
+            map["mac"] = mac
+            registerConnectStatuesCallBackSink?.success(map)
+          }
+        } catch (e: Exception) {
+          e.printStackTrace()
+          registerConnectStatuesCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+        }
       }
 
       override fun onConnecting(mac: String?) {
         LogUtil.e("Connecting")
+        try{
+          if (mac != null) {
+            var map =   HashMap<String, Any?>()
+            map["status"] = "onConnecting"
+            map["mac"] = mac
+            registerConnectStatuesCallBackSink?.success(map)
+          }
+          } catch (e: Exception) {
+          e.printStackTrace()
+          registerConnectStatuesCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+        }
       }
 
       override fun onDisConnected(mac: String?) {
         LogUtil.e("Disconnect")
+        try{
+          if (mac != null) {
+            var map =   HashMap<String, Any?>()
+            map["status"] = "onDisConnected"
+            map["mac"] = mac
+            registerConnectStatuesCallBackSink?.success(map)
+          }
+        } catch (e: Exception) {
+          e.printStackTrace()
+          registerConnectStatuesCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+        }
       }
 
       override fun onConnectFail(code: Int) {
         LogUtil.e("Connection failed")
+        try{
+          var map =   HashMap<String, Any?>()
+          map["status"] = "onConnectFail"
+          map["code"] = code
+          registerConnectStatuesCallBackSink?.success(map)
+          } catch (e: Exception) {
+          e.printStackTrace()
+          registerConnectStatuesCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+        }
       }
 
       override fun onDiscoveredServices(code: Int) {
         LogUtil.e("onDiscoveredServices")
-        if (code == Code.REQUEST_SUCCESS) {
-          LogUtil.e("onDiscoveredServices : REQUEST_SUCCESS")
+        try{
+          var map =   HashMap<String, Any?>()
+          map["status"] = "onDiscoveredServices"
+          map["code"] = code
+          map["code_name"] = Code.toString(code)
+          registerConnectStatuesCallBackSink?.success(map)
+        } catch (e: Exception) {
+          e.printStackTrace()
+          registerConnectStatuesCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
         }
       }
 
@@ -965,6 +1128,13 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     CallBackManager.getInstance().registerSomatosensoryGameCallback(object :SomatosensoryGameCallback.ICallBack{
       override fun onReceiveData(somatosensoryGame: SomatosensoryGame?) {
         LogUtil.e(somatosensoryGame.toString())
+        try{
+          val jsonResult = gson.toJson(somatosensoryGame)
+          registerSomatosensoryGameCallbackSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
+        } catch (e: Exception) {
+          e.printStackTrace()
+          registerSomatosensoryGameCallbackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+        }
       }
 
       override fun onReceiveStatus(status: Int) {
@@ -975,31 +1145,92 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
     NjjProtocolHelper.getInstance().registerSingleHeartOxBloodCallback(
       object : NjjNotifyCallback {
+
         override fun onBloodPressureData(systolicPressure: Int, diastolicPressure: Int) {
           LogUtil.e("Single Blood Pressure: $systolicPressure/$diastolicPressure")
+          try {
+            var mapDetail =  HashMap<String, Any?>()
+            mapDetail["systolicPressure"] = systolicPressure
+            mapDetail["diastolicPressure"] = diastolicPressure
+            var map =  HashMap<String, Any?>()
+            map["onBloodPressureData"] = mapDetail
+            registerSingleHeartOxBloodCallbackSink?.success(map)
+          } catch (e: Exception) {
+            e.printStackTrace()
+            registerSingleHeartOxBloodCallbackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+          }
         }
 
         override fun onHeartRateData(rate: Int) {
           LogUtil.e("Single Heart Rate: $rate")
+          try {
+            var map =  HashMap<String, Any?>()
+            map["onHeartRateData"] = rate
+            registerSingleHeartOxBloodCallbackSink?.success(map)
+          } catch (e: Exception) {
+            e.printStackTrace()
+            registerSingleHeartOxBloodCallbackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+          }
         }
 
         override fun onOxyData(rate: Int) {
           LogUtil.e("Single Blood Oxygen: $rate")
+          try {
+            var map =  HashMap<String, Any?>()
+            map["onOxyData"] = rate
+            registerSingleHeartOxBloodCallbackSink?.success(map)
+          } catch (e: Exception) {
+            e.printStackTrace()
+            registerSingleHeartOxBloodCallbackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+          }
         }
 
         override fun takePhone(value: Int) {
           LogUtil.e("Take Photo: $value")
+          try {
+            var map =  HashMap<String, Any?>()
+            map["takePhone"] = value
+            registerSingleHeartOxBloodCallbackSink?.success(map)
+          } catch (e: Exception) {
+            e.printStackTrace()
+            registerSingleHeartOxBloodCallbackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+          }
         }
 
         override fun onStepData(njjStepData: NjjStepData?) {
           LogUtil.e("Calories: ${njjStepData?.calData} Steps: ${njjStepData?.stepNum} Distance: ${njjStepData?.distance}")
+          try {
+            val jsonResult = gson.toJson(njjStepData)
+            var map =  HashMap<String, Any?>()
+            map["onStepData"] = gson.fromJson(jsonResult, HashMap::class.java)
+            registerSingleHeartOxBloodCallbackSink?.success(map)
+          } catch (e: Exception) {
+            e.printStackTrace()
+            registerSingleHeartOxBloodCallbackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+          }
         }
 
         override fun findPhone(value: Int) {
           LogUtil.e("Find Phone: $value")
+          try {
+            var map =  HashMap<String, Any?>()
+            map["findPhone"] = value
+            registerSingleHeartOxBloodCallbackSink?.success(map)
+          } catch (e: Exception) {
+            e.printStackTrace()
+            registerSingleHeartOxBloodCallbackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+          }
         }
 
         override fun endCallPhone(value: Int) {
+          try {
+            var map = HashMap<String, Any?>()
+            map["endCallPhone"] = value
+            registerSingleHeartOxBloodCallbackSink?.success(map)
+          } catch (e: Exception) {
+            e.printStackTrace()
+            registerSingleHeartOxBloodCallbackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+          }
           if (value == 0) {
             LogUtil.e("End Call")
           }
