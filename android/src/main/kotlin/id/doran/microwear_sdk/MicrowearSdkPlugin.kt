@@ -37,6 +37,114 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     override fun onCancel(o: Any?) {}
   }
 
+  private var getBatteryLevelChannel: EventChannel? = null
+  private var getBatteryLevelSink : EventChannel.EventSink? = null
+  private val getBatteryLevelHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      getBatteryLevelSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
+  private var syncHourStepChannel: EventChannel? = null
+  private var syncHourStepSink : EventChannel.EventSink? = null
+  private val syncHourStepHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      syncHourStepSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
+  private var syncWeekDaySportsChannel: EventChannel? = null
+  private var syncWeekDaySportsSink : EventChannel.EventSink? = null
+  private val syncWeekDaySportsHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      syncWeekDaySportsSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
+  private var deviceConfigChannel: EventChannel? = null
+  private var deviceConfigSink : EventChannel.EventSink? = null
+  private val deviceConfigHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      deviceConfigSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
+  private var getAlarmClockInfoChannel: EventChannel? = null
+  private var getAlarmClockInfoSink : EventChannel.EventSink? = null
+  private val getAlarmClockInfoHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      getAlarmClockInfoSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
+  private var syncBloodPressureChannel: EventChannel? = null
+  private var syncBloodPressureSink : EventChannel.EventSink? = null
+  private val syncBloodPressureHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      syncBloodPressureSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
+  private var syncHeartDataChannel: EventChannel? = null
+  private var syncHeartDataSink : EventChannel.EventSink? = null
+  private val syncHeartDataHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      syncHeartDataSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
+  private var syncOxDataChannel: EventChannel? = null
+  private var syncOxDataSink : EventChannel.EventSink? = null
+  private val syncOxDataHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      syncOxDataSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
+  private var syncHomeDataChannel: EventChannel? = null
+  private var syncHomeDataSink : EventChannel.EventSink? = null
+  private val syncHomeDataHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      syncHomeDataSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
+  private var syncRealTimeECGChannel: EventChannel? = null
+  private var syncRealTimeECGSink : EventChannel.EventSink? = null
+  private val syncRealTimeECGHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      syncRealTimeECGSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
+  private var getDeviceFunChannel: EventChannel? = null
+  private var getDeviceFunSink : EventChannel.EventSink? = null
+  private val getDeviceFunHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      getDeviceFunSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
+  private var getDeviceConfig1Channel: EventChannel? = null
+  private var getDeviceConfig1Sink : EventChannel.EventSink? = null
+  private val getDeviceConfig1Handler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      getDeviceConfig1Sink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     Log.d("MicrowearSdkPlugin","onAttachedToEngine")
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "microwear_sdk")
@@ -45,12 +153,49 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
     deviceDataReceivedChannel = EventChannel(flutterPluginBinding.binaryMessenger, "deviceDataReceived")
     deviceDataReceivedChannel!!.setStreamHandler(deviceDataReceivedHandler)
+
+    getBatteryLevelChannel = EventChannel(flutterPluginBinding.binaryMessenger, "getBatteryLevel")
+    getBatteryLevelChannel!!.setStreamHandler(getBatteryLevelHandler)
+
+    syncHourStepChannel = EventChannel(flutterPluginBinding.binaryMessenger, "syncHourStep")
+    syncHourStepChannel!!.setStreamHandler(syncHourStepHandler)
+
+    syncWeekDaySportsChannel = EventChannel(flutterPluginBinding.binaryMessenger, "syncWeekDaySports")
+    syncWeekDaySportsChannel!!.setStreamHandler(syncWeekDaySportsHandler)
+
+    deviceConfigChannel = EventChannel(flutterPluginBinding.binaryMessenger, "deviceConfig")
+    deviceConfigChannel!!.setStreamHandler(deviceConfigHandler)
+
+    getAlarmClockInfoChannel = EventChannel(flutterPluginBinding.binaryMessenger, "getAlarmClockInfo")
+    getAlarmClockInfoChannel!!.setStreamHandler(getAlarmClockInfoHandler)
+
+    syncBloodPressureChannel = EventChannel(flutterPluginBinding.binaryMessenger, "syncBloodPressure")
+    syncBloodPressureChannel!!.setStreamHandler(syncBloodPressureHandler)
+
+    syncHeartDataChannel = EventChannel(flutterPluginBinding.binaryMessenger, "syncHeartData")
+    syncHeartDataChannel!!.setStreamHandler(syncHeartDataHandler)
+
+    syncOxDataChannel = EventChannel(flutterPluginBinding.binaryMessenger, "syncOxData")
+    syncOxDataChannel!!.setStreamHandler(syncOxDataHandler)
+
+    syncHomeDataChannel = EventChannel(flutterPluginBinding.binaryMessenger, "syncHomeData")
+    syncHomeDataChannel!!.setStreamHandler(syncHomeDataHandler)
+
+    syncRealTimeECGChannel = EventChannel(flutterPluginBinding.binaryMessenger, "syncRealTimeECG")
+    syncRealTimeECGChannel!!.setStreamHandler(syncRealTimeECGHandler)
+
+    getDeviceFunChannel = EventChannel(flutterPluginBinding.binaryMessenger, "getDeviceFun")
+    getDeviceFunChannel!!.setStreamHandler(getDeviceFunHandler)
+
+    getDeviceConfig1Channel = EventChannel(flutterPluginBinding.binaryMessenger, "getDeviceConfig1")
+    getDeviceConfig1Channel!!.setStreamHandler(getDeviceConfig1Handler)
   }
 
   override fun onMethodCall(call: MethodCall, result: Result) {
     when (call.method) {
       "sendRequest" -> {
         val microwearDeviceControl: Int? = call.argument<Int>("microwearDeviceControl")
+        val data: Map<String, Any>? = call.argument<Map<String, Any>>("data")
         if (microwearDeviceControl != null) {
           when (microwearDeviceControl) {
             //Watch face push
@@ -103,6 +248,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
                 override fun onFail() {
                   LogUtil.e("Get battery level failed")
+
                 }
               })
             }
