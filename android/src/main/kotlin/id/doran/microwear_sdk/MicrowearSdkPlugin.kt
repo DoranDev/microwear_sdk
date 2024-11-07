@@ -145,6 +145,33 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     override fun onCancel(o: Any?) {}
   }
 
+  private var registerConnectStatuesCallBackChannel: EventChannel? = null
+  private var registerConnectStatuesCallBackSink : EventChannel.EventSink? = null
+  private val registerConnectStatuesCallBackHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      registerConnectStatuesCallBackSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
+  private var registerSomatosensoryGameCallbackChannel: EventChannel? = null
+  private var registerSomatosensoryGameCallbackSink : EventChannel.EventSink? = null
+  private val registerSomatosensoryGameCallbackHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      registerSomatosensoryGameCallbackSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
+  private var registerSingleHeartOxBloodCallbackChannel: EventChannel? = null
+  private var registerSingleHeartOxBloodCallbackSink : EventChannel.EventSink? = null
+  private val registerSingleHeartOxBloodCallbackHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      registerSingleHeartOxBloodCallbackSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     Log.d("MicrowearSdkPlugin","onAttachedToEngine")
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "microwear_sdk")
@@ -189,6 +216,16 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
     getDeviceConfig1Channel = EventChannel(flutterPluginBinding.binaryMessenger, "getDeviceConfig1")
     getDeviceConfig1Channel!!.setStreamHandler(getDeviceConfig1Handler)
+
+    registerConnectStatuesCallBackChannel = EventChannel(flutterPluginBinding.binaryMessenger, "registerConnectStatuesCallBack")
+    registerConnectStatuesCallBackChannel!!.setStreamHandler(registerConnectStatuesCallBackHandler)
+
+    registerSomatosensoryGameCallbackChannel = EventChannel(flutterPluginBinding.binaryMessenger, "registerSomatosensoryGameCallback")
+    registerSomatosensoryGameCallbackChannel!!.setStreamHandler(registerSomatosensoryGameCallbackHandler)
+
+    registerSingleHeartOxBloodCallbackChannel = EventChannel(flutterPluginBinding.binaryMessenger, "registerSingleHeartOxBloodCallback")
+    registerSingleHeartOxBloodCallbackChannel!!.setStreamHandler(registerSingleHeartOxBloodCallbackHandler)
+
   }
 
   override fun onMethodCall(call: MethodCall, result: Result) {
