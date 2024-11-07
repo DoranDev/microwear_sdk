@@ -1,5 +1,6 @@
 package id.doran.microwear_sdk
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.util.Log
@@ -20,13 +21,15 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import java.util.Date
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 /** MicrowearSdkPlugin */
 class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   private lateinit var channel : MethodChannel
   private lateinit var mContext : Context
   private lateinit var mActivity: Activity
-
+  private var gson = Gson()
 
   private var deviceDataReceivedChannel: EventChannel? = null
   private var deviceDataReceivedSink : EventChannel.EventSink? = null
@@ -69,6 +72,24 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   private val deviceConfigHandler = object : EventChannel.StreamHandler {
     override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
       deviceConfigSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
+  private var syncSleepDataChannel: EventChannel? = null
+  private var syncSleepDataSink : EventChannel.EventSink? = null
+  private val syncSleepDataHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      syncSleepDataSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
+  private var syncSportRecordChannel: EventChannel? = null
+  private var syncSportRecordSink : EventChannel.EventSink? = null
+  private val syncSportRecordHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      syncSportRecordSink = eventSink
     }
     override fun onCancel(o: Any?) {}
   }
@@ -172,6 +193,9 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     override fun onCancel(o: Any?) {}
   }
 
+
+
+
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     Log.d("MicrowearSdkPlugin","onAttachedToEngine")
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "microwear_sdk")
@@ -192,6 +216,12 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
     deviceConfigChannel = EventChannel(flutterPluginBinding.binaryMessenger, "deviceConfig")
     deviceConfigChannel!!.setStreamHandler(deviceConfigHandler)
+
+    syncSleepDataChannel = EventChannel(flutterPluginBinding.binaryMessenger, "syncSleepData")
+    syncSleepDataChannel!!.setStreamHandler(syncSleepDataHandler)
+
+    syncSportRecordChannel = EventChannel(flutterPluginBinding.binaryMessenger, "syncSportRecord")
+    syncSportRecordChannel!!.setStreamHandler(syncSportRecordHandler)
 
     getAlarmClockInfoChannel = EventChannel(flutterPluginBinding.binaryMessenger, "getAlarmClockInfo")
     getAlarmClockInfoChannel!!.setStreamHandler(getAlarmClockInfoHandler)
@@ -226,8 +256,10 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     registerSingleHeartOxBloodCallbackChannel = EventChannel(flutterPluginBinding.binaryMessenger, "registerSingleHeartOxBloodCallback")
     registerSingleHeartOxBloodCallbackChannel!!.setStreamHandler(registerSingleHeartOxBloodCallbackHandler)
 
+
   }
 
+  @SuppressLint("CheckResult")
   override fun onMethodCall(call: MethodCall, result: Result) {
     when (call.method) {
       "sendRequest" -> {
@@ -281,6 +313,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 override fun onSuccess(batteryLevel: Int) {
                   LogUtil.e("Battery level: $batteryLevel")
                   //"Battery level: $batteryLevel"
+                  getBatteryLevelSink?.success(batteryLevel)
                 }
 
                 override fun onFail() {
@@ -292,41 +325,71 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
             EVT_TYPE_HOUR_STEP -> {
               NjjProtocolHelper.getInstance().syncHourStep().subscribe {
-                LogUtil.e("Get hourly steps successful")
-                var stringBuffer = StringBuffer()
-                it.forEach {
-                  stringBuffer.append("Steps: ${it.stepNum}  Calories: ${it.calData}")
+                  it?.let {
+                    try {
+                      val jsonResult = gson.toJson(it)
+                      syncHourStepSink?.success(jsonResult)
+                    } catch (e: Exception) {
+                      e.printStackTrace()
+                      syncHourStepSink?.error("Serialization Error", "Failed to serialize result", e.message)
+                    }
+                  }
                 }
-                //stringBuffer.toString()
-              }
             }
 
             EVT_TYPE_HISTORY_SPORT_DATA -> {
               NjjProtocolHelper.getInstance().syncWeekDaySports().subscribe {
-                LogUtil.e("Get seven days data successful")
-                //"Get seven days data successful. Count: ${it.size}"
+                  it?.let {
+                    try {
+                      val jsonResult = gson.toJson(it)
+                      syncWeekDaySportsSink?.success(jsonResult)
+                    } catch (e: Exception) {
+                      e.printStackTrace()
+                      syncWeekDaySportsSink?.error("Serialization Error", "Failed to serialize result", e.message)
+                    }
+                  }
               }
             }
 
             EVT_TYPE_BAND_CONFIG -> {
               NjjProtocolHelper.getInstance().deviceConfig.subscribe {
-                LogUtil.e("Band info: $it")
-                //it.toString()
+                it?.let {
+                    try {
+                      val jsonResult = gson.toJson(it)
+                      deviceConfigSink?.success(jsonResult)
+                    } catch (e: Exception) {
+                      e.printStackTrace()
+                      deviceConfigSink?.error("Serialization Error", "Failed to serialize result", e.message)
+                    }
+                  }
               }
             }
 
             EVT_TYPE_SLEEP_DATA -> {
               NjjProtocolHelper.getInstance().syncSleepData().subscribe {
-                LogUtil.e("Sleep data callback successful")
-                var sleepDetailList = it.sleepDetailList
-                var sleepTime = it.sleepTime
+                  it?.let {
+                    try {
+                      val jsonResult = gson.toJson(it)
+                      syncSleepDataSink?.success(jsonResult)
+                    } catch (e: Exception) {
+                      e.printStackTrace()
+                      syncSleepDataSink?.error("Serialization Error", "Failed to serialize result", e.message)
+                    }
+                  }
               }
             }
 
             EVT_TYPE_SPORT_RECORD -> {
               NjjProtocolHelper.getInstance().syncSportRecord().subscribe {
-                LogUtil.e("Exercise data")
-                //"Sleep data callback successful Date: ${it.date} Steps: ${it.stepNum}"
+                it?.let {
+                  try {
+                    val jsonResult = gson.toJson(it)
+                    syncSportRecordSink?.success(jsonResult)
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    syncSportRecordSink?.error("Serialization Error", "Failed to serialize result", e.message)
+                  }
+                }
               }
             }
 
@@ -568,7 +631,15 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 38 -> {
                   NjjProtocolHelper.getInstance().getAlarmClockInfo().subscribe {
                     LogUtil.e("Get alarm data successful")
-                    //"Get alarm data successful ${it.forEach { it -> it.alarmCycle }}"
+                    it?.let {
+                      try {
+                        val jsonResult = gson.toJson(it)
+                        getAlarmClockInfoSink?.success(jsonResult)
+                      } catch (e: Exception) {
+                        e.printStackTrace()
+                        getAlarmClockInfoSink?.error("Serialization Error", "Failed to serialize result", e.message)
+                      }
+                    }
                   }
                 }
 
@@ -613,49 +684,44 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             EVT_TYPE_BP_DAY -> {
               NjjProtocolHelper.getInstance().syncBloodPressure().subscribe {
                 LogUtil.e("All-day blood pressure callback successful")
-                var stringBuffer = StringBuffer()
-                stringBuffer.append("All-day BP=")
-                it.forEach { njj ->
-                  stringBuffer.append("${njj.diastolicPressure} ")
+                it?.let {
+                  try {
+                    val jsonResult = gson.toJson(it)
+                    syncBloodPressureSink?.success(jsonResult)
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    syncBloodPressureSink?.error("Serialization Error", "Failed to serialize result", e.message)
+                  }
                 }
-                //stringBuffer
               }
             }
 
             EVT_TYPE_HR_DAY -> {
               NjjProtocolHelper.getInstance().syncHeartData().subscribe { it ->
                 LogUtil.e("All-day heart rate callback successful")
-                var stringBuffer = StringBuffer()
-                stringBuffer.append("All-day HR=")
-                it.forEach { njj ->
-                  stringBuffer.append("${njj.heartRate} ")
+                it?.let {
+                  try {
+                    val jsonResult = gson.toJson(it)
+                    syncHeartDataSink?.success(jsonResult)
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    syncHeartDataSink?.error("Serialization Error", "Failed to serialize result", e.message)
+                  }
                 }
-                //stringBuffer
               }
-
-              /* NjjBleHelper.getInstance().syncBloodPressure().subscribe {
-                 LogUtil.e("全天血压回调成功")
-                 it.forEach { njj ->
-                     LogUtil.e(njj.diastolicPressure)
-                 }
-             }
-
-             NjjBleHelper.getInstance().syncOxData().subscribe {
-                 LogUtil.e("全天血氧回调成功")
-                 it.forEach { njj ->
-                     LogUtil.e(njj.bloodOxy)
-                 }
-             }*/
             }
 
             EVT_TYPE_BO_DAY -> {
               NjjProtocolHelper.getInstance().syncOxData().subscribe {
-                var stringBuffer = StringBuffer()
-                stringBuffer.append("All-day SpO2=")
-                it.forEach { njj ->
-                  stringBuffer.append("${njj.bloodOxy} ")
+                it?.let {
+                  try {
+                    val jsonResult = gson.toJson(it)
+                    syncOxDataSink?.success(jsonResult)
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    syncOxDataSink?.error("Serialization Error", "Failed to serialize result", e.message)
+                  }
                 }
-                //stringBuffer
               }
             }
 
