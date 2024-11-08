@@ -263,7 +263,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     when (call.method) {
       "sendRequest" -> {
         val microwearDeviceControl: Int? = call.argument<Int>("microwearDeviceControl")
-        val data: Map<String, Any>? = call.argument<Map<String, Any>>("data")
+        val data: Map<String, Any?>? = call.argument<Map<String, Any?>>("data")
         if (microwearDeviceControl != null) {
           when (microwearDeviceControl) {
             //Watch face push
@@ -293,6 +293,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               NjjProtocolHelper.getInstance().getDeviceInfo(object : NjjFirmwareCallback {
                 override fun onFirmwareSuccess(firmware: String) {
                   LogUtil.e("Firmware version: $firmware")
+                  result.success(firmware)
                   //"Firmware version: $firmware"
                 }
 
@@ -393,9 +394,10 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             EVT_TYPE_UNIT_SYSTEM -> {
-              val pos = 2
-              when (pos) {
-                2 -> NjjProtocolHelper.getInstance().setUnitFormat(true, object : NjjWriteCallback {
+              var isMetricSystem = true
+
+              isMetricSystem = data?.get("isMetricSystem") as? Boolean ?: isMetricSystem
+              NjjProtocolHelper.getInstance().setUnitFormat(isMetricSystem, object : NjjWriteCallback {
                   override fun onWriteSuccess() {
                     LogUtil.e("Command sent successfully")
                     //"Set unit successful"
@@ -403,28 +405,18 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
                   override fun onWriteFail() {
                     //"Set unit failed"
+                    LogUtil.e("Command sent failed")
                   }
-                })
+              })
 
-                3 -> NjjProtocolHelper.getInstance()
-                  .setUnitFormat(false, object : NjjWriteCallback {
-                    override fun onWriteSuccess() {
-                      LogUtil.e("Command sent successfully")
-                      //"Set unit successful"
-                    }
-
-                    override fun onWriteFail() {
-                      //"Set unit failed"
-                    }
-                  })
-              }
             }
 
             EVT_TYPE_TIME_MODE -> {
-              val pos = 5
-              when (pos) {
-                5 -> NjjProtocolHelper.getInstance()
-                  .setTimeFormat(false, object : NjjWriteCallback {
+              var is24 = true
+              is24 = data?.get("is24") as? Boolean ?: is24
+
+              NjjProtocolHelper.getInstance()
+                  .setTimeFormat(is24, object : NjjWriteCallback {
                     override fun onWriteSuccess() {
                       LogUtil.e("Command sent successfully")
                       //"Set time format successful"
@@ -433,24 +425,16 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                     override fun onWriteFail() {
                       //"Set time format failed"
                     }
-                  })
-
-                6 -> NjjProtocolHelper.getInstance().setTimeFormat(true, object : NjjWriteCallback {
-                  override fun onWriteSuccess() {
-                    //"Set time format successful"
-                  }
-
-                  override fun onWriteFail() {
-                    //"Set time format failed"
-                  }
-                })
-              }
+               })
             }
 
             EVT_TYPE_TEMP_UNIT -> {
-              val pos = 7
-              when (pos) {
-                7 -> NjjProtocolHelper.getInstance().setTempUnit(false, object : NjjWriteCallback {
+              var isCen = true
+
+              isCen = data?.get("isCen") as? Boolean ?: isCen
+
+
+              NjjProtocolHelper.getInstance().setTempUnit(isCen, object : NjjWriteCallback {
                   override fun onWriteSuccess() {
                     LogUtil.e("Command sent successfully")
                     //"Command sent successfully"
@@ -460,18 +444,6 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                     //"Command send failed"
                   }
                 })
-
-                8 -> NjjProtocolHelper.getInstance().setTempUnit(true, object : NjjWriteCallback {
-                  override fun onWriteSuccess() {
-                    LogUtil.e("Command sent successfully")
-                    //"Command sent successfully"
-                  }
-
-                  override fun onWriteFail() {
-                    //"Command send failed"
-                  }
-                })
-              }
             }
 
             EVT_TYPE_DATE_TIME -> {
@@ -488,7 +460,11 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             EVT_TYPE_TARGET_STEP -> {
-              NjjProtocolHelper.getInstance().setTargetStep(800, object : NjjWriteCallback {
+              var step = 800
+
+              step = data?.get("step") as? Int ?: step
+
+              NjjProtocolHelper.getInstance().setTargetStep(step, object : NjjWriteCallback {
                 override fun onWriteSuccess() {
                   LogUtil.e("Command sent successfully")
                   //"Set target steps successful"
@@ -501,7 +477,11 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             EVT_TYPE_DISPLAY_TIME -> {
-              NjjProtocolHelper.getInstance().setDisplayTime(10, object : NjjWriteCallback {
+              var time = 10
+
+              time = data?.get("time") as? Int ?: time
+
+              NjjProtocolHelper.getInstance().setDisplayTime(time, object : NjjWriteCallback {
                 override fun onWriteSuccess() {
                   LogUtil.e("Command sent successfully")
                   //"Set screen-on duration successful"
@@ -514,9 +494,16 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             EVT_TYPE_REAL_TIME_WEATHER -> {
+              var tempData = 22
+              var weatherType = 5
+
+              data?.let {
+                tempData = it["tempData"] as? Int ?: tempData
+                weatherType = it["weatherType"] as? Int ?: weatherType
+              }
               var syncWeatherData = NjjSyncWeatherData()
-              syncWeatherData.tempData = 22
-              syncWeatherData.weatherType = 5
+              syncWeatherData.tempData = tempData
+              syncWeatherData.weatherType = weatherType
 
               NjjProtocolHelper.getInstance()
                 .syncWeatherTypeData(syncWeatherData, object : NjjWriteCallback {
@@ -532,10 +519,18 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             EVT_TYPE_RAISE_WRIST -> {
+              var wristScreenStatus = 1
+              var wristScreenBeginTime = 510
+              var wristScreenEndTime = 1120
+              data?.let {
+                wristScreenStatus = it["wristScreenStatus"] as? Int ?: wristScreenStatus
+                wristScreenBeginTime = it["wristScreenBeginTime"] as? Int ?: wristScreenBeginTime
+                wristScreenEndTime = it["wristScreenEndTime"] as? Int ?: wristScreenEndTime
+              }
               var entity = NjjWristScreenEntity()
-              entity.wristScreenStatus = 1
-              entity.wristScreenBeginTime = 510
-              entity.wristScreenEndTime = 1120
+              entity.wristScreenStatus = wristScreenStatus
+              entity.wristScreenBeginTime = wristScreenBeginTime
+              entity.wristScreenEndTime = wristScreenEndTime
               NjjProtocolHelper.getInstance().upHandleScreenOn(entity, object : NjjWriteCallback {
                 override fun onWriteSuccess() {
                   LogUtil.e("Command sent successfully $entity")
@@ -549,11 +544,21 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             EVT_TYPE_DISTURB -> {
+              var disturbStatus = 1
+              var disturbInterval = 5
+              var disturbBeginTime = 510
+              var disturbEndTime = 1120
+              data?.let {
+                disturbStatus = it["disturbStatus"] as? Int ?: disturbStatus
+                disturbInterval = it["disturbInterval"] as? Int ?: disturbInterval
+                disturbBeginTime = it["disturbBeginTime"] as? Int ?: disturbBeginTime
+                disturbEndTime = it["disturbEndTime"] as? Int ?: disturbEndTime
+              }
               var entity = NjjDisturbEntity()
-              entity.disturbStatus = 1
-              entity.disturbInterval = 5
-              entity.disturbBeginTime = 510
-              entity.disturbEndTime = 1120
+              entity.disturbStatus = disturbStatus
+              entity.disturbInterval = disturbInterval
+              entity.disturbBeginTime = disturbBeginTime
+              entity.disturbEndTime = disturbEndTime
               NjjProtocolHelper.getInstance().syncNoDisturbSet(entity, object : NjjWriteCallback {
                 override fun onWriteSuccess() {
                   LogUtil.e("Command sent successfully $entity")
@@ -567,11 +572,21 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             EVT_TYPE_DRINK_WATER -> {
+              var drinkWaterStatus = 1
+              var drinkWaterInterval = 5
+              var drinkWaterBeginTime = 510
+              var drinkWaterEndTime = 1120
+              data?.let {
+                drinkWaterStatus = it["drinkWaterStatus"] as? Int ?: drinkWaterStatus
+                drinkWaterInterval = it["drinkWaterInterval"] as? Int ?: drinkWaterInterval
+                drinkWaterBeginTime = it["drinkWaterBeginTime"] as? Int ?: drinkWaterBeginTime
+                drinkWaterEndTime = it["drinkWaterEndTime"] as? Int ?: drinkWaterEndTime
+              }
               var entity = NjjDrinkWaterEntity()
-              entity.drinkWaterStatus = 1
-              entity.drinkWaterInterval = 5
-              entity.drinkWaterBeginTime = 510
-              entity.drinkWaterEndTime = 1120
+              entity.drinkWaterStatus = drinkWaterStatus
+              entity.drinkWaterInterval = drinkWaterInterval
+              entity.drinkWaterBeginTime = drinkWaterBeginTime
+              entity.drinkWaterEndTime = drinkWaterEndTime
               NjjProtocolHelper.getInstance().syncWaterNotify(entity, object : NjjWriteCallback {
                 override fun onWriteSuccess() {
                   LogUtil.e("Command sent successfully $entity")
@@ -587,11 +602,22 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             EVT_TYPE_WASH_HAND -> {
+              var washHandStatus = 1
+              var washHandInterval = 5
+              var washHandBeginTime = 510
+              var washHandEndTime = 1120
+              data?.let {
+                washHandStatus = it["washHandStatus"] as? Int ?: washHandStatus
+                washHandInterval = it["washHandInterval"] as? Int ?: washHandInterval
+                washHandBeginTime = it["washHandBeginTime"] as? Int ?: washHandBeginTime
+                washHandEndTime = it["washHandEndTime"] as? Int ?: washHandEndTime
+              }
+
               var njjWashHandEntity = NjjWashHandEntity()
-              njjWashHandEntity.washHandStatus = 1
-              njjWashHandEntity.washHandInterval = 5
-              njjWashHandEntity.washHandBeginTime = 510
-              njjWashHandEntity.washHandEndTime = 1120
+              njjWashHandEntity.washHandStatus = washHandStatus
+              njjWashHandEntity.washHandInterval = washHandInterval
+              njjWashHandEntity.washHandBeginTime = washHandBeginTime
+              njjWashHandEntity.washHandEndTime = washHandEndTime
               NjjProtocolHelper.getInstance()
                 .syncWashNotify(njjWashHandEntity, object : NjjWriteCallback {
                   override fun onWriteSuccess() {
@@ -606,11 +632,21 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             EVT_TYPE_LONG_SIT -> {
+              var longSitStatus = 1
+              var longSitInterval = 5
+              var longSitBeginTime = 510
+              var longSitEndTime = 1120
+              data?.let {
+                longSitStatus = it["longSitStatus"] as? Int ?: longSitStatus
+                longSitInterval = it["longSitInterval"] as? Int ?: longSitInterval
+                longSitBeginTime = it["longSitBeginTime"] as? Int ?: longSitBeginTime
+                longSitEndTime = it["longSitEndTime"] as? Int ?: longSitEndTime
+              }
               var commonSetEntity = NjjLongSitEntity()
-              commonSetEntity.longSitStatus = 1
-              commonSetEntity.longSitInterval = 5
-              commonSetEntity.longSitBeginTime = 510
-              commonSetEntity.longSitEndTime = 1120
+              commonSetEntity.longSitStatus = longSitStatus
+              commonSetEntity.longSitInterval = longSitInterval
+              commonSetEntity.longSitBeginTime = longSitBeginTime
+              commonSetEntity.longSitEndTime = longSitEndTime
               NjjProtocolHelper.getInstance()
                 .syncLongSitNotify(commonSetEntity, object : NjjWriteCallback {
                   override fun onWriteSuccess() {
@@ -625,9 +661,12 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             EVT_TYPE_ALARM -> {
-              val pos = 38
-              when (pos) {
-                38 -> {
+              var method = "GET"
+              data?.let {
+                method = it["method"] as? String ?: method
+              }
+              when (method) {
+                "GET" -> {
                   NjjProtocolHelper.getInstance().alarmClockInfo.subscribe {
                     LogUtil.e("Get alarm data successful")
                     it?.let {
@@ -642,40 +681,98 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                   }
                 }
 
-                else -> {
-                  // Add default data if empty
-                  val infos: MutableList<NjjAlarmClockInfo> = ArrayList()
-                  val timeArr = intArrayOf(
-                    6 * 3600,
-                    95 * 360,
-                    12 * 3600,
-                    18 * 3600,
-                    225 * 360,
-                    12 * 3600,
-                    18 * 3600,
-                    225 * 360
-                  )
-                  val cycleArr = intArrayOf(62, 65, 127, 65, 127, 127, 65, 127)
-                  var count = 4
+                "POST" -> {
+                  var index =  0
+                  var mEnabled = 0
+                  var mRepeat: String? = null
+                  var mHour =  0
+                  var mMinute =  0
+                  var listRepeat :List<String> =  emptyList()
+                  data?.let {
+                    index = it["index"] as? Int ?: index
+                    mEnabled = it["mEnabled"] as? Int ?: mEnabled
+                    mRepeat = it["mRepeat"] as? String ?: mRepeat
+                    mHour = it["mHour"] as? Int ?: mHour
+                    mMinute = it["mMinute"] as? Int ?: mMinute
+                    listRepeat = it["listRepeat"] as? List<String> ?: listRepeat
+                  }
 
+                  var bleRepeat = 0
+                  // Map listRepeat items to integer flags if listRepeat is not empty
+                  if (listRepeat.isNotEmpty()) {
+                    for (item in listRepeat) {
+                      val itemRepeat = when (item) {
+                        "MONDAY" -> 0b00000010
+                        "TUESDAY" -> 0b00000100
+                        "WEDNESDAY" -> 0b00001000
+                        "THURSDAY" -> 0b00010000
+                        "FRIDAY" -> 0b00100000
+                        "SATURDAY" -> 0b01000000
+                        "SUNDAY" -> 0b00000001
+                        "ONCE" -> 0b00000000
+                        "WORKDAY" -> 0b00111110 // Monday to Friday
+                        "WEEKEND" -> 0b01000001 // Saturday and Sunday
+                        "EVERYDAY" -> 0b01111111 // All days
+                        else -> null
+                      }
+                      // Add itemRepeat to bleRepeat only if it’s not null
+                      itemRepeat?.let { bleRepeat = bleRepeat or it }
+                    }
+                  }
+                  // If mRepeat is specified, override bleRepeat with the single repeat value
+                  mRepeat?.let {
+                    bleRepeat = when (it) {
+                      "MONDAY" -> 0b00000010
+                      "TUESDAY" -> 0b00000100
+                      "WEDNESDAY" -> 0b00001000
+                      "THURSDAY" -> 0b00010000
+                      "FRIDAY" -> 0b00100000
+                      "SATURDAY" -> 0b01000000
+                      "SUNDAY" -> 0b00000001
+                      "ONCE" -> 0b00000000
+                      "WORKDAY" -> 0b00111110 // Monday to Friday
+                      "WEEKEND" -> 0b01000001 // Saturday and Sunday
+                      "EVERYDAY" -> 0b01111111 // All days
+                      else -> bleRepeat
+                    }
+                  }
+                  // Generate default arrays for time and cycle values
+                  val timeArr = intArrayOf(6 * 3600, 95 * 360, 12 * 3600, 18 * 3600, 225 * 360, 12 * 3600, 18 * 3600, 225 * 360)
+                  val cycleArr = intArrayOf(62, 65, 127, 65, 127, 127, 65, 127)
+                  val infos: MutableList<NjjAlarmClockInfo> = ArrayList()
+                  val count = 4
+
+                  // Loop to add customized alarms to infos
                   for (i in 0 until count) {
+                    // Calculate the alarm time in seconds from mHour and mMinute if this is the indexed alarm
+                    val alarmTime = if (index == i) mHour * 3600 + mMinute * 60 else timeArr[i]
+
+                    // Set alarm cycle to bleRepeat if the current index matches, else use cycleArr default
+                    val alarmCycle = if (index == i) bleRepeat else cycleArr[i]
+
                     infos.add(
                       NjjAlarmClockInfo(
-                        i.toString(), timeArr[i], cycleArr[i], false, true, 0
+                        i.toString(),      // Unique alarm identifier
+                        alarmTime,         // Alarm time in seconds
+                        alarmCycle,        // Alarm cycle based on repeats
+                        mEnabled == 1,     // Alarm state based on mEnabled (true if enabled)
+                         true, // Assuming delete flag is true by default
+                        0           // Set type to 0 as it's not needed
                       )
                     )
                   }
-                  NjjProtocolHelper.getInstance()
-                    .syncAlarmClockInfo(infos, object : NjjWriteCallback {
-                      override fun onWriteSuccess() {
-                        LogUtil.e("Command sent successfully")
-                        //"Alarm setting successful"
-                      }
 
-                      override fun onWriteFail() {
-                        //"Alarm setting failed"
-                      }
-                    })
+                  // Sync the alarm data using NjjProtocolHelper
+                  NjjProtocolHelper.getInstance().syncAlarmClockInfo(infos, object : NjjWriteCallback {
+                    override fun onWriteSuccess() {
+                      LogUtil.e("Command sent successfully")
+                      // "Alarm setting successful"
+                    }
+
+                    override fun onWriteFail() {
+                      // "Alarm setting failed"
+                    }
+                  })
                 }
               }
             }
@@ -738,38 +835,35 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             EVT_TYPE_TAKE_PHOTO -> {
-              val pos = 35
-              when (pos) {
-                35 -> NjjProtocolHelper.getInstance()
-                  .openTakePhotoCamera(true, object : NjjWriteCallback {
-                    override fun onWriteSuccess() {
-                      LogUtil.e("Command sent successfully")
-                      //"Command sent successfully"
-                    }
-
-                    override fun onWriteFail() {
-                      //"Command send failed"
-                    }
-                  })
-
-                36 -> NjjProtocolHelper.getInstance()
-                  .openTakePhotoCamera(false, object : NjjWriteCallback {
-                    override fun onWriteSuccess() {
-                      LogUtil.e("Command sent successfully")
-                      //"Command sent successfully"
-                    }
-
-                    override fun onWriteFail() {
-                      //"Command send failed"
-                    }
-                  })
+              var isOpen = true
+              data?.let {
+                isOpen = it["isOpen"] as? Boolean ?: isOpen
               }
+              NjjProtocolHelper.getInstance()
+                  .openTakePhotoCamera(isOpen, object : NjjWriteCallback {
+                    override fun onWriteSuccess() {
+                      LogUtil.e("Command sent successfully")
+                      //"Command sent successfully"
+                    }
+
+                    override fun onWriteFail() {
+                      //"Command send failed"
+                    }
+               })
             }
 
             // Message push
             EVT_TYPE_ALERT_MSG -> {
+              var messageId = 1
+              var title = "Hello"
+              var value = "Test Message"
+              data?.let {
+                messageId = it["messageId"] as? Int ?: messageId
+                title = it["title"] as? String ?: title
+                value = it["value"] as? String ?: value
+              }
               NjjProtocolHelper.getInstance()
-                .setNotify(4, "Hello", "Test Message", object : NjjWriteCallback {
+                .setNotify(messageId, title, value, object : NjjWriteCallback {
                   override fun onWriteSuccess() {
                     LogUtil.e("Command sent successfully")
                     //"Command sent successfully"
@@ -786,7 +880,14 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             EVT_TYPE_ADD_FRIEND -> {
-              NjjProtocolHelper.getInstance().pushQRCode(0, "https://blog.csdn.net").subscribe {
+              var type = 0
+              var content = "https://blog.csdn.net"
+              data?.let {
+                type = it["type"] as? Int ?: type
+                content = it["content"] as? String ?: content
+              }
+              NjjProtocolHelper.getInstance().pushQRCode(type, content).subscribe {
+                LogUtil.e("Push successful")
                 if (it == 1) {
                   LogUtil.e("Push successful")
                   //"Push successful"
@@ -795,39 +896,35 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             EVT_TYPE_RECEIPT_CODE -> {
-              NjjProtocolHelper.getInstance().pushPayCode(12, "https://blog.csdn.net").subscribe {
+              var type = 12
+              var content = "https://blog.csdn.net"
+              data?.let {
+                type = it["type"] as? Int ?: type
+                content = it["content"] as? String ?: content
+              }
+              NjjProtocolHelper.getInstance().pushPayCode(type, content).subscribe {
                 LogUtil.e("Push successful")
                 //"Push successful"
               }
             }
 
             EVT_TYPE_ANDROID_PHONE_CTRL -> {
-              val pos = 43 
-              when (pos) {
-                43 -> NjjProtocolHelper.getInstance().handUpPhone(0, object : NjjWriteCallback {
-                  override fun onWriteSuccess() {
-                    LogUtil.e("Command sent successfully")
-                    //"Command sent successfully"
-                  }
-
-                  override fun onWriteFail() {
-                    LogUtil.e("Command send failed")
-                    //"Command send failed"
-                  }
-                })
-
-                44 -> NjjProtocolHelper.getInstance().handUpPhone(1, object : NjjWriteCallback {
-                  override fun onWriteSuccess() {
-                    LogUtil.e("Command sent successfully")
-                    //"Command sent successfully"
-                  }
-
-                  override fun onWriteFail() {
-                    LogUtil.e("Command send failed")
-                    //"Command send failed"
-                  }
-                })
+              //hang up 0；Answer 1
+              var type = 0
+              data?.let {
+                type = it["type"] as? Int ?: type
               }
+              NjjProtocolHelper.getInstance().handUpPhone(type, object : NjjWriteCallback {
+                  override fun onWriteSuccess() {
+                    LogUtil.e("Command sent successfully")
+                    //"Command sent successfully"
+                  }
+
+                  override fun onWriteFail() {
+                    LogUtil.e("Command send failed")
+                    //"Command send failed"
+                  }
+                })
             }
 
             EVT_TYPE_APP_REQUEST_SYNC -> {
@@ -899,7 +996,11 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             EVT_TYPE_ECG_HR -> {
-              NjjProtocolHelper.getInstance().syncRealTimeECG(true, object : NjjECGCallBack {
+              var isOpen = true
+              data?.let {
+                isOpen = it["isOpen"] as? Boolean ?: isOpen
+              }
+              NjjProtocolHelper.getInstance().syncRealTimeECG(isOpen, object : NjjECGCallBack {
                 override fun onReceivePPGData(type: Int, time: Int, heart: Int) {
                   LogUtil.e("type=$type  heart=$heart")
                   try {
