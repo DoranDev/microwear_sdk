@@ -5,6 +5,19 @@ import 'package:microwear_sdk/microwear_device_control.dart';
 class MicrowearSdk {
   final methodChannel = const MethodChannel('microwear_sdk');
 
+  /// Connects to the device with the specified [macAddress].
+  Future<void> connect({required String macAddress}) async {
+    final response =
+        await methodChannel.invokeMethod('connect', {'macAddress': macAddress});
+    return response;
+  }
+
+  /// Disconnects from the device.
+  Future<void> disconnect() async {
+    final response = await methodChannel.invokeMethod('disconnect');
+    return response;
+  }
+
   /// Sends a request to the device using the specified [microwearDeviceControl] command
   /// and optional [data] map.
   Future sendRequest(MicrowearDeviceControl microwearDeviceControl,
