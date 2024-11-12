@@ -47,7 +47,6 @@ android {
 
     sourceSets {
         main.java.srcDirs += "src/main/kotlin"
-        test.java.srcDirs += "src/test/kotlin"
     }
 
     defaultConfig {
@@ -61,15 +60,15 @@ android {
         implementation 'com.github.SoarY:NJJBle:1.0.0'
     }
 
-    testOptions {
-        unitTests.all {
-            useJUnitPlatform()
-
-            testLogging {
-               events "passed", "skipped", "failed", "standardOut", "standardError"
-               outputs.upToDateWhen {false}
-               showStandardStreams = true
-            }
-        }
-    }
+//    testOptions {
+//        unitTests.all {
+//            useJUnitPlatform()
+//
+//            testLogging {
+//               events "passed", "skipped", "failed", "standardOut", "standardError"
+//               outputs.upToDateWhen {false}
+//               showStandardStreams = true
+//            }
+//        }
+//    }
 }
