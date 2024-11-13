@@ -6,75 +6,13 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
-import com.njj.njjsdk.callback.CallBackManager
-import com.njj.njjsdk.callback.ConnectStatuesCallBack
-import com.njj.njjsdk.callback.NjjBatteryCallBack
-import com.njj.njjsdk.callback.NjjConfig1CallBack
-import com.njj.njjsdk.callback.NjjDeviceFunCallback
-import com.njj.njjsdk.callback.NjjECGCallBack
-import com.njj.njjsdk.callback.NjjFirmwareCallback
-import com.njj.njjsdk.callback.NjjHomeDataCallBack
-import com.njj.njjsdk.callback.NjjNotifyCallback
-import com.njj.njjsdk.callback.NjjWriteCallback
-import com.njj.njjsdk.callback.SomatosensoryGameCallback
+import com.njj.njjsdk.callback.*
 import com.njj.njjsdk.library.Code
 import com.njj.njjsdk.manger.NJJOtaManage
 import com.njj.njjsdk.manger.NjjBleManger
 import com.njj.njjsdk.manger.NjjProtocolHelper
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_ADD_FRIEND
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_ALARM
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_ALERT_FIND_WATCH
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_ALERT_MSG
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_ALL_DAY_FALG
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_ANDROID_PHONE_CTRL
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_APP_REQUEST_SYNC
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_BAND_CONFIG
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_BAND_CONFIG1
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_BAT
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_BO_DAY
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_BP_DAY
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_DATE_TIME
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_DEVICE_FUN
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_DISPLAY_TIME
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_DISTURB
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_DRINK_WATER
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_ECG_HR
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_FIRMWARE_VER
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_HISTORY_SPORT_DATA
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_HOUR_STEP
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_HR_DAY
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_LONG_SIT
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_OTA_START
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_RAISE_WRIST
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_REAL_TIME_WEATHER
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_RECEIPT_CODE
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_SLEEP_DATA
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_SPORT_RECORD
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_TAKE_PHOTO
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_TARGET_STEP
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_TEMP_UNIT
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_TIME_MODE
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_TP_VER
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_UI_VER
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_UNIT_SYSTEM
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_WASH_HAND
-import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_WOMEN_HEALTH
-import com.njj.njjsdk.protocol.entity.BLEDevice
-import com.njj.njjsdk.protocol.entity.BleDeviceFun
-import com.njj.njjsdk.protocol.entity.NjjAlarmClockInfo
-import com.njj.njjsdk.protocol.entity.NjjBloodOxyData
-import com.njj.njjsdk.protocol.entity.NjjBloodPressure
-import com.njj.njjsdk.protocol.entity.NjjDisturbEntity
-import com.njj.njjsdk.protocol.entity.NjjDrinkWaterEntity
-import com.njj.njjsdk.protocol.entity.NjjEcgData
-import com.njj.njjsdk.protocol.entity.NjjHeartData
-import com.njj.njjsdk.protocol.entity.NjjLongSitEntity
-import com.njj.njjsdk.protocol.entity.NjjMedicineEntity
-import com.njj.njjsdk.protocol.entity.NjjStepData
-import com.njj.njjsdk.protocol.entity.NjjSyncWeatherData
-import com.njj.njjsdk.protocol.entity.NjjWashHandEntity
-import com.njj.njjsdk.protocol.entity.NjjWristScreenEntity
-import com.njj.njjsdk.protocol.entity.SomatosensoryGame
+import com.njj.njjsdk.protocol.cmd.*
+import com.njj.njjsdk.protocol.entity.*
 import com.njj.njjsdk.utils.ApplicationProxy
 import com.njj.njjsdk.utils.LogUtil
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -1294,12 +1232,12 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         }
       }
 
-      override fun onConnectFail(code: Int) {
+      override fun onConnectFail(mac: String?) {
         LogUtil.e("Connection failed")
         try{
           var map =   HashMap<String, Any?>()
           map["status"] = "onConnectFail"
-          map["code"] = code
+          map["mac"] = mac
           registerConnectStatuesCallBackSink?.success(map)
         } catch (e: Exception) {
           e.printStackTrace()
@@ -1307,7 +1245,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         }
       }
 
-      override fun onDiscoveredServices(code: Int) {
+      override fun onDiscoveredServices(code: Int,mac: String?) {
         LogUtil.e("onDiscoveredServices")
         try{
           var map =   HashMap<String, Any?>()
