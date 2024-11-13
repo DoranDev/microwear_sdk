@@ -1185,6 +1185,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     Log.d("MicrowearSdkPlugin","onAttachedToActivity")
     mActivity = binding.activity
     NJJOtaManage.getInstance().init(mActivity.application)
+    NjjBleManger.getInstance().init(mActivity.application)
     ApplicationProxy.getInstance().setApplication(mActivity.application)
     CallBackManager.getInstance().registerConnectStatuesCallBack("", object : ConnectStatuesCallBack.ICallBack {
       override fun onConnected(mac: String?) {
