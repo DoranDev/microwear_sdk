@@ -6,13 +6,75 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
-import com.njj.njjsdk.callback.*
+import com.njj.njjsdk.callback.CallBackManager
+import com.njj.njjsdk.callback.ConnectStatuesCallBack
+import com.njj.njjsdk.callback.NjjBatteryCallBack
+import com.njj.njjsdk.callback.NjjConfig1CallBack
+import com.njj.njjsdk.callback.NjjDeviceFunCallback
+import com.njj.njjsdk.callback.NjjECGCallBack
+import com.njj.njjsdk.callback.NjjFirmwareCallback
+import com.njj.njjsdk.callback.NjjHomeDataCallBack
+import com.njj.njjsdk.callback.NjjNotifyCallback
+import com.njj.njjsdk.callback.NjjWriteCallback
+import com.njj.njjsdk.callback.SomatosensoryGameCallback
 import com.njj.njjsdk.library.Code
 import com.njj.njjsdk.manger.NJJOtaManage
 import com.njj.njjsdk.manger.NjjBleManger
 import com.njj.njjsdk.manger.NjjProtocolHelper
-import com.njj.njjsdk.protocol.cmd.*
-import com.njj.njjsdk.protocol.entity.*
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_ADD_FRIEND
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_ALARM
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_ALERT_FIND_WATCH
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_ALERT_MSG
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_ALL_DAY_FALG
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_ANDROID_PHONE_CTRL
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_APP_REQUEST_SYNC
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_BAND_CONFIG
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_BAND_CONFIG1
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_BAT
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_BO_DAY
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_BP_DAY
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_DATE_TIME
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_DEVICE_FUN
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_DISPLAY_TIME
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_DISTURB
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_DRINK_WATER
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_ECG_HR
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_FIRMWARE_VER
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_HISTORY_SPORT_DATA
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_HOUR_STEP
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_HR_DAY
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_LONG_SIT
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_OTA_START
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_RAISE_WRIST
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_REAL_TIME_WEATHER
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_RECEIPT_CODE
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_SLEEP_DATA
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_SPORT_RECORD
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_TAKE_PHOTO
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_TARGET_STEP
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_TEMP_UNIT
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_TIME_MODE
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_TP_VER
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_UI_VER
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_UNIT_SYSTEM
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_WASH_HAND
+import com.njj.njjsdk.protocol.cmd.ruiyu.EVT_TYPE_WOMEN_HEALTH
+import com.njj.njjsdk.protocol.entity.BLEDevice
+import com.njj.njjsdk.protocol.entity.BleDeviceFun
+import com.njj.njjsdk.protocol.entity.NjjAlarmClockInfo
+import com.njj.njjsdk.protocol.entity.NjjBloodOxyData
+import com.njj.njjsdk.protocol.entity.NjjBloodPressure
+import com.njj.njjsdk.protocol.entity.NjjDisturbEntity
+import com.njj.njjsdk.protocol.entity.NjjDrinkWaterEntity
+import com.njj.njjsdk.protocol.entity.NjjEcgData
+import com.njj.njjsdk.protocol.entity.NjjHeartData
+import com.njj.njjsdk.protocol.entity.NjjLongSitEntity
+import com.njj.njjsdk.protocol.entity.NjjMedicineEntity
+import com.njj.njjsdk.protocol.entity.NjjStepData
+import com.njj.njjsdk.protocol.entity.NjjSyncWeatherData
+import com.njj.njjsdk.protocol.entity.NjjWashHandEntity
+import com.njj.njjsdk.protocol.entity.NjjWristScreenEntity
+import com.njj.njjsdk.protocol.entity.SomatosensoryGame
 import com.njj.njjsdk.utils.ApplicationProxy
 import com.njj.njjsdk.utils.LogUtil
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -284,8 +346,10 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     when (call.method) {
       "connect" -> {
         val macAddress = call.argument<String>("macAddress")
+        LogUtil.e("connect $macAddress")
         val bleDevice = createBLEDeviceFromMac(macAddress)
         if (bleDevice != null) {
+          LogUtil.e("bleDevice != null")
           NjjBleManger.getInstance().clearRequest(bleDevice.device.address)
           NjjBleManger.getInstance().connectionRequest(bleDevice)
         }
@@ -357,57 +421,57 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
             EVT_TYPE_HOUR_STEP -> {
               NjjProtocolHelper.getInstance().syncHourStep().subscribe {
-                  it?.let {
-                    try {
-                      val jsonResult = gson.toJson(it)
-                      syncHourStepSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
-                    } catch (e: Exception) {
-                      e.printStackTrace()
-                      syncHourStepSink?.error("Serialization Error", "Failed to serialize result", e.message)
-                    }
+                it?.let {
+                  try {
+                    val jsonResult = gson.toJson(it)
+                    syncHourStepSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    syncHourStepSink?.error("Serialization Error", "Failed to serialize result", e.message)
                   }
                 }
+              }
             }
 
             EVT_TYPE_HISTORY_SPORT_DATA -> {
               NjjProtocolHelper.getInstance().syncWeekDaySports().subscribe {
-                  it?.let {
-                    try {
-                      val jsonResult = gson.toJson(it)
-                      syncWeekDaySportsSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
-                    } catch (e: Exception) {
-                      e.printStackTrace()
-                      syncWeekDaySportsSink?.error("Serialization Error", "Failed to serialize result", e.message)
-                    }
+                it?.let {
+                  try {
+                    val jsonResult = gson.toJson(it)
+                    syncWeekDaySportsSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    syncWeekDaySportsSink?.error("Serialization Error", "Failed to serialize result", e.message)
                   }
+                }
               }
             }
 
             EVT_TYPE_BAND_CONFIG -> {
               NjjProtocolHelper.getInstance().deviceConfig.subscribe {
                 it?.let {
-                    try {
-                      val jsonResult = gson.toJson(it)
-                      deviceConfigSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
-                    } catch (e: Exception) {
-                      e.printStackTrace()
-                      deviceConfigSink?.error("Serialization Error", "Failed to serialize result", e.message)
-                    }
+                  try {
+                    val jsonResult = gson.toJson(it)
+                    deviceConfigSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    deviceConfigSink?.error("Serialization Error", "Failed to serialize result", e.message)
                   }
+                }
               }
             }
 
             EVT_TYPE_SLEEP_DATA -> {
               NjjProtocolHelper.getInstance().syncSleepData().subscribe {
-                  it?.let {
-                    try {
-                      val jsonResult = gson.toJson(it)
-                      syncSleepDataSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
-                    } catch (e: Exception) {
-                      e.printStackTrace()
-                      syncSleepDataSink?.error("Serialization Error", "Failed to serialize result", e.message)
-                    }
+                it?.let {
+                  try {
+                    val jsonResult = gson.toJson(it)
+                    syncSleepDataSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    syncSleepDataSink?.error("Serialization Error", "Failed to serialize result", e.message)
                   }
+                }
               }
             }
 
@@ -430,15 +494,15 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
               isMetricSystem = data?.get("isMetricSystem") as? Boolean ?: isMetricSystem
               NjjProtocolHelper.getInstance().setUnitFormat(isMetricSystem, object : NjjWriteCallback {
-                  override fun onWriteSuccess() {
-                    LogUtil.e("Command sent successfully")
-                    //"Set unit successful"
-                  }
+                override fun onWriteSuccess() {
+                  LogUtil.e("Command sent successfully")
+                  //"Set unit successful"
+                }
 
-                  override fun onWriteFail() {
-                    //"Set unit failed"
-                    LogUtil.e("Command sent failed")
-                  }
+                override fun onWriteFail() {
+                  //"Set unit failed"
+                  LogUtil.e("Command sent failed")
+                }
               })
 
             }
@@ -448,16 +512,16 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               is24 = data?.get("is24") as? Boolean ?: is24
 
               NjjProtocolHelper.getInstance()
-                  .setTimeFormat(is24, object : NjjWriteCallback {
-                    override fun onWriteSuccess() {
-                      LogUtil.e("Command sent successfully")
-                      //"Set time format successful"
-                    }
+                .setTimeFormat(is24, object : NjjWriteCallback {
+                  override fun onWriteSuccess() {
+                    LogUtil.e("Command sent successfully")
+                    //"Set time format successful"
+                  }
 
-                    override fun onWriteFail() {
-                      //"Set time format failed"
-                    }
-               })
+                  override fun onWriteFail() {
+                    //"Set time format failed"
+                  }
+                })
             }
 
             EVT_TYPE_TEMP_UNIT -> {
@@ -467,15 +531,15 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
 
               NjjProtocolHelper.getInstance().setTempUnit(isCen, object : NjjWriteCallback {
-                  override fun onWriteSuccess() {
-                    LogUtil.e("Command sent successfully")
-                    //"Command sent successfully"
-                  }
+                override fun onWriteSuccess() {
+                  LogUtil.e("Command sent successfully")
+                  //"Command sent successfully"
+                }
 
-                  override fun onWriteFail() {
-                    //"Command send failed"
-                  }
-                })
+                override fun onWriteFail() {
+                  //"Command send failed"
+                }
+              })
             }
 
             EVT_TYPE_DATE_TIME -> {
@@ -788,7 +852,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                         alarmTime,         // Alarm time in seconds
                         alarmCycle,        // Alarm cycle based on repeats
                         mEnabled == 1,     // Alarm state based on mEnabled (true if enabled)
-                         true, // Assuming delete flag is true by default
+                        true, // Assuming delete flag is true by default
                         0           // Set type to 0 as it's not needed
                       )
                     )
@@ -872,16 +936,16 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 isOpen = it["isOpen"] as? Boolean ?: isOpen
               }
               NjjProtocolHelper.getInstance()
-                  .openTakePhotoCamera(isOpen, object : NjjWriteCallback {
-                    override fun onWriteSuccess() {
-                      LogUtil.e("Command sent successfully")
-                      //"Command sent successfully"
-                    }
+                .openTakePhotoCamera(isOpen, object : NjjWriteCallback {
+                  override fun onWriteSuccess() {
+                    LogUtil.e("Command sent successfully")
+                    //"Command sent successfully"
+                  }
 
-                    override fun onWriteFail() {
-                      //"Command send failed"
-                    }
-               })
+                  override fun onWriteFail() {
+                    //"Command send failed"
+                  }
+                })
             }
 
             // Message push
@@ -947,16 +1011,16 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 type = it["type"] as? Int ?: type
               }
               NjjProtocolHelper.getInstance().handUpPhone(type, object : NjjWriteCallback {
-                  override fun onWriteSuccess() {
-                    LogUtil.e("Command sent successfully")
-                    //"Command sent successfully"
-                  }
+                override fun onWriteSuccess() {
+                  LogUtil.e("Command sent successfully")
+                  //"Command sent successfully"
+                }
 
-                  override fun onWriteFail() {
-                    LogUtil.e("Command send failed")
-                    //"Command send failed"
-                  }
-                })
+                override fun onWriteFail() {
+                  LogUtil.e("Command send failed")
+                  //"Command send failed"
+                }
+              })
             }
 
             EVT_TYPE_APP_REQUEST_SYNC -> {
@@ -968,23 +1032,23 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                   njjBloodPressure: NjjBloodPressure,
                   njjBloodOxyData: NjjBloodOxyData
                 ) {
-                    try {
-                      val njjEcgDatajsonResult = gson.toJson(njjEcgData)
-                      val njjHeartDatajsonResult = gson.toJson(njjHeartData)
-                      val njjStepDatajsonResult = gson.toJson(njjStepData)
-                      val njjBloodPressurejsonResult = gson.toJson(njjBloodPressure)
-                      val njjBloodOxyDatajsonResult = gson.toJson(njjBloodOxyData)
-                      var map =   HashMap<String, Any?>()
-                      map["ecgData"] = gson.fromJson(njjEcgDatajsonResult, HashMap::class.java)
-                      map["heartData"] = gson.fromJson(njjHeartDatajsonResult, HashMap::class.java)
-                      map["stepData"] = gson.fromJson(njjStepDatajsonResult, HashMap::class.java)
-                      map["bloodPressure"] = gson.fromJson(njjBloodPressurejsonResult, HashMap::class.java)
-                      map["bloodOxyData"] = gson.fromJson(njjBloodOxyDatajsonResult, HashMap::class.java)
-                      syncHomeDataSink?.success(map)
-                    } catch (e: Exception) {
-                      e.printStackTrace()
-                      syncHomeDataSink?.error("Serialization Error", "Failed to serialize result", e.message)
-                    }
+                  try {
+                    val njjEcgDatajsonResult = gson.toJson(njjEcgData)
+                    val njjHeartDatajsonResult = gson.toJson(njjHeartData)
+                    val njjStepDatajsonResult = gson.toJson(njjStepData)
+                    val njjBloodPressurejsonResult = gson.toJson(njjBloodPressure)
+                    val njjBloodOxyDatajsonResult = gson.toJson(njjBloodOxyData)
+                    var map =   HashMap<String, Any?>()
+                    map["ecgData"] = gson.fromJson(njjEcgDatajsonResult, HashMap::class.java)
+                    map["heartData"] = gson.fromJson(njjHeartDatajsonResult, HashMap::class.java)
+                    map["stepData"] = gson.fromJson(njjStepDatajsonResult, HashMap::class.java)
+                    map["bloodPressure"] = gson.fromJson(njjBloodPressurejsonResult, HashMap::class.java)
+                    map["bloodOxyData"] = gson.fromJson(njjBloodOxyDatajsonResult, HashMap::class.java)
+                    syncHomeDataSink?.success(map)
+                  } catch (e: Exception) {
+                    e.printStackTrace()
+                    syncHomeDataSink?.error("Serialization Error", "Failed to serialize result", e.message)
+                  }
 
                 }
               })
@@ -1083,7 +1147,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
             EVT_TYPE_BAND_CONFIG1 -> {
               NjjProtocolHelper.getInstance().getDeviceConfig1(object : NjjConfig1CallBack {
-                var map =   HashMap<String, Any?>() 
+                var map =   HashMap<String, Any?>()
                 override fun onWriteSuccess() {
                   Log.e("onWriteSuccess", "getDeviceConfig1")
                 }
@@ -1168,9 +1232,9 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
           }
         }
       }
-       else -> result.notImplemented()
-      }
+      else -> result.notImplemented()
     }
+  }
 
   override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
     channel.setMethodCallHandler(null)
@@ -1209,7 +1273,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             map["mac"] = mac
             registerConnectStatuesCallBackSink?.success(map)
           }
-          } catch (e: Exception) {
+        } catch (e: Exception) {
           e.printStackTrace()
           registerConnectStatuesCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
         }
@@ -1230,27 +1294,26 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         }
       }
 
-      override fun onConnectFail(mac: String?) {
+      override fun onConnectFail(code: Int) {
         LogUtil.e("Connection failed")
         try{
           var map =   HashMap<String, Any?>()
           map["status"] = "onConnectFail"
-          map["macAddress"] = mac
+          map["code"] = code
           registerConnectStatuesCallBackSink?.success(map)
-          } catch (e: Exception) {
+        } catch (e: Exception) {
           e.printStackTrace()
           registerConnectStatuesCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
         }
       }
 
-      override fun onDiscoveredServices(code: Int,macAddress: String) {
+      override fun onDiscoveredServices(code: Int) {
         LogUtil.e("onDiscoveredServices")
         try{
           var map =   HashMap<String, Any?>()
           map["status"] = "onDiscoveredServices"
           map["code"] = code
           map["code_name"] = Code.toString(code)
-          map["macAddress"] = macAddress
           registerConnectStatuesCallBackSink?.success(map)
         } catch (e: Exception) {
           e.printStackTrace()
@@ -1382,6 +1445,6 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   override fun onDetachedFromActivity() {
-     Log.d("MicrowearSdkPlugin","onDetachedFromActivity")
+    Log.d("MicrowearSdkPlugin","onDetachedFromActivity")
   }
 }
