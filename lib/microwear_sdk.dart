@@ -23,7 +23,7 @@ class MicrowearSdk {
   Future sendRequest(MicrowearDeviceControl microwearDeviceControl,
       {Map? data}) async {
     final response = await methodChannel.invokeMethod('sendRequest',
-        {'microwearDeviceControl': microwearDeviceControl, 'data': data});
+        {'microwearDeviceControl': microwearDeviceControl.value, 'data': data});
     return response;
   }
 
