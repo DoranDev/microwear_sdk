@@ -14,6 +14,7 @@ import com.njj.njjsdk.manger.NjjProtocolHelper
 import com.njj.njjsdk.protocol.cmd.*
 import com.njj.njjsdk.protocol.entity.*
 import com.njj.njjsdk.utils.ApplicationProxy
+import com.njj.njjsdk.utils.BleBeaconUtil
 import com.njj.njjsdk.utils.LogUtil
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -23,9 +24,9 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import java.util.Date
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.util.Date
 
 
 /** MicrowearSdkPlugin */
@@ -55,15 +56,16 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     return null // Return null if unable to create the BLEDevice
   }
 
-  // Helper function to create a synthetic scan record with the NJYID
+
+  // Helper function to create a synthetic scan record with the NJYID in the correct format
   private fun generateScanRecordWithNJYID(): ByteArray {
-    val idBytes = "BCBC".toByteArray(Charsets.UTF_8)
-    val manufacturerData = byteArrayOf(0xFF.toByte()) + idBytes
+    val idBytes = byteArrayOf(0xBC.toByte(), 0xBC.toByte()) // "BCBC" as hex bytes
+    val manufacturerData = byteArrayOf(0xFF.toByte()) + idBytes // Manufacturer data type (0xFF) + ID bytes
 
     val buffer = ByteBuffer.allocate(manufacturerData.size + 2)
     buffer.order(ByteOrder.LITTLE_ENDIAN)
-    buffer.put(manufacturerData.size.toByte())
-    buffer.put(manufacturerData)
+    buffer.put((manufacturerData.size).toByte()) // Length of this data field
+    buffer.put(manufacturerData) // Manufacturer data with "ID"
 
     return buffer.array()
   }
@@ -301,12 +303,23 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     when (call.method) {
       "connect" -> {
         val macAddress = call.argument<String>("macAddress")
-        LogUtil.e("connect $macAddress")
+        LogUtil.d("connect $macAddress")
         val bleDevice = createBLEDeviceFromMac(macAddress)
         if (bleDevice != null) {
-          LogUtil.e("bleDevice != null")
+          LogUtil.d("bleDevice != null")
           NjjBleManger.getInstance().clearRequest(bleDevice.device.address)
-          NjjBleManger.getInstance().connectionRequest(bleDevice)
+
+          val beaconMap = BleBeaconUtil.parseData(bleDevice.getScanRecord())
+          val id = beaconMap["ID"]
+          if (id != null) {
+            if (!id.startsWith("BCBC")) {
+                  LogUtil.d("connect fail no BCBC: ${beaconMap}")
+            }else{
+               NjjBleManger.getInstance().connectionRequest(bleDevice)
+            }
+          }else{
+            LogUtil.d("connect fail no id: ${beaconMap}")
+          }
         }
       }
       "disconnect" -> {
@@ -325,12 +338,12 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             EVT_TYPE_ALERT_FIND_WATCH -> {
               NjjProtocolHelper.getInstance().findMe(object : NjjWriteCallback {
                 override fun onWriteSuccess() {
-                  LogUtil.e("Find watch successful")
+                  LogUtil.d("Find watch successful")
                   //"Find watch successful"
                 }
 
                 override fun onWriteFail() {
-                  LogUtil.e("Find watch failed")
+                  LogUtil.d("Find watch failed")
                   //"Find watch failed"
                 }
               })
@@ -343,13 +356,13 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             EVT_TYPE_FIRMWARE_VER -> {
               NjjProtocolHelper.getInstance().getDeviceInfo(object : NjjFirmwareCallback {
                 override fun onFirmwareSuccess(firmware: String) {
-                  LogUtil.e("Firmware version: $firmware")
+                  LogUtil.d("Firmware version: $firmware")
                   result.success(firmware)
                   //"Firmware version: $firmware"
                 }
 
                 override fun onFirmwareFail() {
-                  LogUtil.e("Get failed")
+                  LogUtil.d("Get failed")
                   //"Get device info failed"
                 }
               })
@@ -362,13 +375,13 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             EVT_TYPE_BAT -> {
               NjjProtocolHelper.getInstance().getBatteryLevel(object : NjjBatteryCallBack {
                 override fun onSuccess(batteryLevel: Int) {
-                  LogUtil.e("Battery level: $batteryLevel")
+                  LogUtil.d("Battery level: $batteryLevel")
                   //"Battery level: $batteryLevel"
                   getBatteryLevelSink?.success(batteryLevel)
                 }
 
                 override fun onFail() {
-                  LogUtil.e("Get battery level failed")
+                  LogUtil.d("Get battery level failed")
 
                 }
               })
@@ -450,13 +463,13 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               isMetricSystem = data?.get("isMetricSystem") as? Boolean ?: isMetricSystem
               NjjProtocolHelper.getInstance().setUnitFormat(isMetricSystem, object : NjjWriteCallback {
                 override fun onWriteSuccess() {
-                  LogUtil.e("Command sent successfully")
+                  LogUtil.d("Command sent successfully")
                   //"Set unit successful"
                 }
 
                 override fun onWriteFail() {
                   //"Set unit failed"
-                  LogUtil.e("Command sent failed")
+                  LogUtil.d("Command sent failed")
                 }
               })
 
@@ -469,7 +482,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               NjjProtocolHelper.getInstance()
                 .setTimeFormat(is24, object : NjjWriteCallback {
                   override fun onWriteSuccess() {
-                    LogUtil.e("Command sent successfully")
+                    LogUtil.d("Command sent successfully")
                     //"Set time format successful"
                   }
 
@@ -487,7 +500,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
               NjjProtocolHelper.getInstance().setTempUnit(isCen, object : NjjWriteCallback {
                 override fun onWriteSuccess() {
-                  LogUtil.e("Command sent successfully")
+                  LogUtil.d("Command sent successfully")
                   //"Command sent successfully"
                 }
 
@@ -500,7 +513,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             EVT_TYPE_DATE_TIME -> {
               NjjProtocolHelper.getInstance().syncTime(object : NjjWriteCallback {
                 override fun onWriteSuccess() {
-                  LogUtil.e("Command sent successfully")
+                  LogUtil.d("Command sent successfully")
                   //"Time sync successful"
                 }
 
@@ -517,7 +530,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
               NjjProtocolHelper.getInstance().setTargetStep(step, object : NjjWriteCallback {
                 override fun onWriteSuccess() {
-                  LogUtil.e("Command sent successfully")
+                  LogUtil.d("Command sent successfully")
                   //"Set target steps successful"
                 }
 
@@ -534,7 +547,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
               NjjProtocolHelper.getInstance().setDisplayTime(time, object : NjjWriteCallback {
                 override fun onWriteSuccess() {
-                  LogUtil.e("Command sent successfully")
+                  LogUtil.d("Command sent successfully")
                   //"Set screen-on duration successful"
                 }
 
@@ -559,7 +572,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               NjjProtocolHelper.getInstance()
                 .syncWeatherTypeData(syncWeatherData, object : NjjWriteCallback {
                   override fun onWriteSuccess() {
-                    LogUtil.e("Command sent successfully")
+                    LogUtil.d("Command sent successfully")
                     //"Set weather successful"
                   }
 
@@ -584,7 +597,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               entity.wristScreenEndTime = wristScreenEndTime
               NjjProtocolHelper.getInstance().upHandleScreenOn(entity, object : NjjWriteCallback {
                 override fun onWriteSuccess() {
-                  LogUtil.e("Command sent successfully $entity")
+                  LogUtil.d("Command sent successfully $entity")
                   //"Set raise to wake successful"
                 }
 
@@ -612,7 +625,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               entity.disturbEndTime = disturbEndTime
               NjjProtocolHelper.getInstance().syncNoDisturbSet(entity, object : NjjWriteCallback {
                 override fun onWriteSuccess() {
-                  LogUtil.e("Command sent successfully $entity")
+                  LogUtil.d("Command sent successfully $entity")
                   //"Set Do Not Disturb successful"
                 }
 
@@ -640,8 +653,8 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               entity.drinkWaterEndTime = drinkWaterEndTime
               NjjProtocolHelper.getInstance().syncWaterNotify(entity, object : NjjWriteCallback {
                 override fun onWriteSuccess() {
-                  LogUtil.e("Command sent successfully $entity")
-                  LogUtil.e("Command sent successfully")
+                  LogUtil.d("Command sent successfully $entity")
+                  LogUtil.d("Command sent successfully")
                   //"Set water reminder successful"
                 }
 
@@ -672,7 +685,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               NjjProtocolHelper.getInstance()
                 .syncWashNotify(njjWashHandEntity, object : NjjWriteCallback {
                   override fun onWriteSuccess() {
-                    LogUtil.e("Command sent successfully $njjWashHandEntity")
+                    LogUtil.d("Command sent successfully $njjWashHandEntity")
                     //"Set Do Not Disturb successful"
                   }
 
@@ -701,7 +714,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               NjjProtocolHelper.getInstance()
                 .syncLongSitNotify(commonSetEntity, object : NjjWriteCallback {
                   override fun onWriteSuccess() {
-                    LogUtil.e("Command sent successfully=$commonSetEntity")
+                    LogUtil.d("Command sent successfully=$commonSetEntity")
                     //"Command sent successfully"
                   }
 
@@ -719,7 +732,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               when (method) {
                 "GET" -> {
                   NjjProtocolHelper.getInstance().alarmClockInfo.subscribe {
-                    LogUtil.e("Get alarm data successful")
+                    LogUtil.d("Get alarm data successful")
                     it?.let {
                       try {
                         val jsonResult = gson.toJson(it)
@@ -816,7 +829,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                   // Sync the alarm data using NjjProtocolHelper
                   NjjProtocolHelper.getInstance().syncAlarmClockInfo(infos, object : NjjWriteCallback {
                     override fun onWriteSuccess() {
-                      LogUtil.e("Command sent successfully")
+                      LogUtil.d("Command sent successfully")
                       // "Alarm setting successful"
                     }
 
@@ -830,7 +843,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
             EVT_TYPE_BP_DAY -> {
               NjjProtocolHelper.getInstance().syncBloodPressure().subscribe {
-                LogUtil.e("All-day blood pressure callback successful")
+                LogUtil.d("All-day blood pressure callback successful")
                 it?.let {
                   try {
                     val jsonResult = gson.toJson(it)
@@ -845,7 +858,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
             EVT_TYPE_HR_DAY -> {
               NjjProtocolHelper.getInstance().syncHeartData().subscribe { it ->
-                LogUtil.e("All-day heart rate callback successful")
+                LogUtil.d("All-day heart rate callback successful")
                 it?.let {
                   try {
                     val jsonResult = gson.toJson(it)
@@ -875,7 +888,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             EVT_TYPE_ALL_DAY_FALG -> {
               NjjProtocolHelper.getInstance().syncHeartMonitor(1, object : NjjWriteCallback {
                 override fun onWriteSuccess() {
-                  LogUtil.e("Command sent successfully")
+                  LogUtil.d("Command sent successfully")
                   //"Command sent successfully"
                 }
 
@@ -893,7 +906,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               NjjProtocolHelper.getInstance()
                 .openTakePhotoCamera(isOpen, object : NjjWriteCallback {
                   override fun onWriteSuccess() {
-                    LogUtil.e("Command sent successfully")
+                    LogUtil.d("Command sent successfully")
                     //"Command sent successfully"
                   }
 
@@ -916,7 +929,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               NjjProtocolHelper.getInstance()
                 .setNotify(messageId, title, value, object : NjjWriteCallback {
                   override fun onWriteSuccess() {
-                    LogUtil.e("Command sent successfully")
+                    LogUtil.d("Command sent successfully")
                     //"Command sent successfully"
                   }
 
@@ -938,9 +951,9 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 content = it["content"] as? String ?: content
               }
               NjjProtocolHelper.getInstance().pushQRCode(type, content).subscribe {
-                LogUtil.e("Push successful")
+                LogUtil.d("Push successful")
                 if (it == 1) {
-                  LogUtil.e("Push successful")
+                  LogUtil.d("Push successful")
                   //"Push successful"
                 }
               }
@@ -954,7 +967,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 content = it["content"] as? String ?: content
               }
               NjjProtocolHelper.getInstance().pushPayCode(type, content).subscribe {
-                LogUtil.e("Push successful")
+                LogUtil.d("Push successful")
                 //"Push successful"
               }
             }
@@ -967,12 +980,12 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               }
               NjjProtocolHelper.getInstance().handUpPhone(type, object : NjjWriteCallback {
                 override fun onWriteSuccess() {
-                  LogUtil.e("Command sent successfully")
+                  LogUtil.d("Command sent successfully")
                   //"Command sent successfully"
                 }
 
                 override fun onWriteFail() {
-                  LogUtil.e("Command send failed")
+                  LogUtil.d("Command send failed")
                   //"Command send failed"
                 }
               })
@@ -1017,7 +1030,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
               NjjProtocolHelper.getInstance().syncRealTimeECG(false, object : NjjECGCallBack {
                 override fun onReceivePPGData(type: Int, time: Int, heart: Int) {
-                  LogUtil.e("type=$type  heart=$heart")
+                  LogUtil.d("type=$type  heart=$heart")
                   try {
                     var map =   HashMap<String, Any?>()
                     map["isOpen"] = false
@@ -1032,7 +1045,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
 
                 override fun onECGReceiveEnd(type: Int) {
-                  LogUtil.e("type=$type")
+                  LogUtil.d("type=$type")
                   try {
                     var map =   HashMap<String, Any?>()
                     map["isOpen"] = false
@@ -1053,7 +1066,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               }
               NjjProtocolHelper.getInstance().syncRealTimeECG(isOpen, object : NjjECGCallBack {
                 override fun onReceivePPGData(type: Int, time: Int, heart: Int) {
-                  LogUtil.e("type=$type  heart=$heart")
+                  LogUtil.d("type=$type  heart=$heart")
                   try {
                     var map =   HashMap<String, Any?>()
                     map["isOpen"] = true
@@ -1068,7 +1081,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
 
                 override fun onECGReceiveEnd(type: Int) {
-                  LogUtil.e("type=$type")
+                  LogUtil.d("type=$type")
                   try {
                     var map =   HashMap<String, Any?>()
                     map["isOpen"] = true
@@ -1108,7 +1121,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
 
                 override fun onLongSitEntity(njjLongSitEntity: NjjLongSitEntity) {
-                  LogUtil.e(njjLongSitEntity.toString())
+                  LogUtil.d(njjLongSitEntity.toString())
                   try {
                     val jsonResult = gson.toJson(njjLongSitEntity)
                     map["njjLongSitEntity"] = gson.fromJson(jsonResult, HashMap::class.java)
@@ -1120,7 +1133,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
 
                 override fun onNjjDrinkWaterEntity(njjDrinkWaterEntity: NjjDrinkWaterEntity) {
-                  LogUtil.e(njjDrinkWaterEntity.toString())
+                  LogUtil.d(njjDrinkWaterEntity.toString())
                   try{
                     val jsonResult = gson.toJson(njjDrinkWaterEntity)
                     map["njjDrinkWaterEntity"] = gson.fromJson(jsonResult, HashMap::class.java)
@@ -1132,7 +1145,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
 
                 override fun onNjjWashHandEntity(njjWashHandEntity: NjjWashHandEntity) {
-                  LogUtil.e(njjWashHandEntity.toString())
+                  LogUtil.d(njjWashHandEntity.toString())
                   try{
                     val jsonResult = gson.toJson(njjWashHandEntity)
                     map["njjWashHandEntity"] = gson.fromJson(jsonResult, HashMap::class.java)
@@ -1144,7 +1157,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
 
                 override fun onNjjWristScreenEntity(njjWristScreenEntity: NjjWristScreenEntity) {
-                  LogUtil.e(njjWristScreenEntity.toString())
+                  LogUtil.d(njjWristScreenEntity.toString())
                   try{
                     val jsonResult = gson.toJson(njjWristScreenEntity)
                     map["njjWristScreenEntity"] = gson.fromJson(jsonResult, HashMap::class.java)
@@ -1156,7 +1169,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
 
                 override fun onNjjDisturbEntity(njjDisturbEntity: NjjDisturbEntity) {
-                  LogUtil.e(njjDisturbEntity.toString())
+                  LogUtil.d(njjDisturbEntity.toString())
                   try{
                     val jsonResult = gson.toJson(njjDisturbEntity)
                     map["njjDisturbEntity"] = gson.fromJson(jsonResult, HashMap::class.java)
@@ -1168,7 +1181,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
 
                 override fun onNjjMedicineEntity(njjMedicineEntity: NjjMedicineEntity) {
-                  LogUtil.e(njjMedicineEntity.toString())
+                  LogUtil.d(njjMedicineEntity.toString())
                   try{
                     val jsonResult = gson.toJson(njjMedicineEntity)
                     map["njjMedicineEntity"] = gson.fromJson(jsonResult, HashMap::class.java)
@@ -1206,7 +1219,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     ApplicationProxy.getInstance().setApplication(mActivity.application)
     CallBackManager.getInstance().registerConnectStatuesCallBack("", object : ConnectStatuesCallBack.ICallBack {
       override fun onConnected(mac: String?) {
-        LogUtil.e("Connection successful")
+        LogUtil.d("Connection successful")
         try{
           if (mac != null) {
             var map =   HashMap<String, Any?>()
@@ -1221,7 +1234,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       }
 
       override fun onConnecting(mac: String?) {
-        LogUtil.e("Connecting")
+        LogUtil.d("Connecting")
         try{
           if (mac != null) {
             var map =   HashMap<String, Any?>()
@@ -1236,7 +1249,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       }
 
       override fun onDisConnected(mac: String?) {
-        LogUtil.e("Disconnect")
+        LogUtil.d("Disconnect")
         try{
           if (mac != null) {
             var map =   HashMap<String, Any?>()
@@ -1251,7 +1264,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       }
 
       override fun onConnectFail(mac: String?) {
-        LogUtil.e("Connection failed")
+        LogUtil.d("Connection failed")
         try{
           var map =   HashMap<String, Any?>()
           map["status"] = "onConnectFail"
@@ -1264,7 +1277,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       }
 
       override fun onDiscoveredServices(code: Int,mac: String?) {
-        LogUtil.e("onDiscoveredServices")
+        LogUtil.d("onDiscoveredServices")
         try{
           var map =   HashMap<String, Any?>()
           map["status"] = "onDiscoveredServices"
@@ -1280,7 +1293,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     })
     CallBackManager.getInstance().registerSomatosensoryGameCallback(object :SomatosensoryGameCallback.ICallBack{
       override fun onReceiveData(somatosensoryGame: SomatosensoryGame?) {
-        LogUtil.e(somatosensoryGame.toString())
+        LogUtil.d(somatosensoryGame.toString())
         try{
           val jsonResult = gson.toJson(somatosensoryGame)
           registerSomatosensoryGameCallbackSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
@@ -1291,7 +1304,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       }
 
       override fun onReceiveStatus(status: Int) {
-        LogUtil.e("onReceiveStatus: $status")
+        LogUtil.d("onReceiveStatus: $status")
       }
 
     })
@@ -1300,7 +1313,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       object : NjjNotifyCallback {
 
         override fun onBloodPressureData(systolicPressure: Int, diastolicPressure: Int) {
-          LogUtil.e("Single Blood Pressure: $systolicPressure/$diastolicPressure")
+          LogUtil.d("Single Blood Pressure: $systolicPressure/$diastolicPressure")
           try {
             var mapDetail =  HashMap<String, Any?>()
             mapDetail["systolicPressure"] = systolicPressure
@@ -1315,7 +1328,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         }
 
         override fun onHeartRateData(rate: Int) {
-          LogUtil.e("Single Heart Rate: $rate")
+          LogUtil.d("Single Heart Rate: $rate")
           try {
             var map =  HashMap<String, Any?>()
             map["onHeartRateData"] = rate
@@ -1327,7 +1340,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         }
 
         override fun onOxyData(rate: Int) {
-          LogUtil.e("Single Blood Oxygen: $rate")
+          LogUtil.d("Single Blood Oxygen: $rate")
           try {
             var map =  HashMap<String, Any?>()
             map["onOxyData"] = rate
@@ -1339,7 +1352,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         }
 
         override fun takePhone(value: Int) {
-          LogUtil.e("Take Photo: $value")
+          LogUtil.d("Take Photo: $value")
           try {
             var map =  HashMap<String, Any?>()
             map["takePhone"] = value
@@ -1351,7 +1364,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         }
 
         override fun onStepData(njjStepData: NjjStepData?) {
-          LogUtil.e("Calories: ${njjStepData?.calData} Steps: ${njjStepData?.stepNum} Distance: ${njjStepData?.distance}")
+          LogUtil.d("Calories: ${njjStepData?.calData} Steps: ${njjStepData?.stepNum} Distance: ${njjStepData?.distance}")
           try {
             val jsonResult = gson.toJson(njjStepData)
             var map =  HashMap<String, Any?>()
@@ -1364,7 +1377,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         }
 
         override fun findPhone(value: Int) {
-          LogUtil.e("Find Phone: $value")
+          LogUtil.d("Find Phone: $value")
           try {
             var map =  HashMap<String, Any?>()
             map["findPhone"] = value
@@ -1385,7 +1398,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             registerSingleHeartOxBloodCallbackSink?.error("Serialization Error", "Failed to serialize result", e.message)
           }
           if (value == 0) {
-            LogUtil.e("End Call")
+            LogUtil.d("End Call")
           }
         }
       })
