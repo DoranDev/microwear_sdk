@@ -24,6 +24,8 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import java.util.Date
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 
 /** MicrowearSdkPlugin */
@@ -42,13 +44,28 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       val device = bluetoothAdapter.getRemoteDevice(macAddress)
 
       // Create and populate the BLEDevice
-      val bleDevice = BLEDevice()
-      bleDevice.device = device
+      val bleDevice = BLEDevice().apply {
+        this.device = device
+        this.rssi = -100 // Set a default RSSI value
+        this.scanRecord = generateScanRecordWithNJYID() // Generate scan record with NJYID "ID" field
+      }
 
-      // You can also set other fields if you have the values, e.g., RSSI, projectNo, etc.
       return bleDevice
     }
     return null // Return null if unable to create the BLEDevice
+  }
+
+  // Helper function to create a synthetic scan record with the NJYID
+  private fun generateScanRecordWithNJYID(): ByteArray {
+    val idBytes = "BCBC".toByteArray(Charsets.UTF_8)
+    val manufacturerData = byteArrayOf(0xFF.toByte()) + idBytes
+
+    val buffer = ByteBuffer.allocate(manufacturerData.size + 2)
+    buffer.order(ByteOrder.LITTLE_ENDIAN)
+    buffer.put(manufacturerData.size.toByte())
+    buffer.put(manufacturerData)
+
+    return buffer.array()
   }
 
   private var deviceDataReceivedChannel: EventChannel? = null
