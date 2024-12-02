@@ -25,14 +25,12 @@ class MicrowearSdk {
   /// and optional [data] map.
   Future sendRequest(MicrowearDeviceControl microwearDeviceControl,
       {Map? data}) async {
-    final argument = {
-      'microwearDeviceControl': microwearDeviceControl.value,
-      'data': data
-    };
     if (kDebugMode) {
-      log(argument.toString(), name: "MicroWear sendRequest");
+      log("${microwearDeviceControl.name}: $data",
+          name: "MicroWear sendRequest");
     }
-    final response = await methodChannel.invokeMethod('sendRequest', argument);
+    final response = await methodChannel.invokeMethod('sendRequest',
+        {'microwearDeviceControl': microwearDeviceControl.value, 'data': data});
     return response;
   }
 
