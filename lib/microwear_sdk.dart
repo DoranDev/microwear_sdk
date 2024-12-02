@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:microwear_sdk/microwear_device_control.dart';
 
@@ -22,8 +25,14 @@ class MicrowearSdk {
   /// and optional [data] map.
   Future sendRequest(MicrowearDeviceControl microwearDeviceControl,
       {Map? data}) async {
-    final response = await methodChannel.invokeMethod('sendRequest',
-        {'microwearDeviceControl': microwearDeviceControl.value, 'data': data});
+    final argument = {
+      'microwearDeviceControl': microwearDeviceControl.value,
+      'data': data
+    };
+    if (kDebugMode) {
+      log(argument.toString(), name: "MicroWear sendRequest");
+    }
+    final response = await methodChannel.invokeMethod('sendRequest', argument);
     return response;
   }
 
