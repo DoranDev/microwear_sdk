@@ -22,6 +22,20 @@ class MicrowearSdk {
     });
   }
 
+  /// getBondState with the specified BLE device.
+  Future<void> getBondState(String macAddress) async {
+    await methodChannel.invokeMethod('getBondState', {
+      'macAddress': macAddress,
+    });
+  }
+
+  /// getConnectStatus with the specified BLE device.
+  Future<void> getConnectStatus(String macAddress) async {
+    await methodChannel.invokeMethod('getConnectStatus', {
+      'macAddress': macAddress,
+    });
+  }
+
   /// Registers to listen for connection status of the specified BLE device.
   Future<void> registerConnectStatus(String macAddress) async {
     await methodChannel.invokeMethod('registerConnectStatue', {

@@ -329,6 +329,14 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         val macAddress = call.argument<String>("macAddress")
         NjjBleManger.getInstance().creteBond(macAddress)
       }
+      "getBondState" -> {
+        val macAddress = call.argument<String>("macAddress")
+        NjjBleManger.getInstance().bluetoothClient.getBondState(macAddress)
+      }
+      "getConnectStatus" -> {
+        val macAddress = call.argument<String>("macAddress")
+        NjjBleManger.getInstance().bluetoothClient.getConnectStatus(macAddress)
+      }
       "registerConnectStatue" -> {
         val macAddress = call.argument<String>("macAddress")
         NjjBleManger.getInstance().registerConnectStatue(macAddress)
