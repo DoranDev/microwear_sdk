@@ -325,6 +325,17 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       "disconnect" -> {
         NjjBleManger.getInstance().disConnection()
       }
+      "creteBond" -> {
+        val macAddress = call.argument<String>("macAddress")
+        NjjBleManger.getInstance().creteBond(macAddress)
+      }
+      "registerConnectStatue" -> {
+        val macAddress = call.argument<String>("macAddress")
+        NjjBleManger.getInstance().registerConnectStatue(macAddress)
+      }
+      "unregisterConnectStatue" -> {
+        NjjBleManger.getInstance().unregisterConnectStatue()
+      }
       "sendRequest" -> {
         val microwearDeviceControl: Int? = call.argument<Int>("microwearDeviceControl")
         val data: Map<String, Any?>? = call.argument<Map<String, Any?>>("data")

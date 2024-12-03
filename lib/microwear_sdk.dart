@@ -15,6 +15,25 @@ class MicrowearSdk {
     return response;
   }
 
+  /// Creates a bond with the specified BLE device.
+  Future<void> createBond(String macAddress) async {
+    await methodChannel.invokeMethod('creteBond', {
+      'macAddress': macAddress,
+    });
+  }
+
+  /// Registers to listen for connection status of the specified BLE device.
+  Future<void> registerConnectStatus(String macAddress) async {
+    await methodChannel.invokeMethod('registerConnectStatue', {
+      'macAddress': macAddress,
+    });
+  }
+
+  /// Unregisters the connection status listener.
+  Future<void> unregisterConnectStatus() async {
+    await methodChannel.invokeMethod('unregisterConnectStatue');
+  }
+
   /// Disconnects from the device.
   Future<void> disconnect() async {
     final response = await methodChannel.invokeMethod('disconnect');
