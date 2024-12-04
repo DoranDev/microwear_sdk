@@ -265,6 +265,14 @@ class MicrowearSdk {
       await sendRequest(MicrowearDeviceControl.androidPhoneCtrl,
           data: {"type": type});
 
+  /// Push Contact Dial
+  /// Uses [MicrowearDeviceControl.otaStart].
+  Future startPushContactDial({required List listContact}) async =>
+      await sendRequest(MicrowearDeviceControl.otaStart, data: {
+        "otaType": "startPushContactDial",
+        "listContact": listContact
+      });
+
   /// Opens or closes the real-time ECG monitoring.
   /// [isOpen] specifies whether to open or close the ECG monitoring.
   /// Uses [MicrowearDeviceControl.ecgHr].
