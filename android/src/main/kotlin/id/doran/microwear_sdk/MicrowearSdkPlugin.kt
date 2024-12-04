@@ -1226,7 +1226,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-    channel.setMethodCallHandler(null)
+//    channel.setMethodCallHandler(null)
     Log.d("MicrowearSdkPlugin","onDetachedFromActivity")
   }
 
