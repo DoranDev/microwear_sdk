@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.njj.njjsdk.callback.CallBackManager
 import com.njj.njjsdk.callback.ConnectStatuesCallBack
 import com.njj.njjsdk.callback.NjjBatteryCallBack
@@ -377,9 +378,9 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
           val id = beaconMap["ID"]
           if (id != null) {
             if (!id.startsWith("BCBC")) {
-                  LogUtil.d("connect fail no BCBC: ${beaconMap}")
+              LogUtil.d("connect fail no BCBC: ${beaconMap}")
             }else{
-               NjjBleManger.getInstance().connectionRequest(bleDevice)
+              NjjBleManger.getInstance().connectionRequest(bleDevice)
             }
           }else{
             LogUtil.d("connect fail no id: ${beaconMap}")
@@ -817,15 +818,33 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               when (method) {
                 "GET" -> {
                   NjjProtocolHelper.getInstance().alarmClockInfo.subscribe {
-                    LogUtil.d("Get alarm data successful")
                     it?.let {
                       try {
+                        // Serialize the list to JSON
                         val jsonResult = gson.toJson(it)
-                        getAlarmClockInfoSink?.success(gson.fromJson(jsonResult, HashMap::class.java))
+
+                        LogUtil.d("Serialized JSON result: $jsonResult")
+
+                        // Deserialize back to a List of Maps (or other suitable format)
+                        val deserializedData = gson.fromJson(jsonResult, List::class.java)
+                        getAlarmClockInfoSink?.success(deserializedData)
+                      } catch (e: JsonSyntaxException) {
+                        LogUtil.e("Deserialization failed: ${e.message}")
+                        getAlarmClockInfoSink?.error(
+                          "Serialization Error",
+                          "Failed to serialize result due to JSON structure mismatch",
+                          e.message
+                        )
                       } catch (e: Exception) {
                         e.printStackTrace()
-                        getAlarmClockInfoSink?.error("Serialization Error", "Failed to serialize result", e.message)
+                        getAlarmClockInfoSink?.error(
+                          "Serialization Error",
+                          "An unexpected error occurred",
+                          e.message
+                        )
                       }
+
+
                     }
                   }
                 }
@@ -1042,10 +1061,10 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                     }
                   }
                   for (cont in listContact) {
-                      var emergencyContact = EmergencyContact()
-                      emergencyContact.contactName = cont["displayName"]
-                      emergencyContact.phoneNumber = cont["phone"]
-                      contactList.add(emergencyContact)
+                    var emergencyContact = EmergencyContact()
+                    emergencyContact.contactName = cont["displayName"]
+                    emergencyContact.phoneNumber = cont["phone"]
+                    contactList.add(emergencyContact)
                   }
                   njjPushDataHelper.startPushContactDial(contactList, object :
                     NjjPushDataHelper.NJjPushListener {
