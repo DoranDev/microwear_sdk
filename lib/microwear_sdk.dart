@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:microwear_sdk/microwear_device_control.dart';
+import 'package:microwear_sdk/microwear_weather_data.dart';
 
 /// A class to interact with the Microwear SDK using method channels.
 class MicrowearSdk {
@@ -115,6 +116,23 @@ class MicrowearSdk {
       {required int tempData, required int weatherType}) async {
     final response = await sendRequest(MicrowearDeviceControl.realTimeWeather,
         data: {"tempData": tempData, "weatherType": weatherType});
+    return response;
+  }
+
+  /// Synchronizes the weather forecast (max 7) on the device with [tempData] and [weatherType].
+  /// Uses [MicrowearDeviceControl.weatherForecast].
+  Future syncWeatherForecast(
+      {required List<MicrowearWeatherData> listMicrowearWeatherData}) async {
+    // Ensure the list contains at most 7 items
+    if (listMicrowearWeatherData.length > 7) {
+      throw ArgumentError('The list of weather data must not exceed 7 items.');
+    }
+    final response =
+        await sendRequest(MicrowearDeviceControl.weatherForecast, data: {
+      "weathers": listMicrowearWeatherData
+          .map((e) => {"tempData": e.tempData, "weatherType": e.weatherType})
+          .toList(),
+    });
     return response;
   }
 

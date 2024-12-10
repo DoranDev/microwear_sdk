@@ -194,8 +194,14 @@ enum MicrowearDeviceControl {
   /// Sync 3.0 device MAC + name
   watchCallInfo(122),
 
+  /// GPS Sport
+  gpsSport(124),
+
   /// Motion game
   motionGame(126),
+
+  ///stock
+  stock(138),
 
   /// OTA start command
   otaStart(200),
@@ -204,7 +210,16 @@ enum MicrowearDeviceControl {
   otaData(201),
 
   /// OTA end
-  otaEnd(202);
+  otaEnd(202),
+
+  /// OTA Big start command
+  otaBigStart(206),
+
+  /// OTA Big data command
+  otaBigData(207),
+
+  /// OTA Big end
+  otaBigEnd(208);
 
   final int value;
   const MicrowearDeviceControl(this.value);

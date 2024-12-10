@@ -52,6 +52,7 @@ import com.njj.njjsdk.protocol.cmd.EVT_TYPE_REAL_TIME_WEATHER
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_RECEIPT_CODE
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_SLEEP_DATA
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_SPORT_RECORD
+import com.njj.njjsdk.protocol.cmd.EVT_TYPE_STOCK
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_TAKE_PHOTO
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_TARGET_STEP
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_TEMP_UNIT
@@ -60,10 +61,12 @@ import com.njj.njjsdk.protocol.cmd.EVT_TYPE_TP_VER
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_UI_VER
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_UNIT_SYSTEM
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_WASH_HAND
+import com.njj.njjsdk.protocol.cmd.EVT_TYPE_WEATHER_FORECAST
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_WOMEN_HEALTH
 import com.njj.njjsdk.protocol.entity.BLEDevice
 import com.njj.njjsdk.protocol.entity.BleDeviceFun
 import com.njj.njjsdk.protocol.entity.EmergencyContact
+import com.njj.njjsdk.protocol.entity.NJJWeatherData
 import com.njj.njjsdk.protocol.entity.NjjAlarmClockInfo
 import com.njj.njjsdk.protocol.entity.NjjBloodOxyData
 import com.njj.njjsdk.protocol.entity.NjjBloodPressure
@@ -666,6 +669,50 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                     //"Set weather failed"
                   }
                 })
+            }
+
+            EVT_TYPE_WEATHER_FORECAST -> {
+              var listRaw :List<Map<String, Int>> =  emptyList()
+              data?.let {
+                listRaw = it["weathers"] as List<Map<String, Int>>
+              }
+
+              var listWeather : MutableList<NJJWeatherData> = mutableListOf()
+
+              listRaw.forEach { item ->
+                val tempData = item["tempData"]
+                val weatherType = item["weatherType"]
+
+                val weatherData = NJJWeatherData()
+                weatherData.tempData = tempData!!
+                weatherData.weatherType = weatherType!!
+
+                listWeather.add(weatherData)
+              }
+
+              NjjProtocolHelper.getInstance()
+                .syncWeekWeatherTypeData(listWeather)
+            }
+
+            EVT_TYPE_STOCK -> {
+              var count = 0
+              var id = 0
+              var code = ""
+              var companyName = ""
+              var currentPrice = ""
+              var changePercent = ""
+
+              data?.let {
+                count = it["count"] as Int
+                id = it["id"] as Int
+                code = it["code"] as String
+                companyName = it["companyName"] as String
+                currentPrice = it["currentPrice"] as String
+                changePercent = it["changePercent"] as String
+              }
+
+              NjjProtocolHelper.getInstance()
+                .sendStock(count, id, code, companyName, currentPrice, changePercent)
             }
 
             EVT_TYPE_RAISE_WRIST -> {
