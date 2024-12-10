@@ -297,6 +297,25 @@ class MicrowearSdk {
   Future syncRealTimeECG({required bool isOpen}) async =>
       await sendRequest(MicrowearDeviceControl.ecgHr, data: {"isOpen": isOpen});
 
+  /// Uses [MicrowearDeviceControl.stock].
+  Future sendStock(
+      {required int count,
+      required int id,
+      required String code,
+      required String companyName,
+      required String currentPrice,
+      required String changePercent}) async {
+    final response = await sendRequest(MicrowearDeviceControl.stock, data: {
+      "count": count,
+      "id": id,
+      "code": code,
+      "companyName": companyName,
+      "currentPrice": currentPrice,
+      "changePercent": changePercent
+    });
+    return response;
+  }
+
   final EventChannel _deviceDataReceivedChannel =
       const EventChannel('deviceDataReceived');
 
