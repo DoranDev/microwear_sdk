@@ -9,6 +9,8 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.njj.njjsdk.callback.CallBackManager
 import com.njj.njjsdk.callback.ConnectStatuesCallBack
+import com.njj.njjsdk.callback.GPSCallback
+import com.njj.njjsdk.callback.Mac3CallBack
 import com.njj.njjsdk.callback.NjjBatteryCallBack
 import com.njj.njjsdk.callback.NjjConfig1CallBack
 import com.njj.njjsdk.callback.NjjDeviceFunCallback
@@ -16,6 +18,7 @@ import com.njj.njjsdk.callback.NjjECGCallBack
 import com.njj.njjsdk.callback.NjjFirmwareCallback
 import com.njj.njjsdk.callback.NjjHomeDataCallBack
 import com.njj.njjsdk.callback.NjjNotifyCallback
+import com.njj.njjsdk.callback.NjjStockCallback
 import com.njj.njjsdk.callback.NjjWriteCallback
 import com.njj.njjsdk.callback.SomatosensoryGameCallback
 import com.njj.njjsdk.library.Code
@@ -42,6 +45,7 @@ import com.njj.njjsdk.protocol.cmd.EVT_TYPE_DISTURB
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_DRINK_WATER
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_ECG_HR
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_FIRMWARE_VER
+import com.njj.njjsdk.protocol.cmd.EVT_TYPE_GPS_SPORT
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_HISTORY_SPORT_DATA
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_HOUR_STEP
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_HR_DAY
@@ -63,9 +67,11 @@ import com.njj.njjsdk.protocol.cmd.EVT_TYPE_UNIT_SYSTEM
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_WASH_HAND
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_WEATHER_FORECAST
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_WOMEN_HEALTH
+import com.njj.njjsdk.protocol.cmd.TypeConstant.GPS_CMD_GPS
 import com.njj.njjsdk.protocol.entity.BLEDevice
 import com.njj.njjsdk.protocol.entity.BleDeviceFun
 import com.njj.njjsdk.protocol.entity.EmergencyContact
+import com.njj.njjsdk.protocol.entity.NJJGPSSportEntity
 import com.njj.njjsdk.protocol.entity.NJJWeatherData
 import com.njj.njjsdk.protocol.entity.NjjAlarmClockInfo
 import com.njj.njjsdk.protocol.entity.NjjBloodOxyData
@@ -301,6 +307,23 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
 
+  private var registerMac3CallBackChannel: EventChannel? = null
+  private var registerMac3CallBackSink : EventChannel.EventSink? = null
+  private val registerMac3CallBackHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      registerMac3CallBackSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
+  private var registerGPSCallbackCallBackChannel: EventChannel? = null
+  private var registerGPSCallbackCallBackSink : EventChannel.EventSink? = null
+  private val registerGPSCallbackCallBackHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      registerGPSCallbackCallBackSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
 
 
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -362,6 +385,12 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
     registerSingleHeartOxBloodCallbackChannel = EventChannel(flutterPluginBinding.binaryMessenger, "registerSingleHeartOxBloodCallback")
     registerSingleHeartOxBloodCallbackChannel!!.setStreamHandler(registerSingleHeartOxBloodCallbackHandler)
+
+    registerMac3CallBackChannel = EventChannel(flutterPluginBinding.binaryMessenger, "registerMac3CallBack")
+    registerMac3CallBackChannel!!.setStreamHandler(registerMac3CallBackHandler)
+
+    registerGPSCallbackCallBackChannel = EventChannel(flutterPluginBinding.binaryMessenger, "registerGPSCallbackCallBack")
+    registerGPSCallbackCallBackChannel!!.setStreamHandler(registerGPSCallbackCallBackHandler)
 
   }
 
@@ -714,6 +743,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               NjjProtocolHelper.getInstance()
                 .sendStock(count, id, code, companyName, currentPrice, changePercent)
             }
+
 
             EVT_TYPE_RAISE_WRIST -> {
               var wristScreenStatus = 1
@@ -1389,6 +1419,76 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
               })
             }
+
+            EVT_TYPE_GPS_SPORT -> {
+              var func = "startGPSData"
+              data?.let {
+                func = it["func"] as? String ?: func
+              }
+
+              when (func) {
+                "startGPSStatus" -> {
+                  var tipe = 0
+                  var status = 0
+                  data?.let {
+                    tipe = it["tipe"] as? Int ?: tipe
+                    status = it["status"] as? Int ?: status
+                  }
+                  /**
+                   * Reply to the status of the APP when the watch starts.
+                   *
+                   * @param type
+                   * GPS_CMD_GPS = 0 //Request GPS positioning rights:
+                   * GPS_CMD_APP_BUSY = 7 //APP is busy and cannot respond at this time
+                   *
+                   * @param status
+                   * - 1: GPS open reply
+                   * - 0: GPS closed reply
+                   */
+                  NjjProtocolHelper.getInstance().startGPSStatus(tipe, status)
+                }
+                "sendGPSStatus" -> {
+                  var tipe = 0
+                  var sportId = 0
+                  data?.let {
+                    tipe = it["tipe"] as? Int ?: tipe
+                    sportId = it["sportId"] as? Int ?: sportId
+                  }
+                  /**
+                   * Send the status of the current movement.
+                   *
+                   * @param type
+                   * GPS_CMD_PAUSE= 4, //Pause
+                   * GPS_CMD_CONTINUE= 5, //Continue
+                   * GPS_CMD_END= 6, //End
+                   *
+                   * @param sportId The ID of the current sport activity.
+                   */
+                  NjjProtocolHelper.getInstance().sendGPSStatus(tipe, sportId)
+                }
+                "syncGPSData" -> {
+                  var gpsSportEntity = NJJGPSSportEntity()
+                  data?.let {
+                    gpsSportEntity.sportHr = it["sportHr"] as Int
+                    gpsSportEntity.sportValid = it["sportValid"] as Int
+                    gpsSportEntity.sportType = it["sportType"] as Int
+                    gpsSportEntity.sportTime = it["sportTime"] as Int
+                    gpsSportEntity.sportSteps = it["sportSteps"] as Int
+                    gpsSportEntity.sportKcal = it["sportKcal"] as Int
+                    gpsSportEntity.sportDistance = it["sportDistance"] as Int
+                    gpsSportEntity.sportSpeed = it["sportSpeed"] as Int
+                    gpsSportEntity.sportCadence = it["sportCadence"] as Int
+                    gpsSportEntity.sportStride = it["sportStride"] as Int
+                  }
+                  /**
+                   * Synchronize the sports data of the mobile phone.
+                   *
+                   * @param gpsSportEntity The data entity containing GPS sport information.
+                   */
+                  NjjProtocolHelper.getInstance().syncGPSData(gpsSportEntity)
+                }
+              }
+            }
           }
         }
       }
@@ -1594,6 +1694,127 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
           }
         }
       })
+
+    CallBackManager.getInstance().registerStockCallback(object :NjjStockCallback.ICallBack{
+      override fun onReceiveData() {
+        TODO("Not yet implemented")
+      }
+    })
+
+    CallBackManager.getInstance().registerMac3CallBack(object :Mac3CallBack.ICallBack{
+      override fun onSuccess(mac: String?) {
+        LogUtil.d("onSuccess: $mac")
+        try {
+          var map =  HashMap<String, Any?>()
+          map["status"] = "onSuccess"
+          map["mac"] = mac
+          registerMac3CallBackSink?.success(map)
+        } catch (e: Exception) {
+          e.printStackTrace()
+          registerMac3CallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+        }
+      }
+
+      override fun onFail() {
+        LogUtil.d("onFail")
+        try {
+          var map =  HashMap<String, Any?>()
+          map["status"] = "onFail"
+          registerMac3CallBackSink?.success(map)
+        } catch (e: Exception) {
+          e.printStackTrace()
+          registerMac3CallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+        }
+      }
+    })
+
+    CallBackManager.getInstance().registerGPSCallbackCallBack(object : GPSCallback.ICallBack {
+      override fun onGPSPermission() {
+        try {
+          var map =  HashMap<String, Any?>()
+          map["status"] = "onGPSPermission"
+          registerGPSCallbackCallBackSink?.success(map)
+        } catch (e: Exception) {
+          e.printStackTrace()
+          registerGPSCallbackCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+        }
+      }
+
+      override fun onGPSCountdown(sportId: Int) {
+        try {
+          var map =  HashMap<String, Any?>()
+          map["status"] = "onGPSCountdown"
+          map["sportId"] = sportId
+          registerGPSCallbackCallBackSink?.success(map)
+        } catch (e: Exception) {
+          e.printStackTrace()
+          registerGPSCallbackCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+        }
+      }
+
+      override fun onGPSStart(sportId: Int) {
+        try {
+          var map =  HashMap<String, Any?>()
+          map["status"] = "onGPSStart"
+          map["sportId"] = sportId
+          registerGPSCallbackCallBackSink?.success(map)
+        } catch (e: Exception) {
+          e.printStackTrace()
+          registerGPSCallbackCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+        }
+
+      }
+
+      override fun onGPSSync(gpsSportEntity: NJJGPSSportEntity?) {
+        try {
+          var map =  HashMap<String, Any?>()
+          map["status"] = "onGPSSync"
+          val jsonResult = gson.toJson(gpsSportEntity)
+          map["gpsSportEntity"] = gson.fromJson(jsonResult, HashMap::class.java)
+          registerGPSCallbackCallBackSink?.success(map)
+        } catch (e: Exception) {
+          e.printStackTrace()
+          registerGPSCallbackCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+        }
+      }
+
+      override fun onGPSPause(sportId: Int) {
+        try {
+          var map =  HashMap<String, Any?>()
+          map["status"] = "onGPSPause"
+          map["sportId"] = sportId
+          registerGPSCallbackCallBackSink?.success(map)
+        } catch (e: Exception) {
+          e.printStackTrace()
+          registerGPSCallbackCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+        }
+      }
+
+      override fun onGPSContinue(sportId: Int) {
+        try {
+          var map =  HashMap<String, Any?>()
+          map["status"] = "onGPSContinue"
+          map["sportId"] = sportId
+          registerGPSCallbackCallBackSink?.success(map)
+        } catch (e: Exception) {
+          e.printStackTrace()
+          registerGPSCallbackCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+        }
+      }
+
+      override fun onGPSEnd(sportId: Int) {
+        try {
+          var map =  HashMap<String, Any?>()
+          map["status"] = "onGPSEnd"
+          map["sportId"] = sportId
+          registerGPSCallbackCallBackSink?.success(map)
+        } catch (e: Exception) {
+          e.printStackTrace()
+          registerGPSCallbackCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+        }
+      }
+
+    })
 
   }
 

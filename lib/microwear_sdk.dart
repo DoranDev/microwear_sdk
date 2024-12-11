@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:microwear_sdk/microwear_device_control.dart';
+import 'package:microwear_sdk/microwear_gps_command.dart';
 import 'package:microwear_sdk/microwear_weather_data.dart';
 
 /// A class to interact with the Microwear SDK using method channels.
@@ -312,6 +313,84 @@ class MicrowearSdk {
       "companyName": companyName,
       "currentPrice": currentPrice,
       "changePercent": changePercent
+    });
+    return response;
+  }
+
+  /// Uses [MicrowearDeviceControl.gpsSport].
+  ///
+  ///
+  /// Reply to the status of the APP when the watch starts.
+  ///
+  /// @param type
+  /// GPS_CMD_GPS = 0 //Request GPS positioning rights: [MicrowearGpsCommand.requestPermission]
+  /// GPS_CMD_APP_BUSY = 7 //APP is busy and cannot respond at this time [MicrowearGpsCommand.appBusy]
+  ///
+  /// @param status
+  /// - 1: GPS open reply
+  /// - 0: GPS closed reply
+  ///
+  ///
+  Future startGPSStatus(
+      {required MicrowearGpsCommand type, required int status}) async {
+    final response = await sendRequest(MicrowearDeviceControl.gpsSport, data: {
+      "func": "startGPSStatus",
+      "type": type.value,
+      "status": status,
+    });
+    return response;
+  }
+
+  /// Uses [MicrowearDeviceControl.gpsSport].
+  ///
+  ///
+  /// Reply to the status of the APP when the watch starts.
+  ///
+  /// @param type
+  /// GPS_CMD_PAUSE= 4, //Pause [MicrowearGpsCommand.pauseActivity]
+  /// GPS_CMD_CONTINUE= 5, //Continue [MicrowearGpsCommand.resumeActivity]
+  /// GPS_CMD_END= 6, //End [MicrowearGpsCommand.endActivity]
+  ///
+  /// @param sportId
+  /// The ID of the current sport activity.
+  ///
+  ///
+  Future sendGPSStatus(
+      {required MicrowearGpsCommand type, required int sportId}) async {
+    final response = await sendRequest(MicrowearDeviceControl.gpsSport, data: {
+      "func": "sendGPSStatus",
+      "type": type.value,
+      "sportId": sportId,
+    });
+    return response;
+  }
+
+  /// Synchronize the sports data of the mobile phone.
+  ///
+  Future syncGPSData({
+    required int sportHr,
+    required int sportValid,
+    required int sportType,
+    required int sportTime,
+    required int sportSteps,
+    required int sportKcal,
+    required int sportDistance,
+    required int sportSpeed,
+    required int sportCadence,
+    required int sportStride,
+  }) async {
+    final response = await sendRequest(MicrowearDeviceControl.gpsSport, data: {
+      "func": "syncGPSData",
+      "sportHr": sportHr,
+      "sportValid": sportValid,
+      "sportType": sportType,
+      "sportTime": sportTime,
+      "sportSteps": sportSteps,
+      "sportKcal": sportKcal,
+      "sportDistance": sportDistance,
+      "sportSpeed": sportSpeed,
+      "sportCadence": sportCadence,
+      "sportStride": sportStride
     });
     return response;
   }
