@@ -315,11 +315,11 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     override fun onCancel(o: Any?) {}
   }
 
-  private var registerGPSCallbackCallBackChannel: EventChannel? = null
-  private var registerGPSCallbackCallBackSink : EventChannel.EventSink? = null
-  private val registerGPSCallbackCallBackHandler = object : EventChannel.StreamHandler {
+  private var registerGPSCallBackChannel: EventChannel? = null
+  private var registerGPSCallBackSink : EventChannel.EventSink? = null
+  private val registerGPSCallBackHandler = object : EventChannel.StreamHandler {
     override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
-      registerGPSCallbackCallBackSink = eventSink
+      registerGPSCallBackSink = eventSink
     }
     override fun onCancel(o: Any?) {}
   }
@@ -388,8 +388,8 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     registerMac3CallBackChannel = EventChannel(flutterPluginBinding.binaryMessenger, "registerMac3CallBack")
     registerMac3CallBackChannel!!.setStreamHandler(registerMac3CallBackHandler)
 
-    registerGPSCallbackCallBackChannel = EventChannel(flutterPluginBinding.binaryMessenger, "registerGPSCallbackCallBack")
-    registerGPSCallbackCallBackChannel!!.setStreamHandler(registerGPSCallbackCallBackHandler)
+    registerGPSCallBackChannel = EventChannel(flutterPluginBinding.binaryMessenger, "registerGPSCallBack")
+    registerGPSCallBackChannel!!.setStreamHandler(registerGPSCallBackHandler)
 
   }
 
@@ -1748,10 +1748,10 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         try {
           var map =  HashMap<String, Any?>()
           map["status"] = "onGPSPermission"
-          registerGPSCallbackCallBackSink?.success(map)
+          registerGPSCallBackSink?.success(map)
         } catch (e: Exception) {
           e.printStackTrace()
-          registerGPSCallbackCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+          registerGPSCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
         }
       }
 
@@ -1760,10 +1760,10 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
           var map =  HashMap<String, Any?>()
           map["status"] = "onGPSCountdown"
           map["sportId"] = sportId
-          registerGPSCallbackCallBackSink?.success(map)
+          registerGPSCallBackSink?.success(map)
         } catch (e: Exception) {
           e.printStackTrace()
-          registerGPSCallbackCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+          registerGPSCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
         }
       }
 
@@ -1772,10 +1772,10 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
           var map =  HashMap<String, Any?>()
           map["status"] = "onGPSStart"
           map["sportId"] = sportId
-          registerGPSCallbackCallBackSink?.success(map)
+          registerGPSCallBackSink?.success(map)
         } catch (e: Exception) {
           e.printStackTrace()
-          registerGPSCallbackCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+          registerGPSCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
         }
 
       }
@@ -1786,10 +1786,10 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
           map["status"] = "onGPSSync"
           val jsonResult = gson.toJson(gpsSportEntity)
           map["gpsSportEntity"] = gson.fromJson(jsonResult, HashMap::class.java)
-          registerGPSCallbackCallBackSink?.success(map)
+          registerGPSCallBackSink?.success(map)
         } catch (e: Exception) {
           e.printStackTrace()
-          registerGPSCallbackCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+          registerGPSCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
         }
       }
 
@@ -1798,10 +1798,10 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
           var map =  HashMap<String, Any?>()
           map["status"] = "onGPSPause"
           map["sportId"] = sportId
-          registerGPSCallbackCallBackSink?.success(map)
+          registerGPSCallBackSink?.success(map)
         } catch (e: Exception) {
           e.printStackTrace()
-          registerGPSCallbackCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+          registerGPSCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
         }
       }
 
@@ -1810,10 +1810,10 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
           var map =  HashMap<String, Any?>()
           map["status"] = "onGPSContinue"
           map["sportId"] = sportId
-          registerGPSCallbackCallBackSink?.success(map)
+          registerGPSCallBackSink?.success(map)
         } catch (e: Exception) {
           e.printStackTrace()
-          registerGPSCallbackCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+          registerGPSCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
         }
       }
 
@@ -1822,10 +1822,10 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
           var map =  HashMap<String, Any?>()
           map["status"] = "onGPSEnd"
           map["sportId"] = sportId
-          registerGPSCallbackCallBackSink?.success(map)
+          registerGPSCallBackSink?.success(map)
         } catch (e: Exception) {
           e.printStackTrace()
-          registerGPSCallbackCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
+          registerGPSCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
         }
       }
 
