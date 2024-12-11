@@ -393,113 +393,121 @@ class MicrowearSdk {
     return response;
   }
 
+  /// Stream for device data received events.
   final EventChannel _deviceDataReceivedChannel =
       const EventChannel('deviceDataReceived');
-
-  /// Stream for device data received events.
   Stream get deviceDataReceivedStream => _deviceDataReceivedChannel
       .receiveBroadcastStream(_deviceDataReceivedChannel.name)
       .cast();
 
+  /// Stream for battery level events.
   final EventChannel _getBatteryLevelChannel =
       const EventChannel('getBatteryLevel');
-
-  /// Stream for battery level events.
   Stream get getBatteryLevelStream =>
       _getBatteryLevelChannel.receiveBroadcastStream().cast();
 
-  final EventChannel _syncHourStepChannel = const EventChannel('syncHourStep');
-
   /// Stream for syncing hourly steps data.
+  final EventChannel _syncHourStepChannel = const EventChannel('syncHourStep');
   Stream get syncHourStepStream =>
       _syncHourStepChannel.receiveBroadcastStream().cast();
 
+  /// Stream for syncing weekday sports data.
   final EventChannel _syncWeekDaySportsChannel =
       const EventChannel('syncWeekDaySports');
-
-  /// Stream for syncing weekday sports data.
   Stream get syncWeekDaySportsStream =>
       _syncWeekDaySportsChannel.receiveBroadcastStream().cast();
 
-  final EventChannel _deviceConfigChannel = const EventChannel('deviceConfig');
-
   /// Stream for device configuration events.
+  final EventChannel _deviceConfigChannel = const EventChannel('deviceConfig');
   Stream get deviceConfigStream =>
       _deviceConfigChannel.receiveBroadcastStream().cast();
 
-  final EventChannel _getAlarmClockInfoChannel =
-      const EventChannel('getAlarmClockInfo');
+  /// Stream for syncing sleep data.
+  final EventChannel _syncSleepDataChannel =
+      const EventChannel('syncSleepData');
+  Stream get syncSleepDataStream =>
+      _syncSleepDataChannel.receiveBroadcastStream().cast();
+
+  /// Stream for syncing sport records.
+  final EventChannel _syncSportRecordChannel =
+      const EventChannel('syncSportRecord');
+  Stream get syncSportRecordStream =>
+      _syncSportRecordChannel.receiveBroadcastStream().cast();
 
   /// Stream for retrieving alarm clock information.
+  final EventChannel _getAlarmClockInfoChannel =
+      const EventChannel('getAlarmClockInfo');
   Stream get getAlarmClockInfoStream =>
       _getAlarmClockInfoChannel.receiveBroadcastStream().cast();
 
+  /// Stream for syncing blood pressure data.
   final EventChannel _syncBloodPressureChannel =
       const EventChannel('syncBloodPressure');
-
-  /// Stream for syncing blood pressure data.
   Stream get syncBloodPressureStream =>
       _syncBloodPressureChannel.receiveBroadcastStream().cast();
 
+  /// Stream for syncing heart data.
   final EventChannel _syncHeartDataChannel =
       const EventChannel('syncHeartData');
-
-  /// Stream for syncing heart data.
   Stream get syncHeartDataStream =>
       _syncHeartDataChannel.receiveBroadcastStream().cast();
 
-  final EventChannel _syncOxDataChannel = const EventChannel('syncOxData');
-
   /// Stream for syncing blood oxygen data.
+  final EventChannel _syncOxDataChannel = const EventChannel('syncOxData');
   Stream get syncOxDataStream =>
       _syncOxDataChannel.receiveBroadcastStream().cast();
 
-  final EventChannel _syncHomeDataChannel = const EventChannel('syncHomeData');
-
   /// Stream for syncing home data.
+  final EventChannel _syncHomeDataChannel = const EventChannel('syncHomeData');
   Stream get syncHomeDataStream =>
       _syncHomeDataChannel.receiveBroadcastStream().cast();
 
+  /// Stream for syncing real-time ECG data.
   final EventChannel _syncRealTimeECGChannel =
       const EventChannel('syncRealTimeECG');
-
-  /// Stream for syncing real-time ECG data.
   Stream get syncRealTimeECGStream =>
       _syncRealTimeECGChannel.receiveBroadcastStream().cast();
 
-  final EventChannel _getDeviceFunChannel = const EventChannel('getDeviceFun');
-
   /// Stream for device functionality events.
+  final EventChannel _getDeviceFunChannel = const EventChannel('getDeviceFun');
   Stream get getDeviceFunStream =>
       _getDeviceFunChannel.receiveBroadcastStream().cast();
 
+  /// Stream for retrieving additional device configuration information.
   final EventChannel _getDeviceConfig1Channel =
       const EventChannel('getDeviceConfig1');
-
-  /// Stream for retrieving additional device configuration information.
   Stream get getDeviceConfig1Stream =>
       _getDeviceConfig1Channel.receiveBroadcastStream().cast();
 
+  /// Stream for connection status callback events.
   final EventChannel _registerConnectStatuesCallBackChannel =
       const EventChannel('registerConnectStatuesCallBack');
-
-  /// Stream for connection status callback events.
   Stream get registerConnectStatuesCallBackStream =>
       _registerConnectStatuesCallBackChannel.receiveBroadcastStream().cast();
 
+  /// Stream for somatosensory game callback events.
   final EventChannel _registerSomatosensoryGameCallbackChannel =
       const EventChannel('registerSomatosensoryGameCallback');
-
-  /// Stream for somatosensory game callback events.
   Stream get registerSomatosensoryGameCallbackStream =>
       _registerSomatosensoryGameCallbackChannel.receiveBroadcastStream().cast();
 
+  /// Stream for single heart and blood oxygen callback events.
   final EventChannel _registerSingleHeartOxBloodCallbackChannel =
       const EventChannel('registerSingleHeartOxBloodCallback');
-
-  /// Stream for single heart and blood oxygen callback events.
   Stream get registerSingleHeartOxBloodCallbackStream =>
       _registerSingleHeartOxBloodCallbackChannel
           .receiveBroadcastStream()
           .cast();
+
+  /// Stream for Mac3 callback events.
+  final EventChannel _registerMac3CallBackChannel =
+      const EventChannel('registerMac3CallBack');
+  Stream get registerMac3CallBackStream =>
+      _registerMac3CallBackChannel.receiveBroadcastStream().cast();
+
+  /// Stream for GPS callback events.
+  final EventChannel _registerGPSCallbackCallBackChannel =
+      const EventChannel('registerGPSCallbackCallBack');
+  Stream get registerGPSCallbackCallBackStream =>
+      _registerGPSCallbackCallBackChannel.receiveBroadcastStream().cast();
 }
