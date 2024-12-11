@@ -701,20 +701,22 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             EVT_TYPE_WEATHER_FORECAST -> {
-              var listRaw :List<Map<String, Int>> =  emptyList()
+              var listRaw :List<Map<String, Any>> =  emptyList()
               data?.let {
-                listRaw = it["weathers"] as List<Map<String, Int>>
+                listRaw = it["weathers"] as List<Map<String, Any>>
               }
 
               var listWeather : MutableList<NJJWeatherData> = mutableListOf()
 
               listRaw.forEach { item ->
-                val tempData = item["tempData"]
-                val weatherType = item["weatherType"]
+                val tempData = item["tempData"] as Int
+                val weatherType = item["weatherType"] as Int
+                val pressure = item["pressure"] as String
 
                 val weatherData = NJJWeatherData()
-                weatherData.tempData = tempData!!
-                weatherData.weatherType = weatherType!!
+                weatherData.tempData = tempData
+                weatherData.weatherType = weatherType
+                weatherData.pressure = pressure
 
                 listWeather.add(weatherData)
               }

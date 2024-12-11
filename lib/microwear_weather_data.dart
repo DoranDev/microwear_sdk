@@ -1,5 +1,9 @@
 class MicrowearWeatherData {
   int tempData;
   int weatherType;
-  MicrowearWeatherData(this.tempData, this.weatherType);
+  String pressure;
+  MicrowearWeatherData(
+      {required this.tempData,
+      required this.weatherType,
+      required this.pressure});
 }
