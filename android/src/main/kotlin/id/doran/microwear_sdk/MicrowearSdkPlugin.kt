@@ -67,7 +67,6 @@ import com.njj.njjsdk.protocol.cmd.EVT_TYPE_UNIT_SYSTEM
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_WASH_HAND
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_WEATHER_FORECAST
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_WOMEN_HEALTH
-import com.njj.njjsdk.protocol.cmd.TypeConstant.GPS_CMD_GPS
 import com.njj.njjsdk.protocol.entity.BLEDevice
 import com.njj.njjsdk.protocol.entity.BleDeviceFun
 import com.njj.njjsdk.protocol.entity.EmergencyContact
@@ -709,14 +708,28 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               var listWeather : MutableList<NJJWeatherData> = mutableListOf()
 
               listRaw.forEach { item ->
+                val week = item["week"] as Int
                 val tempData = item["tempData"] as Int
                 val weatherType = item["weatherType"] as Int
                 val pressure = item["pressure"] as String
+                val ultLevel = item["ultLevel"] as String
+                val humidity = item["humidity"] as Int
+                val windDirDay = item["windDirDay"] as Int
+                val windScaleDay = item["windScaleDay"] as String
+                val vis = item["vis"] as Int
+                val precip = item["precip"] as Int
 
                 val weatherData = NJJWeatherData()
+                weatherData.week = week
                 weatherData.tempData = tempData
                 weatherData.weatherType = weatherType
                 weatherData.pressure = pressure
+                weatherData.ultLevel = ultLevel
+                weatherData.humidity = humidity
+                weatherData.windDirDay = windDirDay
+                weatherData.windScaleDay = windScaleDay
+                weatherData.vis = vis
+                weatherData.precip = precip
 
                 listWeather.add(weatherData)
               }

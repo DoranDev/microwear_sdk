@@ -130,9 +130,7 @@ class MicrowearSdk {
     }
     final response =
         await sendRequest(MicrowearDeviceControl.weatherForecast, data: {
-      "weathers": listMicrowearWeatherData
-          .map((e) => {"tempData": e.tempData, "weatherType": e.weatherType})
-          .toList(),
+      "weathers": listMicrowearWeatherData.map((e) => e.toMap()).toList(),
     });
     return response;
   }
