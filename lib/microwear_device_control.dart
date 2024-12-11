@@ -83,7 +83,7 @@ enum MicrowearDeviceControl {
   /// Screen on duration
   displayTime(77),
 
-  /// Band configuration
+  /// Band configuration NjjDeviceInfoData
   bandConfig(78),
 
   /// Sleep data
@@ -155,7 +155,7 @@ enum MicrowearDeviceControl {
   /// Music control
   ctrlMusic(101),
 
-  /// Band configuration
+  /// Band configuration onLongSitEntity,onNjjDrinkWaterEntity,onNjjWashHandEntity,onNjjWristScreenEntity, onNjjDisturbEntity, onNjjMedicineEntity
   bandConfig1(102),
 
   /// Set phone system type
