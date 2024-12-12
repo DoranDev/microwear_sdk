@@ -506,8 +506,8 @@ class MicrowearSdk {
       _registerMac3CallBackChannel.receiveBroadcastStream().cast();
 
   /// Stream for GPS callback events.
-  final EventChannel _registerGPSCallbackChannel =
-      const EventChannel('registerGPSCallback');
-  Stream get registerGPSCallbackStream =>
-      _registerGPSCallbackChannel.receiveBroadcastStream().cast();
+  final EventChannel _registerGPSCallBackChannel =
+      const EventChannel('registerGPSCallBack');
+  Stream get registerGPSCallBackStream =>
+      _registerGPSCallBackChannel.receiveBroadcastStream().cast();
 }
