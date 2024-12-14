@@ -364,7 +364,16 @@ class MicrowearSdk {
   }
 
   /// Synchronize the sports data of the mobile phone.
-  ///
+  /// int sportHr; //Heart rate is only used to receive firmware replies
+  /// int sportValid; //Is the data valid? 0: invalid 1: valid Data needs to be sent every second
+  /// int sportType; //Sports type
+  /// int sportTime; //Time (seconds)
+  /// int sportSteps; //Number of steps
+  /// int sportKcal; //Calories (kilocalories)
+  /// int sportDistance; //Distance (meters)
+  /// int sportSpeed; //Kilometers (hours)
+  /// int sportCadence; //Cadence
+  /// int sportStride; //Stride
   Future syncGPSData({
     required int sportHr,
     required int sportValid,
