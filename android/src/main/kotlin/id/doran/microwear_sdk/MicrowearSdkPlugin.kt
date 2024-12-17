@@ -324,6 +324,15 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     override fun onCancel(o: Any?) {}
   }
 
+  private var onLoadingChannel: EventChannel? = null
+  private var onLoadingSink : EventChannel.EventSink? = null
+  private val onLoadingHandler = object : EventChannel.StreamHandler {
+    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+      onLoadingSink = eventSink
+    }
+    override fun onCancel(o: Any?) {}
+  }
+
 
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     Log.d("MicrowearSdkPlugin","onAttachedToEngine")
@@ -390,6 +399,9 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
     registerGPSCallBackChannel = EventChannel(flutterPluginBinding.binaryMessenger, "registerGPSCallBack")
     registerGPSCallBackChannel!!.setStreamHandler(registerGPSCallBackHandler)
+
+    onLoadingChannel = EventChannel(flutterPluginBinding.binaryMessenger, "onLoading")
+    onLoadingChannel!!.setStreamHandler(onLoadingHandler)
 
   }
 
@@ -1173,7 +1185,33 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                     }
 
                     override fun onPushProgress(progress: Int){
+                      LogUtil.d("onPushProgress $progress")
+                    }
+                  })
+                }
+                "startPushDial" -> {
+                  var path =""
+                  data?.let {
+                    path = it["path"] as? String ?: path
+                  }
+
+                  njjPushDataHelper.startPushDial(path, object :
+                    NjjPushDataHelper.NJjPushListener {
+                    override fun onPushSuccess(){
+                      LogUtil.d("onPushSuccess")
+                    }
+
+                    override fun onPushError(code: Int){
+                      LogUtil.d("onPushError")
+                    }
+
+                    override fun onPushStart(){
+                      LogUtil.d("onPushStart")
+                    }
+
+                    override fun onPushProgress(progress: Int){
                       LogUtil.d("onPushProgress")
+                      onLoadingSink?.success(progress)
                     }
                   })
                 }

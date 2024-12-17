@@ -519,4 +519,9 @@ class MicrowearSdk {
       const EventChannel('registerGPSCallBack');
   Stream get registerGPSCallBackStream =>
       _registerGPSCallBackChannel.receiveBroadcastStream().cast();
+
+  /// Stream for loading events.
+  final EventChannel _onLoadingChannel = const EventChannel('onLoading');
+  Stream get onLoadingStream =>
+      _onLoadingChannel.receiveBroadcastStream().cast();
 }
