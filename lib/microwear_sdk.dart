@@ -402,6 +402,12 @@ class MicrowearSdk {
     return response;
   }
 
+  /// Push Dial
+  /// Uses [MicrowearDeviceControl.otaStart].
+  Future startPushDial({required String path}) async =>
+      await sendRequest(MicrowearDeviceControl.otaStart,
+          data: {"otaType": "startPushContactDial", "path": path});
+
   /// Stream for device data received events.
   final EventChannel _deviceDataReceivedChannel =
       const EventChannel('deviceDataReceived');
