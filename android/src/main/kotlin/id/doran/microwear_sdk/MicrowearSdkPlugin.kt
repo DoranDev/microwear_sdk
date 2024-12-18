@@ -1221,7 +1221,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                     override fun onPushProgress(progress: Int){
                       LogUtil.d("onPushProgress")
                       var map =   HashMap<String, Any?>()
-                      map["status"] = "onPushStart"
+                      map["status"] = "onPushProgress"
                       map["progress"] = progress
                       onLoadingSink?.success(map)
                     }
@@ -1270,7 +1270,7 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                     override fun onPushProgress(progress: Int){
                       LogUtil.d("onPushProgress")
                       var map =   HashMap<String, Any?>()
-                      map["status"] = "onPushStart"
+                      map["status"] = "onPushProgress"
                       map["progress"] = progress
                       onLoadingSink?.success(map)
                     }
