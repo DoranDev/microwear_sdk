@@ -97,6 +97,9 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import java.io.File
+import java.io.FileInputStream
+import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.Date
@@ -1195,37 +1198,55 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                     path = it["path"] as? String ?: path
                   }
 
-                  njjPushDataHelper.startPushDial(path, object :
-                    NjjPushDataHelper.NJjPushListener {
-                    override fun onPushSuccess(){
-                      LogUtil.d("onPushSuccess")
-                      var map =   HashMap<String, Any?>()
-                      map["status"] = "onPushSuccess"
-                      onLoadingSink?.success(map)
-                    }
+                  // Create a File object from the provided path
+                  val file = File(path)
 
-                    override fun onPushError(code: Int){
-                      LogUtil.d("onPushError")
-                      var map =   HashMap<String, Any?>()
-                      map["status"] = "onPushError"
-                      onLoadingSink?.success(map)
-                    }
+                  // Check if the file exists
+                  if (file.exists()) {
+                    try {
+                      njjPushDataHelper.startPushDial(file.absolutePath.toString(), object :
+                        NjjPushDataHelper.NJjPushListener {
+                        override fun onPushSuccess(){
+                          LogUtil.d("onPushSuccess")
+                          var map =   HashMap<String, Any?>()
+                          map["status"] = "onPushSuccess"
+                          onLoadingSink?.success(map)
+                        }
 
-                    override fun onPushStart(){
-                      LogUtil.d("onPushStart")
-                      var map =   HashMap<String, Any?>()
-                      map["status"] = "onPushStart"
-                      onLoadingSink?.success(map)
-                    }
+                        override fun onPushError(code: Int){
+                          LogUtil.d("onPushError")
+                          var map =   HashMap<String, Any?>()
+                          map["status"] = "onPushError"
+                          onLoadingSink?.success(map)
+                        }
 
-                    override fun onPushProgress(progress: Int){
-                      LogUtil.d("onPushProgress")
-                      var map =   HashMap<String, Any?>()
-                      map["status"] = "onPushProgress"
-                      map["progress"] = progress
-                      onLoadingSink?.success(map)
+                        override fun onPushStart(){
+                          LogUtil.d("onPushStart")
+                          var map =   HashMap<String, Any?>()
+                          map["status"] = "onPushStart"
+                          onLoadingSink?.success(map)
+                        }
+
+                        override fun onPushProgress(progress: Int){
+                          LogUtil.d("onPushProgress")
+                          var map =   HashMap<String, Any?>()
+                          map["status"] = "onPushProgress"
+                          map["progress"] = progress
+                          onLoadingSink?.success(map)
+                        }
+                      })
+                    } catch (e: Exception) {
+                      // Handle any exceptions during the BLE transmission
+                      Log.e("BLE Error", "Error sending file via BLE: ${e.message}")
                     }
-                  })
+                  } else {
+                    // Handle the error: file does not exist
+                    Log.e("File Error", "File not found at path: $path")
+                  }
+//                                val inputStream: InputStream = mContext!!.assets.open(path)
+//                                BleConnector.sendStream(bleKey, inputStream, 0)
+
+
                 }
                 "startPushCustomDial" -> {
                   var path =""
