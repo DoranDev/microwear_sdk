@@ -406,7 +406,28 @@ class MicrowearSdk {
   /// Uses [MicrowearDeviceControl.otaStart].
   Future startPushDial({required String path}) async =>
       await sendRequest(MicrowearDeviceControl.otaStart,
-          data: {"otaType": "startPushContactDial", "path": path});
+          data: {"otaType": "startPushDial", "path": path});
+
+  /// Push Custom Dial
+  /// Uses [MicrowearDeviceControl.otaStart].
+  Future startPushCustomDial(
+          {required String path,
+          required int bigWidth,
+          required int bigHeight,
+          required int smallNeedWidth,
+          required int smallNeedHeight,
+          required int timePosition,
+          required String colors}) async =>
+      await sendRequest(MicrowearDeviceControl.otaStart, data: {
+        "otaType": "startPushCustomDial",
+        "path": path,
+        "bigWidth": bigWidth,
+        "bigHeight": bigHeight,
+        "smallNeedWidth": smallNeedWidth,
+        "smallNeedHeight": smallNeedHeight,
+        "timePosition": timePosition,
+        "colors": colors
+      });
 
   /// Stream for device data received events.
   final EventChannel _deviceDataReceivedChannel =

@@ -1199,19 +1199,80 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                     NjjPushDataHelper.NJjPushListener {
                     override fun onPushSuccess(){
                       LogUtil.d("onPushSuccess")
+                      var map =   HashMap<String, Any?>()
+                      map["status"] = "onPushSuccess"
+                      onLoadingSink?.success(map)
                     }
 
                     override fun onPushError(code: Int){
                       LogUtil.d("onPushError")
+                      var map =   HashMap<String, Any?>()
+                      map["status"] = "onPushError"
+                      onLoadingSink?.success(map)
                     }
 
                     override fun onPushStart(){
                       LogUtil.d("onPushStart")
+                      var map =   HashMap<String, Any?>()
+                      map["status"] = "onPushStart"
+                      onLoadingSink?.success(map)
                     }
 
                     override fun onPushProgress(progress: Int){
                       LogUtil.d("onPushProgress")
-                      onLoadingSink?.success(progress)
+                      var map =   HashMap<String, Any?>()
+                      map["status"] = "onPushStart"
+                      map["progress"] = progress
+                      onLoadingSink?.success(map)
+                    }
+                  })
+                }
+                "startPushCustomDial" -> {
+                  var path =""
+                  var bigWidth = 320
+                  var bigHeight = 380
+                  var smallNeedWidth = 240
+                  var smallNeedHeight = 283
+                  var timePosition =0
+                  var colors = "#FF0000"
+                  data?.let {
+                    path = it["path"] as? String ?: path
+                    bigWidth = it["bigWidth"] as? Int ?: bigWidth
+                    bigHeight = it["bigHeight"] as? Int ?: bigHeight
+                    smallNeedWidth = it["smallNeedWidth"] as? Int ?: smallNeedWidth
+                    smallNeedHeight = it["smallNeedHeight"] as? Int ?: smallNeedHeight
+                    timePosition = it["timePosition"] as? Int ?: timePosition
+                    colors = it["colors"] as? String ?: colors
+                  }
+                  njjPushDataHelper.starPushCustomDial(path,bigWidth,bigHeight,smallNeedWidth,smallNeedHeight,timePosition,colors, object :
+                    NjjPushDataHelper.NJjPushListener {
+                    override fun onPushSuccess(){
+                      LogUtil.d("onPushSuccess")
+                      var map =   HashMap<String, Any?>()
+                      map["status"] = "onPushSuccess"
+                      onLoadingSink?.success(map)
+                    }
+
+                    override fun onPushError(code: Int){
+                      LogUtil.d("onPushError")
+                      var map =   HashMap<String, Any?>()
+                      map["status"] = "onPushError"
+                      onLoadingSink?.success(map)
+                    }
+
+                    override fun onPushStart(){
+                      LogUtil.d("onPushStart")
+                      var map =   HashMap<String, Any?>()
+                      map["status"] = "onPushStart"
+                      onLoadingSink?.success(map)
+                    }
+
+                    override fun onPushProgress(progress: Int){
+                      LogUtil.d("onPushProgress")
+                      var map =   HashMap<String, Any?>()
+                      map["status"] = "onPushStart"
+                      map["progress"] = progress
+                      onLoadingSink?.success(map)
                     }
                   })
                 }
