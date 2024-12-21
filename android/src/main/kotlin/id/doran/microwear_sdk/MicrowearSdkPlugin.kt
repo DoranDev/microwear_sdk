@@ -1648,12 +1648,10 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       override fun onConnected(mac: String?) {
         LogUtil.d("Connection successful")
         try{
-          if (mac != null) {
             var map =   HashMap<String, Any?>()
             map["status"] = "onConnected"
             map["mac"] = mac
             registerConnectStatuesCallBackSink?.success(map)
-          }
         } catch (e: Exception) {
           e.printStackTrace()
           registerConnectStatuesCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
@@ -1663,12 +1661,10 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       override fun onConnecting(mac: String?) {
         LogUtil.d("Connecting")
         try{
-          if (mac != null) {
             var map =   HashMap<String, Any?>()
             map["status"] = "onConnecting"
             map["mac"] = mac
             registerConnectStatuesCallBackSink?.success(map)
-          }
         } catch (e: Exception) {
           e.printStackTrace()
           registerConnectStatuesCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
@@ -1678,12 +1674,10 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       override fun onDisConnected(mac: String?) {
         LogUtil.d("Disconnect")
         try{
-          if (mac != null) {
             var map =   HashMap<String, Any?>()
             map["status"] = "onDisConnected"
             map["mac"] = mac
             registerConnectStatuesCallBackSink?.success(map)
-          }
         } catch (e: Exception) {
           e.printStackTrace()
           registerConnectStatuesCallBackSink?.error("Serialization Error", "Failed to serialize result", e.message)
