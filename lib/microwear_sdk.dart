@@ -24,6 +24,16 @@ class MicrowearSdk {
     });
   }
 
+  Future<String> startService() async {
+    final String result = await methodChannel.invokeMethod('startService');
+    return result;
+  }
+
+  Future<String> stopService() async {
+    final String result = await methodChannel.invokeMethod('stopService');
+    return result;
+  }
+
   /// getBondState with the specified BLE device.
   Future getBondState(String macAddress) async {
     final response = await methodChannel.invokeMethod('getBondState', {

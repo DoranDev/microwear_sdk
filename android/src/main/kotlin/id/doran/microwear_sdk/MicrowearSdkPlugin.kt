@@ -1,5 +1,6 @@
 package id.doran.microwear_sdk
 
+import android.content.Intent
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
@@ -89,6 +90,7 @@ import com.njj.njjsdk.protocol.entity.SomatosensoryGame
 import com.njj.njjsdk.utils.ApplicationProxy
 import com.njj.njjsdk.utils.BleBeaconUtil
 import com.njj.njjsdk.utils.LogUtil
+import id.doran.microwear_sdk.service.MicrowearService
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -454,6 +456,17 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       }
       "unregisterConnectStatue" -> {
         NjjBleManger.getInstance().unregisterConnectStatue()
+      }
+
+      "startService" -> {
+        val intent = Intent(mContext, MicrowearService::class.java)
+        mContext.startService(intent)
+        result.success("Service started")
+      }
+      "stopService" -> {
+        val intent = Intent(mContext, MicrowearService::class.java)
+        mContext.stopService(intent)
+        result.success("Service stopped")
       }
       "sendRequest" -> {
         val microwearDeviceControl: Int? = call.argument<Int>("microwearDeviceControl")

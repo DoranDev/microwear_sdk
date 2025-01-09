@@ -111,7 +111,9 @@ public class RecordChatHelper {
         File outFile = new File(context.getExternalCacheDir(), RECORD + File.separator + name + RECORD_SUFFIX_PCM);
         OpusUtils.decodeOpusFile(file.getAbsolutePath(), outFile.getAbsolutePath(), s -> {
             Log.i(TAG, "speechRecognition: " + s);
-            // Here we need to convert speech recognition into text and simulate the problem in the example.
+
+            //TODO: Here we need to convert speech recognition into text and simulate the problem in the example.
+
             String problem = "What is your name";
             speechRecognitionChatGPT(problem);
         }, null);
@@ -136,7 +138,7 @@ public class RecordChatHelper {
             e.printStackTrace();
         }
 
-        // Here, the user needs to call ChatGPT to get a reply. The example simulates this.
+        //TODO: Here, the user needs to call ChatGPT to get a reply. The example simulates this.
         String reply = "My name is JETE AI";
         try {
             sendSpeechRecognitionContent(reply);
