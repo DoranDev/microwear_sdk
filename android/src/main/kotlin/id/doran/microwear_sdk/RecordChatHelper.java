@@ -3,6 +3,7 @@ package id.doran.microwear_sdk;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.arthenica.ffmpegkit.FFmpegKit;
 import com.njj.njjsdk.callback.CallBackManager;
 import com.njj.njjsdk.callback.RecordingDataCallback;
 import com.njj.njjsdk.entity.RecordingDataEntity;
@@ -39,6 +40,7 @@ public class RecordChatHelper {
 
     private static final String RECORD_SUFFIX_OPUS = ".opus";
     private static final String RECORD_SUFFIX_PCM = ".pcm";
+    private static final String RECORD_SUFFIX_WAV = ".wav";
 
     private String name;
 
@@ -113,13 +115,14 @@ public class RecordChatHelper {
 
     private void speechRecognition(boolean newSession) {
         File file = new File(context.getExternalCacheDir(), RECORD + File.separator + name + RECORD_SUFFIX_OPUS);
-        File outFile = new File(context.getExternalCacheDir(), RECORD + File.separator + name + RECORD_SUFFIX_PCM);
-        OpusUtils.decodeOpusFile(file.getAbsolutePath(), outFile.getAbsolutePath(), s -> {
+        File wavFile = new File(context.getExternalCacheDir(), RECORD + File.separator + name + RECORD_SUFFIX_WAV);
+        // Decode OPUS to WAV using FFmpegKit
+        decodeOpusToWav(file, wavFile, s -> {
             Log.i(TAG, "speechRecognition: " + s);
 
             // Run Wit.ai speech-to-text in a background thread
             new Thread(() -> {
-                String transcription = convertSpeechToTextWithWitAI(outFile);
+                String transcription = convertSpeechToTextWithWitAI(wavFile);
                 if (transcription != null) {
                     Log.i(TAG, "Transcription: " + transcription);
 
@@ -132,6 +135,32 @@ public class RecordChatHelper {
         }, null);
     }
 
+    // Method to convert OPUS to WAV using FFmpegKit
+    private void decodeOpusToWav(File opusFile, File wavFile, OnFinishCallback callback, OnErrorCallback errorCallback) {
+        // FFmpegKit command to convert OPUS to WAV
+        String command = "-i " + opusFile.getAbsolutePath() + " " + wavFile.getAbsolutePath();
+
+        // Use FFmpegKit to execute the command
+        FFmpegKit.executeAsync(command, session -> {
+            if (session.getReturnCode().isSuccess()) {
+                // Conversion was successful
+                callback.onFinish("OPUS to WAV conversion completed.");
+            } else {
+                // Handle error in conversion
+                errorCallback.onError("Error converting OPUS to WAV.");
+            }
+        });
+    }
+
+    // Callback interfaces for success and error
+    interface OnFinishCallback {
+        void onFinish(String message);
+    }
+
+    interface OnErrorCallback {
+        void onError(String errorMessage);
+    }
+
     // Method to send audio to Wit.ai
     private String convertSpeechToTextWithWitAI(File audioFile) {
         OkHttpClient client = new OkHttpClient();
@@ -141,14 +170,14 @@ public class RecordChatHelper {
             // Create a request body for the PCM audio file
             RequestBody requestBody = RequestBody.create(
                     audioFile,
-                    MediaType.parse("audio/raw")
+                    MediaType.parse("audio/wav")
             );
 
             // Build the HTTP request to Wit.ai
             Request request = new Request.Builder()
                     .url("https://api.wit.ai/speech?v=20250110")
                     .header("Authorization", token)
-                    .header("Content-Type", "audio/raw")
+                    .header("Content-Type", "audio/wav")
                     .post(requestBody)
                     .build();
 
@@ -179,7 +208,7 @@ public class RecordChatHelper {
         try {
             // Build the HTTP request to Wit.ai
             Request request = new Request.Builder()
-                    .url("http://connect.dorangadget.com/api/chatbot?text=${question}&provider=gemini")
+                    .url("https://api.jeteconnect.id/api/chatbot?text=${question}&provider=gemini")
                     .header("token", token)
                     .get()
                     .build();
