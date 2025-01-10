@@ -10,6 +10,9 @@ import com.njj.njjsdk.manger.NjjProtocolHelper;
 import com.njj.njjsdk.utils.LogUtil;
 import android.content.Context;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -18,6 +21,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import okhttp3.*;
 
 public class RecordChatHelper {
 
@@ -112,11 +117,93 @@ public class RecordChatHelper {
         OpusUtils.decodeOpusFile(file.getAbsolutePath(), outFile.getAbsolutePath(), s -> {
             Log.i(TAG, "speechRecognition: " + s);
 
-            //TODO: Here we need to convert speech recognition into text and simulate the problem in the example.
+            // Run Wit.ai speech-to-text in a background thread
+            new Thread(() -> {
+                String transcription = convertSpeechToTextWithWitAI(outFile);
+                if (transcription != null) {
+                    Log.i(TAG, "Transcription: " + transcription);
 
-            String problem = "What is your name";
-            speechRecognitionChatGPT(problem);
+                    // Simulate problem
+                    speechRecognitionChatGPT(transcription);
+                } else {
+                    Log.e(TAG, "Transcription failed or was not returned.");
+                }
+            }).start();
         }, null);
+    }
+
+    // Method to send audio to Wit.ai
+    private String convertSpeechToTextWithWitAI(File audioFile) {
+        OkHttpClient client = new OkHttpClient();
+        String token = "Bearer SF4DSTOT3ISXDPOC46MU2HP7TRZPN4NW";
+
+        try {
+            // Create a request body for the PCM audio file
+            RequestBody requestBody = RequestBody.create(
+                    audioFile,
+                    MediaType.parse("audio/wav")
+            );
+//            curl ^
+//                    -H "Authorization: Bearer SF4DSTOT3ISXDPOC46MU2HP7TRZPN4NW" ^
+//                    "https://api.wit.ai/message?v=20250110&q="
+
+            // Build the HTTP request to Wit.ai
+            Request request = new Request.Builder()
+                    .url("https://api.wit.ai/speech?v=20250110")
+                    .header("Authorization", token)
+                    .header("Content-Type", "audio/wav")
+                    .post(requestBody)
+                    .build();
+
+            // Execute the request synchronously
+            Response response = client.newCall(request).execute();
+            if (response.isSuccessful()) {
+                String jsonResponse = response.body().string();
+                Log.i(TAG, "Wit.ai Response: " + jsonResponse);
+
+                // Extract transcription
+                JSONObject jsonObject = new JSONObject(jsonResponse);
+                return jsonObject.optString("text", null);
+            } else {
+                Log.e(TAG, "Wit.ai API Response Error: " + response.code());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error sending audio to Wit.ai", e);
+            gptErrorTip("Error sending audio");
+        }
+        return null; // Return null in case of an error
+    }
+
+    // Method to send audio to Wit.ai
+    private String sendTextToAI(String question) {
+        OkHttpClient client = new OkHttpClient();
+        String token = "x45rRwduZ10T4mqE73fTyMny6aNhmQ8W2lhvE7ot40065";
+
+        try {
+            // Build the HTTP request to Wit.ai
+            Request request = new Request.Builder()
+                    .url("http://connect.dorangadget.com/api/chatbot?text=${question}&provider=gemini")
+                    .header("token", token)
+                    .get()
+                    .build();
+
+            // Execute the request synchronously
+            Response response = client.newCall(request).execute();
+            if (response.isSuccessful()) {
+                String jsonResponse = response.body().string();
+                Log.i(TAG, "AI Response: " + jsonResponse);
+
+                // Extract transcription
+                JSONObject jsonObject = new JSONObject(jsonResponse);
+                return jsonObject.optString("pesan", null);
+            } else {
+                Log.e(TAG, "AI API Response Error: " + response.code());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error sending text to JETE AI", e);
+            gptErrorTip("Error sending text to AI");
+        }
+        return null; // Return null in case of an error
     }
 
     private void speechRecognitionChatGPT(String problem) {
@@ -138,8 +225,8 @@ public class RecordChatHelper {
             e.printStackTrace();
         }
 
-        //TODO: Here, the user needs to call ChatGPT to get a reply. The example simulates this.
-        String reply = "My name is JETE AI";
+        //call ChatGPT to get a reply.
+        String reply = sendTextToAI(problem);
         try {
             sendSpeechRecognitionContent(reply);
         } catch (UnsupportedEncodingException e) {
