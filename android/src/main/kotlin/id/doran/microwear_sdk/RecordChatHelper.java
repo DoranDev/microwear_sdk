@@ -11,6 +11,7 @@ import com.njj.njjsdk.manger.NjjProtocolHelper;
 import com.njj.njjsdk.utils.LogUtil;
 import android.content.Context;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -117,6 +118,7 @@ public class RecordChatHelper {
         File file = new File(context.getExternalCacheDir(), RECORD + File.separator + name + RECORD_SUFFIX_OPUS);
         File outFile = new File(context.getExternalCacheDir(), RECORD + File.separator + name + RECORD_SUFFIX_PCM);
         File wavFile = new File(context.getExternalCacheDir(), RECORD + File.separator + name + RECORD_SUFFIX_WAV);
+
         // Decode OPUS to WAV using FFmpegKit
         OpusUtils.decodeOpusFile(file.getAbsolutePath(),outFile.getAbsolutePath(),s -> {
             Log.i(TAG, "decodeOpusFile: "+s);
@@ -143,17 +145,15 @@ public class RecordChatHelper {
     private void convertPcmToWav(File pcmFile, File wavFile, OnFinishCallback callback, OnErrorCallback errorCallback) {
         // Ensure PCM file exists
         if (!pcmFile.exists()) {
+            Log.e(TAG, "PCM file not found");
             errorCallback.onError("PCM file not found.");
             return;
         }
 
-        // Delete existing WAV file if it exists
-        if (wavFile.exists()) {
-            wavFile.delete();
-        }
-
-        // Explicitly specify PCM format and conversion to WAV
-        String command = "-f s16le -ar 44100 -ac 2 -i " + pcmFile.getAbsolutePath() + " " + wavFile.getAbsolutePath();
+        // Use more explicit FFmpeg parameters
+        String command = "-f s16le -ar 44100 -ac 2 -i " + pcmFile.getAbsolutePath() +
+                " -acodec pcm_s16le -ar 16000 " + // Convert to 16kHz for better STT
+                wavFile.getAbsolutePath();
 
         // Execute FFmpegKit command
         FFmpegKit.executeAsync(command, session -> {
@@ -177,7 +177,6 @@ public class RecordChatHelper {
         void onError(String errorMessage);
     }
 
-    // Method to send audio to Wit.ai
     private String convertSpeechToTextWithWitAI(File audioFile) {
         OkHttpClient client = new OkHttpClient();
         String token = "Bearer SF4DSTOT3ISXDPOC46MU2HP7TRZPN4NW";
@@ -203,9 +202,8 @@ public class RecordChatHelper {
                 String jsonResponse = response.body().string();
                 Log.i(TAG, "Wit.ai Response: " + jsonResponse);
 
-                // Extract transcription
-                JSONObject jsonObject = new JSONObject(jsonResponse);
-                return jsonObject.optString("text", null);
+                // Process JSON response to extract "is_final" text
+                return getFinalTranscription(jsonResponse);
             } else {
                 Log.e(TAG, "Wit.ai API Response Error: " + response.code());
             }
@@ -214,6 +212,25 @@ public class RecordChatHelper {
             gptErrorTip("Error sending audio");
         }
         return null; // Return null in case of an error
+    }
+
+    private String getFinalTranscription(String jsonResponse) {
+        try {
+            // Parse JSON response
+            JSONArray jsonArray = new JSONArray(jsonResponse);
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject object = jsonArray.getJSONObject(i);
+
+                // Check if the object has "is_final" as true
+                if (object.optBoolean("is_final", false)) {
+                    return object.optString("text", ""); // Return the final text
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error parsing JSON response", e);
+        }
+        return null; // Return null if no final transcription is found
     }
 
     // Method to send audio to Wit.ai
