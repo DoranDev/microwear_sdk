@@ -141,17 +141,14 @@ public class RecordChatHelper {
             // Create a request body for the PCM audio file
             RequestBody requestBody = RequestBody.create(
                     audioFile,
-                    MediaType.parse("audio/wav")
+                    MediaType.parse("audio/raw")
             );
-//            curl ^
-//                    -H "Authorization: Bearer SF4DSTOT3ISXDPOC46MU2HP7TRZPN4NW" ^
-//                    "https://api.wit.ai/message?v=20250110&q="
 
             // Build the HTTP request to Wit.ai
             Request request = new Request.Builder()
                     .url("https://api.wit.ai/speech?v=20250110")
                     .header("Authorization", token)
-                    .header("Content-Type", "audio/wav")
+                    .header("Content-Type", "audio/raw")
                     .post(requestBody)
                     .build();
 
