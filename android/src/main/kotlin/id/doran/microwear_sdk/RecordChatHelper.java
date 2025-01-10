@@ -115,39 +115,55 @@ public class RecordChatHelper {
 
     private void speechRecognition(boolean newSession) {
         File file = new File(context.getExternalCacheDir(), RECORD + File.separator + name + RECORD_SUFFIX_OPUS);
+        File outFile = new File(context.getExternalCacheDir(), RECORD + File.separator + name + RECORD_SUFFIX_PCM);
         File wavFile = new File(context.getExternalCacheDir(), RECORD + File.separator + name + RECORD_SUFFIX_WAV);
         // Decode OPUS to WAV using FFmpegKit
-        decodeOpusToWav(file, wavFile, s -> {
-            Log.i(TAG, "speechRecognition: " + s);
+        OpusUtils.decodeOpusFile(file.getAbsolutePath(),outFile.getAbsolutePath(),s -> {
+            Log.i(TAG, "decodeOpusFile: "+s);
+            convertPcmToWav(outFile, wavFile, r -> {
+                Log.i(TAG, "decodeOpusToWav: " + r);
 
-            // Run Wit.ai speech-to-text in a background thread
-            new Thread(() -> {
-                String transcription = convertSpeechToTextWithWitAI(wavFile);
-                if (transcription != null) {
-                    Log.i(TAG, "Transcription: " + transcription);
+                // Run Wit.ai speech-to-text in a background thread
+                new Thread(() -> {
+                    String transcription = convertSpeechToTextWithWitAI(wavFile);
+                    if (transcription != null) {
+                        Log.i(TAG, "Transcription: " + transcription);
 
-                    // Simulate problem
-                    speechRecognitionChatGPT(transcription);
-                } else {
-                    Log.e(TAG, "Transcription failed or was not returned.");
-                }
-            }).start();
-        }, null);
+                        // Simulate problem
+                        speechRecognitionChatGPT(transcription);
+                    } else {
+                        Log.e(TAG, "Transcription failed or was not returned.");
+                    }
+                }).start();
+            }, null);
+        },null);
+
     }
 
-    // Method to convert OPUS to WAV using FFmpegKit
-    private void decodeOpusToWav(File opusFile, File wavFile, OnFinishCallback callback, OnErrorCallback errorCallback) {
-        // FFmpegKit command to convert OPUS to WAV
-        String command = "-i " + opusFile.getAbsolutePath() + " " + wavFile.getAbsolutePath();
+    private void convertPcmToWav(File pcmFile, File wavFile, OnFinishCallback callback, OnErrorCallback errorCallback) {
+        // Ensure PCM file exists
+        if (!pcmFile.exists()) {
+            errorCallback.onError("PCM file not found.");
+            return;
+        }
 
-        // Use FFmpegKit to execute the command
+        // Delete existing WAV file if it exists
+        if (wavFile.exists()) {
+            wavFile.delete();
+        }
+
+        // Explicitly specify PCM format and conversion to WAV
+        String command = "-f s16le -ar 44100 -ac 2 -i " + pcmFile.getAbsolutePath() + " " + wavFile.getAbsolutePath();
+
+        // Execute FFmpegKit command
         FFmpegKit.executeAsync(command, session -> {
             if (session.getReturnCode().isSuccess()) {
-                // Conversion was successful
-                callback.onFinish("OPUS to WAV conversion completed.");
+                Log.i(TAG, "PCM to WAV conversion completed.");
+                callback.onFinish("PCM to WAV conversion completed.");
             } else {
-                // Handle error in conversion
-                errorCallback.onError("Error converting OPUS to WAV.");
+                Log.e(TAG, "Error converting PCM to WAV: " + session.getFailStackTrace());
+                String errorMessage = session.getFailStackTrace();
+                errorCallback.onError("Error converting PCM to WAV: " + errorMessage);
             }
         });
     }
