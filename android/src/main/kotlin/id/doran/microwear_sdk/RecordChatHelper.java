@@ -182,6 +182,7 @@ public class RecordChatHelper {
         String token = "Bearer SF4DSTOT3ISXDPOC46MU2HP7TRZPN4NW";
 
         try {
+            Log.e(TAG, "audioFile: " + audioFile.getAbsolutePath());
             // Create a request body for the PCM audio file
             RequestBody requestBody = RequestBody.create(
                     audioFile,
@@ -202,10 +203,13 @@ public class RecordChatHelper {
                 String jsonResponse = response.body().string();
                 Log.i(TAG, "Wit.ai Response: " + jsonResponse);
 
-                // Process JSON response to extract "is_final" text
-                return getFinalTranscription(jsonResponse);
-            } else {
-                Log.e(TAG, "Wit.ai API Response Error: " + response.code());
+                // Gunakan versi terbaru dari getFinalTranscription
+                String finalTranscription = getFinalTranscription(jsonResponse);
+                if (finalTranscription != null && !finalTranscription.isEmpty()) {
+                    return finalTranscription; // Kembalikan teks transkripsi final
+                } else {
+                    Log.e(TAG, "Transcription failed or was not returned.");
+                }
             }
         } catch (Exception e) {
             Log.e(TAG, "Error sending audio to Wit.ai", e);
@@ -216,23 +220,18 @@ public class RecordChatHelper {
 
     private String getFinalTranscription(String jsonResponse) {
         try {
-            // Parse JSON response
-            JSONArray jsonArray = new JSONArray(jsonResponse);
+            // Parse JSON response as a JSONObject
+            JSONObject jsonObject = new JSONObject(jsonResponse);
 
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject object = jsonArray.getJSONObject(i);
-
-                // Check if the object has "is_final" as true
-                if (object.optBoolean("is_final", false)) {
-                    return object.optString("text", ""); // Return the final text
-                }
+            // Periksa apakah ini adalah transkripsi final
+            if ("FINAL_TRANSCRIPTION".equals(jsonObject.optString("type"))) {
+                return jsonObject.optString("text", ""); // Ambil teks final
             }
         } catch (Exception e) {
             Log.e(TAG, "Error parsing JSON response", e);
         }
-        return null; // Return null if no final transcription is found
+        return null; // Return null jika tidak ada transkripsi final ditemukan
     }
-
     // Method to send audio to Wit.ai
     private String sendTextToAI(String question) {
         OkHttpClient client = new OkHttpClient();
