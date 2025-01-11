@@ -120,7 +120,15 @@ public class RecordChatHelper {
     private void speechRecognition(boolean newSession) {
         File file = new File(context.getExternalCacheDir(), RECORD + File.separator + name + RECORD_SUFFIX_OPUS);
         File outFile = new File(context.getExternalCacheDir(), RECORD + File.separator + name + RECORD_SUFFIX_PCM);
-        File wavFile = new File(context.getExternalFilesDir(null), RECORD + File.separator + name + RECORD_SUFFIX_WAV);
+//        File outputDir = new File(context.getFilesDir(), RECORD);
+//        if (!outputDir.exists()) {
+//            if (!outputDir.mkdirs()) {
+//                Log.e(TAG, "Failed to create directory: " + outputDir.getAbsolutePath());
+//                return; // Exit or handle error accordingly
+//            }
+//        }
+//        File wavFile = new File(outputDir, RECORD + File.separator + name + RECORD_SUFFIX_WAV);
+        File wavFile = new File(context.getExternalCacheDir(), RECORD + File.separator + name + RECORD_SUFFIX_WAV);
 
         // Decode OPUS to WAV using FFmpegKit
         OpusUtils.decodeOpusFile(file.getAbsolutePath(),outFile.getAbsolutePath(),s -> {
@@ -345,10 +353,18 @@ public class RecordChatHelper {
             // Parse JSON response as a JSONObject
             JSONObject jsonObject = new JSONObject(jsonResponse);
 
-            // Periksa apakah ini adalah transkripsi final
-            if ("FINAL_TRANSCRIPTION".equals(jsonObject.optString("type"))) {
+            // Periksa apakah ini adalah transkripsi final berdasarkan "is_final"
+            if ("FINAL_TRANSCRIPTION".equals(jsonObject.optString("type"))
+                    && jsonObject.optBoolean("is_final", false)) {
                 return jsonObject.optString("text", ""); // Ambil teks final
             }
+
+            // Periksa untuk FINAL_UNDERSTANDING yang juga bisa berisi is_final
+            if ("FINAL_UNDERSTANDING".equals(jsonObject.optString("type"))
+                    && jsonObject.optBoolean("is_final", false)) {
+                return jsonObject.optString("text", ""); // Ambil teks final
+            }
+
         } catch (Exception e) {
             Log.e(TAG, "Error parsing JSON response", e);
         }
