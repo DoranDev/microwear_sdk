@@ -334,6 +334,7 @@ public class RecordChatHelper {
                     return finalTranscription; // Return the transcription text
                 } else {
                     Log.e(TAG, "Transcription failed or was not returned.");
+                    gptErrorTip("Transcription failed or was not returned.");
                 }
             } else {
                 if (response.body() != null) {
@@ -350,25 +351,17 @@ public class RecordChatHelper {
     }
     private String getFinalTranscription(String jsonResponse) {
         try {
-            // Parse JSON response as a JSONObject
-            JSONObject jsonObject = new JSONObject(jsonResponse);
+            // Step 1: Split the input string
+            String[] parts = jsonResponse.split("\\}\\s*\\{");
 
-            // Periksa apakah ini adalah transkripsi final berdasarkan "is_final"
-            if ("FINAL_TRANSCRIPTION".equals(jsonObject.optString("type"))
-                    && jsonObject.optBoolean("is_final", false)) {
-                return jsonObject.optString("text", ""); // Ambil teks final
-            }
-
-            // Periksa untuk FINAL_UNDERSTANDING yang juga bisa berisi is_final
-            if ("FINAL_UNDERSTANDING".equals(jsonObject.optString("type"))
-                    && jsonObject.optBoolean("is_final", false)) {
-                return jsonObject.optString("text", ""); // Ambil teks final
-            }
-
-        } catch (Exception e) {
-            Log.e(TAG, "Error parsing JSON response", e);
+            Log.e(TAG, "jsonObject: "+"{" + parts[parts.length - 1]);
+            JSONObject lastObject = new JSONObject("{" + parts[parts.length - 1]);
+            return lastObject.optString("text", null);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        return null; // Return null jika tidak ada transkripsi final ditemukan
+
+        return null;
     }
     // Method to send audio to Wit.ai
     private String sendTextToAI(String question) {
@@ -378,7 +371,7 @@ public class RecordChatHelper {
         try {
             // Build the HTTP request to Wit.ai
             Request request = new Request.Builder()
-                    .url("https://api.jeteconnect.id/api/chatbot?text=${question}&provider=gemini")
+                    .url("https://api.jeteconnect.id/api/chatbot?text=" + question + "&provider=gemini")
                     .header("token", token)
                     .get()
                     .build();
