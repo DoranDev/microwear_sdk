@@ -120,7 +120,7 @@ public class RecordChatHelper {
     private void speechRecognition(boolean newSession) {
         File file = new File(context.getExternalCacheDir(), RECORD + File.separator + name + RECORD_SUFFIX_OPUS);
         File outFile = new File(context.getExternalCacheDir(), RECORD + File.separator + name + RECORD_SUFFIX_PCM);
-        File wavFile = new File(context.getExternalCacheDir(), RECORD + File.separator + name + RECORD_SUFFIX_WAV);
+        File wavFile = new File(context.getExternalFilesDir(null), RECORD + File.separator + name + RECORD_SUFFIX_WAV);
 
         // Decode OPUS to WAV using FFmpegKit
         OpusUtils.decodeOpusFile(file.getAbsolutePath(),outFile.getAbsolutePath(),s -> {
@@ -187,9 +187,13 @@ public class RecordChatHelper {
 
         // Proses konversi manual ke WAV seperti pada kode sebelumnya
         try {
-            int channelCount = 2; // Contoh
-            int sampleRate = 44100; // Contoh
-            int bitsPerSample = 16; // Contoh
+//            int channelCount = 2; // Contoh
+//            int sampleRate = 44100; // Contoh
+//            int bitsPerSample = 16; // Contoh
+
+            int channelCount = 1;  // Mono
+            int sampleRate = 16000; // 16kHz (bisa 44100 Hz juga, tergantung kebutuhan)
+            int bitsPerSample = 16; // 16-bit audio
 
             // Konversi PCM ke WAV
             int inputSize = (int) pcmFile.length();
