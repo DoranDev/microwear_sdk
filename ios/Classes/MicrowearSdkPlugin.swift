@@ -9,8 +9,8 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler{
 
     public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         switch arguments as? String {
-        case MicrowearSdkPlugin.eventChannelNameOnReadPower:
-            onReadPowerSink = events
+        case MicrowearSdkPlugin.eventChannelNameDeviceDataReceived:
+            deviceDataReceivedSink = events
         default:
             break
         }
@@ -21,21 +21,23 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler{
         return nil
     }
 
-    static let eventChannelNameOnReadPower = "onReadPower"
-    var onReadPowerSink: FlutterEventSink?
+    static let eventChannelNameDeviceDataReceived = "deviceDataReceived"
+    var deviceDataReceivedSink: FlutterEventSink?
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "microwear_sdk", binaryMessenger: registrar.messenger())
         let instance = MicrowearSdkPlugin(channel)
         registrar.addMethodCallDelegate(instance, channel: channel)
-        let onReadPowerChannel = FlutterEventChannel(name: eventChannelNameOnReadPower, binaryMessenger: registrar.messenger())
-        onReadPowerChannel.setStreamHandler(instance)
+        let deviceDataReceivedChannel = FlutterEventChannel(name: eventChannelNameDeviceDataReceived, binaryMessenger: registrar.messenger())
+        deviceDataReceivedChannel.setStreamHandler(instance)
     }
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let args = call.arguments as? [String: Any]
         switch call.method {
-        case "getPlatformVersion":
-            result("iOS " + UIDevice.current.systemVersion)
+        case "connect":
+            let macAddress = (args?["macAddress"] as? String)!
+            //TODO
         default:
             result(FlutterMethodNotImplemented)
         }
