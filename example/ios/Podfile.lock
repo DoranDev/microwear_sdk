@@ -15,7 +15,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  microwear_sdk: b25acda759f1e4d006160c89ee507140b1afed43
+  microwear_sdk: f9ad6c653dece3b78674823ffecabd2a94dbc369
 
 PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
 

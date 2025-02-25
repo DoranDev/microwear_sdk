@@ -10,7 +10,7 @@
 		</data>
 		<key>Frameworks/RTKLEFoundation.framework/RTKLEFoundation</key>
 		<data>
-		2N4LMne+LWZYsy+G71JZK54ppZg=
+		syT6epF/1naSnP71BOJ5lGzvlJA=
 		</data>
 		<key>Frameworks/RTKLEFoundation.framework/_CodeSignature/CodeResources</key>
 		<data>
@@ -22,7 +22,7 @@
 		</data>
 		<key>Frameworks/RTKOTASDK.framework/RTKOTASDK</key>
 		<data>
-		LQw5DIgLwCBwhY31cAKzViEDdr8=
+		oJhM2LXF9cN2zCPmL6hQlFRcst4=
 		</data>
 		<key>Frameworks/RTKOTASDK.framework/_CodeSignature/CodeResources</key>
 		<data>
@@ -34,7 +34,7 @@
 		</data>
 		<key>Headers/NJYBleService.h</key>
 		<data>
-		BGcvAsZwFpu19S3LN/ALI/i7th8=
+		10mJi2rTlaXB5BnTAaeNL5bgYc4=
 		</data>
 		<key>Headers/NJY_AReceiptCodeModel.h</key>
 		<data>
@@ -80,6 +80,10 @@
 		<data>
 		mWZzgG1byU9n+IBCHfYzLy4N6Cg=
 		</data>
+		<key>Headers/NJY_GPSInfoModel.h</key>
+		<data>
+		PxFCVEg/WRSCQw7el7Sh2xgxiZs=
+		</data>
 		<key>Headers/NJY_GameModel.h</key>
 		<data>
 		dt+dv6Ykyr67CrZRSFrkgVB2gTg=
@@ -104,6 +108,10 @@
 		<data>
 		NGDpyUzzvSZu29b04F9jyIFAMXU=
 		</data>
+		<key>Headers/NJY_NewModel.h</key>
+		<data>
+		mpsbzcEBLxLJ4AHtrkokkGI+Ca8=
+		</data>
 		<key>Headers/NJY_NotifModel.h</key>
 		<data>
 		labA3oTY9nza7pl3kN6YFwMnGnM=
@@ -114,11 +122,15 @@
 		</data>
 		<key>Headers/NJY_PublicEnum.h</key>
 		<data>
-		mZou+NXgtnGPoqB1m7NQ1d1iCCA=
+		Fm+zRJnFZXSuoeympD9TPUlQjRY=
 		</data>
 		<key>Headers/NJY_QiblaModel.h</key>
 		<data>
 		uQDWkbvGitGK8C5ybPXbVYURSzo=
+		</data>
+		<key>Headers/NJY_SchedDuleModel.h</key>
+		<data>
+		8guJkewz2KER0SOR7PSUKK3mSlQ=
 		</data>
 		<key>Headers/NJY_SharesModel.h</key>
 		<data>
@@ -154,7 +166,7 @@
 		</data>
 		<key>Headers/NJY_WeatherForecastModel.h</key>
 		<data>
-		0Gn028W1U5Ncgj495uw1phX9Jp8=
+		yGakanJGPWedlo+WG71iFeZLR5E=
 		</data>
 		<key>Headers/NJY_WeatherModel.h</key>
 		<data>
@@ -166,7 +178,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		nSnnTwKQcUZ67OdJ4oxnPbck/cA=
+		anBq9AqC+uY5Or9q7cqxmjckQ+o=
 		</data>
 		<key>en.lproj/Localizable.strings</key>
 		<dict>
@@ -213,11 +225,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			2N4LMne+LWZYsy+G71JZK54ppZg=
+			syT6epF/1naSnP71BOJ5lGzvlJA=
 			</data>
 			<key>hash2</key>
 			<data>
-			v+Oevp8lwmsfAKwo1l67QfGwaj/0WI466zNEEqczPdo=
+			z9nj8lcyDk22IXX48nlGDkKgp9WOg1zqreDZiLOwkKI=
 			</data>
 		</dict>
 		<key>Frameworks/RTKLEFoundation.framework/_CodeSignature/CodeResources</key>
@@ -246,11 +258,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			LQw5DIgLwCBwhY31cAKzViEDdr8=
+			oJhM2LXF9cN2zCPmL6hQlFRcst4=
 			</data>
 			<key>hash2</key>
 			<data>
-			ry3a8PaAjkq/bX/kuFpVklsx1wq/XtpHE8aToXOJ280=
+			BHKR+2IH2t3kSJrvqqtcIhQjFZw7OF71vhZKG6lhrhs=
 			</data>
 		</dict>
 		<key>Frameworks/RTKOTASDK.framework/_CodeSignature/CodeResources</key>
@@ -279,11 +291,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			BGcvAsZwFpu19S3LN/ALI/i7th8=
+			10mJi2rTlaXB5BnTAaeNL5bgYc4=
 			</data>
 			<key>hash2</key>
 			<data>
-			8Ks/ndhrMZfOFJW2B4JGteldo5wJyT8gcDrpLIKIvkY=
+			xjL/e1XdXlhhS8CLlIud6uwXZh/qpNwdxlrwgXrBM70=
 			</data>
 		</dict>
 		<key>Headers/NJY_AReceiptCodeModel.h</key>
@@ -407,6 +419,17 @@
 			QeNL7rH890OFwXaMVSFWS0p1X5vBuRjtMfQQ+4XmhO4=
 			</data>
 		</dict>
+		<key>Headers/NJY_GPSInfoModel.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			PxFCVEg/WRSCQw7el7Sh2xgxiZs=
+			</data>
+			<key>hash2</key>
+			<data>
+			s2/DIOXojoGCgAb8IN/29drhGRok7nxZjOXvV5/KRwQ=
+			</data>
+		</dict>
 		<key>Headers/NJY_GameModel.h</key>
 		<dict>
 			<key>hash</key>
@@ -473,6 +496,17 @@
 			eMgWYS7QOcN7OnfK3dL0Mx9rI4Zvfd/feSSrnaG8lfY=
 			</data>
 		</dict>
+		<key>Headers/NJY_NewModel.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			mpsbzcEBLxLJ4AHtrkokkGI+Ca8=
+			</data>
+			<key>hash2</key>
+			<data>
+			nDL7Gy8XiNedm4o6v7EPBoVk56Wf3Tfb3TxI4JPIyUo=
+			</data>
+		</dict>
 		<key>Headers/NJY_NotifModel.h</key>
 		<dict>
 			<key>hash</key>
@@ -499,11 +533,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			mZou+NXgtnGPoqB1m7NQ1d1iCCA=
+			Fm+zRJnFZXSuoeympD9TPUlQjRY=
 			</data>
 			<key>hash2</key>
 			<data>
-			KkrZ4tejkJ7b0xwnuXonBBaW0WUK0N0XH9IjXUcm0X8=
+			rLsDsylKWlfvrw/DbVWJ6097a+4dyscTbokGPpEZy/M=
 			</data>
 		</dict>
 		<key>Headers/NJY_QiblaModel.h</key>
@@ -515,6 +549,17 @@
 			<key>hash2</key>
 			<data>
 			hdUsLXLIwiUaZN5XuHDZohvH1CD69JRPIakEwBOf4hA=
+			</data>
+		</dict>
+		<key>Headers/NJY_SchedDuleModel.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			8guJkewz2KER0SOR7PSUKK3mSlQ=
+			</data>
+			<key>hash2</key>
+			<data>
+			cuVEqEFwmePmN7y+KTEY2RHwmbUdOSBjQe/iwFVQKno=
 			</data>
 		</dict>
 		<key>Headers/NJY_SharesModel.h</key>
@@ -609,11 +654,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			0Gn028W1U5Ncgj495uw1phX9Jp8=
+			yGakanJGPWedlo+WG71iFeZLR5E=
 			</data>
 			<key>hash2</key>
 			<data>
-			mFkudkslhqEXYp0OwgAcvIn/574l2FVn51AgEKYGFX8=
+			tIrBXqNdvz1K1BRSdTV1wsx93aI68GKH7kszHlaGIHg=
 			</data>
 		</dict>
 		<key>Headers/NJY_WeatherModel.h</key>

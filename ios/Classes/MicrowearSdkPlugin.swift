@@ -189,4 +189,21 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler{
             result(FlutterMethodNotImplemented)
         }
     }
+    
+    
+    private func connectToDevice(with bleAddress: String, result: @escaping FlutterResult) {
+      let bleService = NJYBleService.sharedInstance()
+
+      if let peripherals = bleService.bleModals as? [NJY_Peripherial] {
+        for peripheral in peripherals {
+          if peripheral.mac == bleAddress {
+            bleService.connect(peripheral.peripheral)
+            result("Connected to \(peripheral.name ?? "device")")
+            return
+          }
+        }
+      }
+      result(FlutterError(code: "DEVICE_NOT_FOUND", message: "Device with address \(bleAddress) not found", details: nil))
+    }
+    
 }
