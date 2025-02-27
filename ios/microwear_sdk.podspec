@@ -16,7 +16,7 @@ A new Flutter project.
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
   s.vendored_frameworks=
-  'FR/RTKOTASDK.framework',
+  'FR/RTKOTASDK.xcframework',
   'FR/NJYBLESDK.framework',
   'FR/RTKLEFoundation.xcframework',
   'FR/SpeexKit.framework'
