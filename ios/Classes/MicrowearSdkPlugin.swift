@@ -1,7 +1,7 @@
 import Flutter
 import UIKit
 
-public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
+public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
     // Event sinks for various event channels
     var deviceDataReceivedSink: FlutterEventSink?
     var batteryLevelSink: FlutterEventSink?
@@ -55,74 +55,115 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
         super.init()
     }
 
-    public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-        let channelName = arguments as? String
-
-        switch channelName {
-        case MicrowearSdkPlugin.deviceDataReceivedChannelName:
-            deviceDataReceivedSink = events
-        case MicrowearSdkPlugin.batteryLevelChannelName:
-            batteryLevelSink = events
-        case MicrowearSdkPlugin.syncHourStepChannelName:
-            syncHourStepSink = events
-        case MicrowearSdkPlugin.syncWeekDaySportsChannelName:
-            syncWeekDaySportsSink = events
-        case MicrowearSdkPlugin.deviceConfigChannelName:
-            deviceConfigSink = events
-        case MicrowearSdkPlugin.syncSleepDataChannelName:
-            syncSleepDataSink = events
-        case MicrowearSdkPlugin.syncSportRecordChannelName:
-            syncSportRecordSink = events
-        case MicrowearSdkPlugin.getAlarmClockInfoChannelName:
-            getAlarmClockInfoSink = events
-        case MicrowearSdkPlugin.syncBloodPressureChannelName:
-            syncBloodPressureSink = events
-        case MicrowearSdkPlugin.syncHeartDataChannelName:
-            syncHeartDataSink = events
-        case MicrowearSdkPlugin.syncOxDataChannelName:
-            syncOxDataSink = events
-        case MicrowearSdkPlugin.syncHomeDataChannelName:
-            syncHomeDataSink = events
-        case MicrowearSdkPlugin.syncRealTimeECGChannelName:
-            syncRealTimeECGSink = events
-        case MicrowearSdkPlugin.getDeviceFunChannelName:
-            getDeviceFunSink = events
-        case MicrowearSdkPlugin.getDeviceConfig1ChannelName:
-            getDeviceConfig1Sink = events
-        case MicrowearSdkPlugin.registerConnectStatuesCallBackChannelName:
-            registerConnectStatuesCallBackSink = events
-        case MicrowearSdkPlugin.registerSomatosensoryGameCallbackChannelName:
-            registerSomatosensoryGameCallbackSink = events
-        case MicrowearSdkPlugin.registerSingleHeartOxBloodCallbackChannelName:
-            registerSingleHeartOxBloodCallbackSink = events
-        case MicrowearSdkPlugin.registerMac3CallBackChannelName:
-            registerMac3CallBackSink = events
-        case MicrowearSdkPlugin.registerGPSCallBackChannelName:
-            registerGPSCallBackSink = events
-        case MicrowearSdkPlugin.onLoadingChannelName:
-            onLoadingSink = events
-        default:
-            break
-        }
-
-        return nil
-    }
-
-    public func onCancel(withArguments arguments: Any?) -> FlutterError? {
-        return nil
-    }
-
-    private static func setupEventChannel(name: String, registrar: FlutterPluginRegistrar, handler: MicrowearSdkPlugin) {
-        let channel = FlutterEventChannel(name: name, binaryMessenger: registrar.messenger())
-        channel.setStreamHandler(handler)
-    }
+//    public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+//        print("onListen called with arguments: \(String(describing: arguments))")
+//
+//        deviceDataReceivedSink = events
+//
+//        batteryLevelSink = events
+//
+//        syncHourStepSink = events
+//
+//        syncWeekDaySportsSink = events
+//
+//        deviceConfigSink = events
+//
+//        syncSleepDataSink = events
+//
+//        syncSportRecordSink = events
+//
+//        getAlarmClockInfoSink = events
+//
+//        syncBloodPressureSink = events
+//
+//        syncHeartDataSink = events
+//
+//        syncOxDataSink = events
+//
+//        syncHomeDataSink = events
+//
+//        syncRealTimeECGSink = events
+//
+//        getDeviceFunSink = events
+//
+//        getDeviceConfig1Sink = events
+//
+//        registerConnectStatuesCallBackSink = events
+//
+//        registerSomatosensoryGameCallbackSink = events
+//
+//        registerSingleHeartOxBloodCallbackSink = events
+//
+//        registerMac3CallBackSink = events
+//
+//        registerGPSCallBackSink = events
+//
+//        onLoadingSink = events
+////
+////        switch arguments as? String {
+////        case MicrowearSdkPlugin.deviceDataReceivedChannelName:
+////            deviceDataReceivedSink = events
+////        case MicrowearSdkPlugin.batteryLevelChannelName:
+////            batteryLevelSink = events
+////        case MicrowearSdkPlugin.syncHourStepChannelName:
+////            syncHourStepSink = events
+////        case MicrowearSdkPlugin.syncWeekDaySportsChannelName:
+////            syncWeekDaySportsSink = events
+////        case MicrowearSdkPlugin.deviceConfigChannelName:
+////            deviceConfigSink = events
+////        case MicrowearSdkPlugin.syncSleepDataChannelName:
+////            syncSleepDataSink = events
+////        case MicrowearSdkPlugin.syncSportRecordChannelName:
+////            syncSportRecordSink = events
+////        case MicrowearSdkPlugin.getAlarmClockInfoChannelName:
+////            getAlarmClockInfoSink = events
+////        case MicrowearSdkPlugin.syncBloodPressureChannelName:
+////            syncBloodPressureSink = events
+////        case MicrowearSdkPlugin.syncHeartDataChannelName:
+////            syncHeartDataSink = events
+////        case MicrowearSdkPlugin.syncOxDataChannelName:
+////            syncOxDataSink = events
+////        case MicrowearSdkPlugin.syncHomeDataChannelName:
+////            syncHomeDataSink = events
+////        case MicrowearSdkPlugin.syncRealTimeECGChannelName:
+////            syncRealTimeECGSink = events
+////        case MicrowearSdkPlugin.getDeviceFunChannelName:
+////            getDeviceFunSink = events
+////        case MicrowearSdkPlugin.getDeviceConfig1ChannelName:
+////            getDeviceConfig1Sink = events
+////        case MicrowearSdkPlugin.registerConnectStatuesCallBackChannelName:
+////            print("Setting registerConnectStatuesCallBackSink")
+////              registerConnectStatuesCallBackSink = events
+////              print("registerConnectStatuesCallBackSink set successfully: \(registerConnectStatuesCallBackSink != nil)")
+////        case MicrowearSdkPlugin.registerSomatosensoryGameCallbackChannelName:
+////            registerSomatosensoryGameCallbackSink = events
+////        case MicrowearSdkPlugin.registerSingleHeartOxBloodCallbackChannelName:
+////            registerSingleHeartOxBloodCallbackSink = events
+////        case MicrowearSdkPlugin.registerMac3CallBackChannelName:
+////            registerMac3CallBackSink = events
+////        case MicrowearSdkPlugin.registerGPSCallBackChannelName:
+////            registerGPSCallBackSink = events
+////        case MicrowearSdkPlugin.onLoadingChannelName:
+////            onLoadingSink = events
+////        default:
+////            break
+////        }
+//
+//        return nil
+//    }
+//
+//    public func onCancel(withArguments arguments: Any?) -> FlutterError? {
+//        return nil
+//    }
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "microwear_sdk", binaryMessenger: registrar.messenger())
         let instance = MicrowearSdkPlugin(channel)
         registrar.addMethodCallDelegate(instance, channel: channel)
+
+        let deviceDataReceivedHandler = DeviceDataReceivedStreamHandler(plugin: instance)
         let deviceDataReceivedChannel = FlutterEventChannel(name: deviceDataReceivedChannelName, binaryMessenger: registrar.messenger())
-        deviceDataReceivedChannel.setStreamHandler(instance)
+        deviceDataReceivedChannel.setStreamHandler(deviceDataReceivedHandler)
 
         let batteryLevelChannel = FlutterEventChannel(name: batteryLevelChannelName, binaryMessenger: registrar.messenger())
         batteryLevelChannel.setStreamHandler(instance)
@@ -166,8 +207,11 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
         let getDeviceConfig1Channel = FlutterEventChannel(name: getDeviceConfig1ChannelName, binaryMessenger: registrar.messenger())
         getDeviceConfig1Channel.setStreamHandler(instance)
 
+
+        let connectStatusHandler = ConnectStatusStreamHandler(plugin: instance)
         let registerConnectStatuesCallBackChannel = FlutterEventChannel(name: registerConnectStatuesCallBackChannelName, binaryMessenger: registrar.messenger())
-        registerConnectStatuesCallBackChannel.setStreamHandler(instance)
+        registerConnectStatuesCallBackChannel.setStreamHandler(connectStatusHandler)
+    
 
         let registerSomatosensoryGameCallbackChannel = FlutterEventChannel(name: registerSomatosensoryGameCallbackChannelName, binaryMessenger: registrar.messenger())
         registerSomatosensoryGameCallbackChannel.setStreamHandler(instance)
@@ -192,16 +236,13 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
         case "connect":
             let macAddress = args?["macAddress"] as? String ?? ""
             connectToDevice(with: macAddress, result: result)
-
         case "creteBond":
             let macAddress = args?["macAddress"] as? String ?? ""
             // TODO: Implement createBond functionality
             result(nil)
-
         case "startService":
             // TODO: Implement startService functionality
             result("service_started")
-
         case "stopService":
             // TODO: Implement stopService functionality
             result("service_stopped")
@@ -229,14 +270,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
             result(nil)
 
         case "sendRequest":
-            guard let microwearDeviceControlValue = args?["microwearDeviceControl"] as? Int,
-                  let data = args?["data"] as? [String: Any]
-            else {
-                result(FlutterError(code: "INVALID_ARGUMENTS",
-                                    message: "Invalid arguments for sendRequest",
-                                    details: nil))
-                return
-            }
+            let microwearDeviceControlValue = args?["microwearDeviceControl"] as? Int
 
             switch microwearDeviceControlValue {
             case 0: // MicrowearDeviceControl.alertFindWatch.value
@@ -250,7 +284,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
             case 29: // MicrowearDeviceControl.ecgHr.value
                 print("Sync 24-hour blood oxygen data command sent") // Mirip dengan mesBo2
                 let asyncCallback = NJYAsyncCallback<AnyObject>.create(self, success: { result in
-                    print("Success: \(result)")
+                    print("Sync 24-hour blood Success: \(result)")
                 }, failure: { error in
                     print("Failure: \(error.localizedDescription)")
                 })
@@ -271,7 +305,6 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
                 print("Low power shutdown command sent")
             case 60: // MicrowearDeviceControl.productId.value
                 print("Get device information command sent") // Mirip dengan device information
-
             case 61: // MicrowearDeviceControl.tpVer.value
                 print("Get version command sent") // Mirip dengan version
             case 62: // MicrowearDeviceControl.firmwareVer.value
@@ -302,9 +335,18 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
             case 72: // MicrowearDeviceControl.bat.value
                 print("Get battery level command sent")
                 let asyncCallback = NJYAsyncCallback<AnyObject>.create(self, success: { result in
-                    print("Success: \(result)")
+                    print("Get battery  Success: \(result)")
+                    if let batteryLevelSink = self.batteryLevelSink {
+                        print("About to send battery to Flutter")
+                        var item = [String: Any]()
+                        item["battery"] = result
+                        batteryLevelSink(item)
+                    }else{
+                        print("batteryLevelSink nil")
+                    }
+
                 }, failure: { error in
-                    print("Failure: \(error.localizedDescription)")
+                    print("Get battery Failure: \(error.localizedDescription)")
                 })
                 bleService.getDeviceBat(asyncCallback)
             case 73: // MicrowearDeviceControl.targetStep.value
@@ -336,10 +378,12 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
             case 85: // MicrowearDeviceControl.disturb.value
                 print("Do not disturb mode command sent")
             case 86: // MicrowearDeviceControl.longSit.value
+                break
                 print("Long sit reminder sent")
             case 87: // MicrowearDeviceControl.drinkWater.value
+                break
                 print("Drink water reminder sent")
-            case 88: // MicrowearDeviceControl.washHand.value
+            case 88: // MicrowearDeviceControl.washHand.value'
                 print("Hand washing reminder command sent")
             case 89: // MicrowearDeviceControl.schedule.value
                 print("Schedule reminder command sent")
@@ -386,6 +430,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
             case 111: // MicrowearDeviceControl.androidPhoneCtrl.value
                 print("Phone answer/hang up status command sent")
             case 112: // MicrowearDeviceControl.unbind.value
+
                 print("Unbind command sent")
             case 120: // MicrowearDeviceControl.hrEcg.value
                 print("Start ECG command sent") // Mirip dengan start ecg
@@ -413,11 +458,10 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
                         macAddressCache = bleAddress
                         bleService.connect(peripheral.peripheral)
                         result("Connected to \(peripheral.name)")
-
                         DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [self] in
                             print("Ini juga dijalankan setelah 3 detik")
                             let asyncCallback = NJYAsyncCallback<AnyObject>.create(self, success: { result in
-                                print("getDeviceBat Success: \(result)")
+                                print("getDeviceVer Success: \(result)")
                                 var item = [String: Any]()
                                 item["status"] = "onDiscoveredServices"
                                 item["mac"] = self.macAddressCache
@@ -425,11 +469,32 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
                                 print(item)
 
                                 if let registerConnectStatuesCallBackSink = self.registerConnectStatuesCallBackSink {
+                                    print("About to send data to Flutter")
                                     registerConnectStatuesCallBackSink(item)
+                                    print("Data sent to Flutter")
+                                } else {
+                                    print("Callback sink is nil")
+                                }
+                                
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [self] in
+                                    print("Ini juga dijalankan setelah 3 detik")
+                                    
+                                    item["status"] = "onConnected"
+                                    item["mac"] = self.macAddressCache
+                                    
+                                    print(item)
+                                    
+                                    if let registerConnectStatuesCallBackSink = self.registerConnectStatuesCallBackSink {
+                                        print("About to send data to Flutter")
+                                        registerConnectStatuesCallBackSink(item)
+                                        print("Data sent to Flutter")
+                                    } else {
+                                        print("Callback sink is nil")
+                                    }
                                 }
 
                             }, failure: { error in
-                                print("getDeviceBat Failure: \(error.localizedDescription)")
+                                print("getDeviceVer Failure: \(error.localizedDescription)")
                                 var item = [String: Any]()
                                 item["status"] = "onConnectFail"
                                 item["mac"] = self.macAddressCache
@@ -439,7 +504,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
                                 }
 
                             })
-                            bleService.getDeviceBat(asyncCallback)
+                            bleService.getDeviceVer(asyncCallback)
                         }
                     }
                 }
@@ -463,3 +528,43 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
         result(FlutterError(code: "DEVICE_NOT_FOUND", message: "Device with address \(bleAddress) not found", details: nil))
     }
 }
+
+ class DataReceivedStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("DataReceivedStreamHandler.onListen called")
+        plugin?.dataReceivedCallBackSink = events
+        print("DataReceivedsink set: \(plugin?.dataReceivedCallBackSink  != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("DataReceivedStreamHandler.onCancel called")
+        return nil
+    }
+ }
+
+ class ConnectStatusStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("ConnectStatusStreamHandler.onListen called")
+        plugin?.registerConnectStatuesCallBackSink = events
+        print("Connect status sink set: \(plugin?.registerConnectStatuesCallBackSink  != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("ConnectStatusStreamHandler.onCancel called")
+        return nil
+    }
+ }
