@@ -555,8 +555,8 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
 
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         print("DataReceivedStreamHandler.onListen called")
-        plugin?.dataReceivedCallBackSink = events
-        print("DataReceivedsink set: \(plugin?.dataReceivedCallBackSink  != nil)")
+        plugin?.deviceDataReceivedSink = events
+        print("DataReceivedsink set: \(plugin?.deviceDataReceivedSink  != nil)")
         return nil
     }
 
@@ -577,8 +577,8 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
 
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         print("DeviceConfigStreamHandler.onListen called")
-        plugin?.deviceConfigCallBackSink = events
-        print("DeviceConfig sink set: \(plugin?.deviceConfigCallBackSink  != nil)")
+        plugin?.deviceConfigSink = events
+        print("DeviceConfig sink set: \(plugin?.deviceConfigSink  != nil)")
         return nil
     }
 
