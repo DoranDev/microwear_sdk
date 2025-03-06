@@ -2,29 +2,28 @@ import Flutter
 import UIKit
 
 public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
-    
     // Event sinks for various event channels
-     var deviceDataReceivedSink: FlutterEventSink?
-     var batteryLevelSink: FlutterEventSink?
-     var syncHourStepSink: FlutterEventSink?
-     var syncWeekDaySportsSink: FlutterEventSink?
-     var deviceConfigSink: FlutterEventSink?
-     var syncSleepDataSink: FlutterEventSink?
-     var syncSportRecordSink: FlutterEventSink?
-     var getAlarmClockInfoSink: FlutterEventSink?
-     var syncBloodPressureSink: FlutterEventSink?
-     var syncHeartDataSink: FlutterEventSink?
-     var syncOxDataSink: FlutterEventSink?
-     var syncHomeDataSink: FlutterEventSink?
-     var syncRealTimeECGSink: FlutterEventSink?
-     var getDeviceFunSink: FlutterEventSink?
-     var getDeviceConfig1Sink: FlutterEventSink?
-     var registerConnectStatuesCallBackSink: FlutterEventSink?
-     var registerSomatosensoryGameCallbackSink: FlutterEventSink?
-     var registerSingleHeartOxBloodCallbackSink: FlutterEventSink?
-     var registerMac3CallBackSink: FlutterEventSink?
-     var registerGPSCallBackSink: FlutterEventSink?
-     var onLoadingSink: FlutterEventSink?
+    var deviceDataReceivedSink: FlutterEventSink?
+    var batteryLevelSink: FlutterEventSink?
+    var syncHourStepSink: FlutterEventSink?
+    var syncWeekDaySportsSink: FlutterEventSink?
+    var deviceConfigSink: FlutterEventSink?
+    var syncSleepDataSink: FlutterEventSink?
+    var syncSportRecordSink: FlutterEventSink?
+    var getAlarmClockInfoSink: FlutterEventSink?
+    var syncBloodPressureSink: FlutterEventSink?
+    var syncHeartDataSink: FlutterEventSink?
+    var syncOxDataSink: FlutterEventSink?
+    var syncHomeDataSink: FlutterEventSink?
+    var syncRealTimeECGSink: FlutterEventSink?
+    var getDeviceFunSink: FlutterEventSink?
+    var getDeviceConfig1Sink: FlutterEventSink?
+    var registerConnectStatuesCallBackSink: FlutterEventSink?
+    var registerSomatosensoryGameCallbackSink: FlutterEventSink?
+    var registerSingleHeartOxBloodCallbackSink: FlutterEventSink?
+    var registerMac3CallBackSink: FlutterEventSink?
+    var registerGPSCallBackSink: FlutterEventSink?
+    var onLoadingSink: FlutterEventSink?
 
     // Event channel names
     static let deviceDataReceivedChannelName = "deviceDataReceived"
@@ -48,7 +47,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     static let registerMac3CallBackChannelName = "registerMac3CallBack"
     static let registerGPSCallBackChannelName = "registerGPSCallBack"
     static let onLoadingChannelName = "onLoading"
-    
+
     let bleService = NJYBleService.sharedInstance()
     var macAddressCache = ""
 
@@ -239,8 +238,6 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
                 return
             }
 
-      
-
             switch microwearDeviceControlValue {
             case 0: // MicrowearDeviceControl.alertFindWatch.value
                 print("Find watch command sent")
@@ -403,8 +400,6 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
             result(FlutterMethodNotImplemented)
         }
     }
-    
-
 
     private func connectToDevice(with bleAddress: String, result: @escaping FlutterResult) {
         bleService.scan()
@@ -418,37 +413,39 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
                         macAddressCache = bleAddress
                         bleService.connect(peripheral.peripheral)
                         result("Connected to \(peripheral.name)")
-                        
-                        
+
                         DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [self] in
                             print("Ini juga dijalankan setelah 3 detik")
                             let asyncCallback = NJYAsyncCallback<AnyObject>.create(self, success: { result in
-                                print("getCentralManagerDidUpdateState Success: \(result)")
+                                print("getDeviceBat Success: \(result)")
                                 var item = [String: Any]()
                                 item["status"] = "onDiscoveredServices"
                                 item["mac"] = self.macAddressCache
-                                
-                                self.registerConnectStatuesCallBackSink?(item)
-                             
+
+                                print(item)
+
+                                if let registerConnectStatuesCallBackSink = self.registerConnectStatuesCallBackSink {
+                                    registerConnectStatuesCallBackSink(item)
+                                }
+
                             }, failure: { error in
-                                print("getCentralManagerDidUpdateState Failure: \(error.localizedDescription)")
+                                print("getDeviceBat Failure: \(error.localizedDescription)")
                                 var item = [String: Any]()
                                 item["status"] = "onConnectFail"
                                 item["mac"] = self.macAddressCache
 
-                                self.registerConnectStatuesCallBackSink?(item)
-                                
+                                if let registerConnectStatuesCallBackSink = self.registerConnectStatuesCallBackSink {
+                                    registerConnectStatuesCallBackSink(item)
+                                }
+
                             })
                             bleService.getDeviceBat(asyncCallback)
-                            return
                         }
                     }
                 }
             }
             result(FlutterError(code: "DEVICE_NOT_FOUND", message: "Device with address \(bleAddress) not found", details: nil))
         }
-       
-
     }
 
     func disconnectFromDevice(with bleAddress: String, result: @escaping FlutterResult) {
