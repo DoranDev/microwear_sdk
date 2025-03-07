@@ -49,6 +49,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
     static let onLoadingChannelName = "onLoading"
 
     let bleService = NJYBleService.sharedInstance()
+
     var macAddressCache = ""
 
     init(_ channel: FlutterMethodChannel) {
@@ -99,55 +100,55 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
 //        registerGPSCallBackSink = events
 //
 //        onLoadingSink = events
-////
-////        switch arguments as? String {
-////        case MicrowearSdkPlugin.deviceDataReceivedChannelName:
-////            deviceDataReceivedSink = events
-////        case MicrowearSdkPlugin.batteryLevelChannelName:
-////            batteryLevelSink = events
-////        case MicrowearSdkPlugin.syncHourStepChannelName:
-////            syncHourStepSink = events
-////        case MicrowearSdkPlugin.syncWeekDaySportsChannelName:
-////            syncWeekDaySportsSink = events
-////        case MicrowearSdkPlugin.deviceConfigChannelName:
-////            deviceConfigSink = events
-////        case MicrowearSdkPlugin.syncSleepDataChannelName:
-////            syncSleepDataSink = events
-////        case MicrowearSdkPlugin.syncSportRecordChannelName:
-////            syncSportRecordSink = events
-////        case MicrowearSdkPlugin.getAlarmClockInfoChannelName:
-////            getAlarmClockInfoSink = events
-////        case MicrowearSdkPlugin.syncBloodPressureChannelName:
-////            syncBloodPressureSink = events
-////        case MicrowearSdkPlugin.syncHeartDataChannelName:
-////            syncHeartDataSink = events
-////        case MicrowearSdkPlugin.syncOxDataChannelName:
-////            syncOxDataSink = events
-////        case MicrowearSdkPlugin.syncHomeDataChannelName:
-////            syncHomeDataSink = events
-////        case MicrowearSdkPlugin.syncRealTimeECGChannelName:
-////            syncRealTimeECGSink = events
-////        case MicrowearSdkPlugin.getDeviceFunChannelName:
-////            getDeviceFunSink = events
-////        case MicrowearSdkPlugin.getDeviceConfig1ChannelName:
-////            getDeviceConfig1Sink = events
-////        case MicrowearSdkPlugin.registerConnectStatuesCallBackChannelName:
-////            print("Setting registerConnectStatuesCallBackSink")
-////              registerConnectStatuesCallBackSink = events
-////              print("registerConnectStatuesCallBackSink set successfully: \(registerConnectStatuesCallBackSink != nil)")
-////        case MicrowearSdkPlugin.registerSomatosensoryGameCallbackChannelName:
-////            registerSomatosensoryGameCallbackSink = events
-////        case MicrowearSdkPlugin.registerSingleHeartOxBloodCallbackChannelName:
-////            registerSingleHeartOxBloodCallbackSink = events
-////        case MicrowearSdkPlugin.registerMac3CallBackChannelName:
-////            registerMac3CallBackSink = events
-////        case MicrowearSdkPlugin.registerGPSCallBackChannelName:
-////            registerGPSCallBackSink = events
-////        case MicrowearSdkPlugin.onLoadingChannelName:
-////            onLoadingSink = events
-////        default:
-////            break
-////        }
+    ////
+    ////        switch arguments as? String {
+    ////        case MicrowearSdkPlugin.deviceDataReceivedChannelName:
+    ////            deviceDataReceivedSink = events
+    ////        case MicrowearSdkPlugin.batteryLevelChannelName:
+    ////            batteryLevelSink = events
+    ////        case MicrowearSdkPlugin.syncHourStepChannelName:
+    ////            syncHourStepSink = events
+    ////        case MicrowearSdkPlugin.syncWeekDaySportsChannelName:
+    ////            syncWeekDaySportsSink = events
+    ////        case MicrowearSdkPlugin.deviceConfigChannelName:
+    ////            deviceConfigSink = events
+    ////        case MicrowearSdkPlugin.syncSleepDataChannelName:
+    ////            syncSleepDataSink = events
+    ////        case MicrowearSdkPlugin.syncSportRecordChannelName:
+    ////            syncSportRecordSink = events
+    ////        case MicrowearSdkPlugin.getAlarmClockInfoChannelName:
+    ////            getAlarmClockInfoSink = events
+    ////        case MicrowearSdkPlugin.syncBloodPressureChannelName:
+    ////            syncBloodPressureSink = events
+    ////        case MicrowearSdkPlugin.syncHeartDataChannelName:
+    ////            syncHeartDataSink = events
+    ////        case MicrowearSdkPlugin.syncOxDataChannelName:
+    ////            syncOxDataSink = events
+    ////        case MicrowearSdkPlugin.syncHomeDataChannelName:
+    ////            syncHomeDataSink = events
+    ////        case MicrowearSdkPlugin.syncRealTimeECGChannelName:
+    ////            syncRealTimeECGSink = events
+    ////        case MicrowearSdkPlugin.getDeviceFunChannelName:
+    ////            getDeviceFunSink = events
+    ////        case MicrowearSdkPlugin.getDeviceConfig1ChannelName:
+    ////            getDeviceConfig1Sink = events
+    ////        case MicrowearSdkPlugin.registerConnectStatuesCallBackChannelName:
+    ////            print("Setting registerConnectStatuesCallBackSink")
+    ////              registerConnectStatuesCallBackSink = events
+    ////              print("registerConnectStatuesCallBackSink set successfully: \(registerConnectStatuesCallBackSink != nil)")
+    ////        case MicrowearSdkPlugin.registerSomatosensoryGameCallbackChannelName:
+    ////            registerSomatosensoryGameCallbackSink = events
+    ////        case MicrowearSdkPlugin.registerSingleHeartOxBloodCallbackChannelName:
+    ////            registerSingleHeartOxBloodCallbackSink = events
+    ////        case MicrowearSdkPlugin.registerMac3CallBackChannelName:
+    ////            registerMac3CallBackSink = events
+    ////        case MicrowearSdkPlugin.registerGPSCallBackChannelName:
+    ////            registerGPSCallBackSink = events
+    ////        case MicrowearSdkPlugin.onLoadingChannelName:
+    ////            onLoadingSink = events
+    ////        default:
+    ////            break
+    ////        }
 //
 //        return nil
 //    }
@@ -262,32 +263,28 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
             result("service_started")
         case "stopService":
             // TODO: Implement stopService functionality
+            bleService.stopScan()
             result("service_stopped")
-
         case "getBondState":
             let macAddress = args?["macAddress"] as? String ?? ""
             // TODO: Implement getBondState functionality
             result(nil)
-
         case "getConnectStatus":
             let macAddress = args?["macAddress"] as? String ?? ""
             // TODO: Implement getConnectStatus functionality
             result(nil)
-
         case "registerConnectStatue":
             let macAddress = args?["macAddress"] as? String ?? ""
             // TODO: Implement registerConnectStatus functionality
             result(nil)
-
         case "unregisterConnectStatue":
             // TODO: Implement unregisterConnectStatus functionality
             result(nil)
-
         case "disconnect":
-            result(nil)
-
+            disconnectFromDevice(with: macAddressCache, result: result)
         case "sendRequest":
             let microwearDeviceControlValue = args?["microwearDeviceControl"] as? Int
+            let data = args?["data"] as? [String: Any]
 
             switch microwearDeviceControlValue {
             case 0: // MicrowearDeviceControl.alertFindWatch.value
@@ -295,7 +292,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 bleService.sendAlertFindWatch()
             case 11: // MicrowearDeviceControl.alertMsg.value
                 print("Message push notification command sent")
-                var notif = NJY_NotifModel()
+                let notif = NJY_NotifModel()
                 notif.msgWhatsApp = 1
                 bleService.sendNotif(notif)
             case 29: // MicrowearDeviceControl.ecgHr.value
@@ -338,8 +335,18 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 print("Set unit system command sent")
             case 67: // MicrowearDeviceControl.dateTime.value
                 print("Set date and time command sent")
-                let curDateTimeModel = NJY_CurDateTimeModel()
-                bleService.sendCurDateTime(curDateTimeModel)
+                let timeModel = NJY_CurDateTimeModel()
+                let dateNow = Date()
+                let tempInterval = dateNow.timeIntervalSince1970
+
+                let zone = TimeZone.current
+                let offset = TimeInterval(zone.secondsFromGMT())
+                let curInterval = tempInterval + offset
+
+                timeModel.curInterval = Int(curInterval)
+                timeModel.curTimeZone = 0
+                timeModel.curTimeZone2 = 0
+                bleService.sendCurDateTime(timeModel)
             case 68: // MicrowearDeviceControl.timeMode.value
                 print("Set time format command sent")
                 bleService.sendTimeMode(0)
@@ -358,7 +365,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                         var item = [String: Any]()
                         item["battery"] = result
                         batteryLevelSink(item)
-                    }else{
+                    } else {
                         print("batteryLevelSink nil")
                     }
 
@@ -391,14 +398,14 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
             case 84: // MicrowearDeviceControl.raiseWrist.value
                 print("Raise wrist to wake screen command sent")
                 let timeSetModel = NJY_TimeSetModel()
+                timeSetModel.isOn = true
+
                 bleService.sendRaiseWrist(timeSetModel)
             case 85: // MicrowearDeviceControl.disturb.value
                 print("Do not disturb mode command sent")
             case 86: // MicrowearDeviceControl.longSit.value
-                break
                 print("Long sit reminder sent")
             case 87: // MicrowearDeviceControl.drinkWater.value
-                break
                 print("Drink water reminder sent")
             case 88: // MicrowearDeviceControl.washHand.value'
                 print("Hand washing reminder command sent")
@@ -426,8 +433,24 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 print("Test settings hr/bp/bo2 command sent")
             case 100: // MicrowearDeviceControl.takePhoto.value
                 print("Take photo command sent")
+                var isOpen = false
+                if data != nil {
+                    isOpen = data?["isOpen"] as? Bool ?? false
+                }
+
+                let photoCallback = NJYAsyncCallback<AnyObject>.create(self, success: { result in
+                    // Handle the result
+                    var item = [String: Any]()
+                    item["takePhone"] = result
+                    self.registerSingleHeartOxBloodCallbackSink?(item)
+                }, failure: { error in
+                    print("photoCallback Failure: \(error.localizedDescription)")
+                })
+
+                bleService.sendTakePhoto(isOpen, callback: photoCallback)
             case 101: // MicrowearDeviceControl.ctrlMusic.value
                 print("Music control command sent")
+
             case 102: // MicrowearDeviceControl.bandConfig1.value
                 print("Band configuration 1 command sent")
             case 103: // MicrowearDeviceControl.phoneSystemType.value
@@ -436,6 +459,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 print("Sync data command sent") // Mirip dengan sync data
             case 106: // MicrowearDeviceControl.findPhone.value
                 print("Find phone command sent")
+
             case 107: // MicrowearDeviceControl.bpDay.value
                 print("All-day blood pressure command sent")
             case 108: // MicrowearDeviceControl.addFriend.value
@@ -492,15 +516,15 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                                 } else {
                                     print("Callback sink is nil")
                                 }
-                                
+
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [self] in
                                     print("Ini juga dijalankan setelah 3 detik")
-                                    
+
                                     item["status"] = "onConnected"
                                     item["mac"] = self.macAddressCache
-                                    
+
                                     print(item)
-                                    
+
                                     if let registerConnectStatuesCallBackSink = self.registerConnectStatuesCallBackSink {
                                         print("About to send data to Flutter")
                                         registerConnectStatuesCallBackSink(item)
@@ -546,7 +570,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
     }
 }
 
- class DataReceivedStreamHandler: NSObject, FlutterStreamHandler {
+class DataReceivedStreamHandler: NSObject, FlutterStreamHandler {
     weak var plugin: MicrowearSdkPlugin?
 
     init(plugin: MicrowearSdkPlugin) {
@@ -556,7 +580,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         print("DataReceivedStreamHandler.onListen called")
         plugin?.deviceDataReceivedSink = events
-        print("DataReceivedsink set: \(plugin?.deviceDataReceivedSink  != nil)")
+        print("DataReceivedsink set: \(plugin?.deviceDataReceivedSink != nil)")
         return nil
     }
 
@@ -564,11 +588,9 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
         print("DataReceivedStreamHandler.onCancel called")
         return nil
     }
- }
+}
 
-
-
- class DeviceConfigStreamHandler: NSObject, FlutterStreamHandler {
+class DeviceConfigStreamHandler: NSObject, FlutterStreamHandler {
     weak var plugin: MicrowearSdkPlugin?
 
     init(plugin: MicrowearSdkPlugin) {
@@ -578,7 +600,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         print("DeviceConfigStreamHandler.onListen called")
         plugin?.deviceConfigSink = events
-        print("DeviceConfig sink set: \(plugin?.deviceConfigSink  != nil)")
+        print("DeviceConfig sink set: \(plugin?.deviceConfigSink != nil)")
         return nil
     }
 
@@ -586,10 +608,9 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
         print("DeviceConfigStreamHandler.onCancel called")
         return nil
     }
- }
+}
 
-
- class ConnectStatusStreamHandler: NSObject, FlutterStreamHandler {
+class ConnectStatusStreamHandler: NSObject, FlutterStreamHandler {
     weak var plugin: MicrowearSdkPlugin?
 
     init(plugin: MicrowearSdkPlugin) {
@@ -599,7 +620,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         print("ConnectStatusStreamHandler.onListen called")
         plugin?.registerConnectStatuesCallBackSink = events
-        print("Connect status sink set: \(plugin?.registerConnectStatuesCallBackSink  != nil)")
+        print("Connect status sink set: \(plugin?.registerConnectStatuesCallBackSink != nil)")
         return nil
     }
 
@@ -607,384 +628,384 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
         print("ConnectStatusStreamHandler.onCancel called")
         return nil
     }
- }
- class BatteryLevelStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("BatteryLevelStreamHandler.onListen called")
-         plugin?.batteryLevelSink = events
-         print("Battery level sink set: \(plugin?.batteryLevelSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("BatteryLevelStreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class SyncHourStepStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("SyncHourStepStreamHandler.onListen called")
-         plugin?.syncHourStepSink = events
-         print("Sync hour step sink set: \(plugin?.syncHourStepSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("SyncHourStepStreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class SyncWeekDaySportsStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("SyncWeekDaySportsStreamHandler.onListen called")
-         plugin?.syncWeekDaySportsSink = events
-         print("Sync week day sports sink set: \(plugin?.syncWeekDaySportsSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("SyncWeekDaySportsStreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class DeviceDataReceivedStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("DeviceDataReceivedStreamHandler.onListen called")
-         plugin?.deviceDataReceivedSink = events
-         print("Device data received sink set: \(plugin?.deviceDataReceivedSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("DeviceDataReceivedStreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class SyncSleepDataStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("SyncSleepDataStreamHandler.onListen called")
-         plugin?.syncSleepDataSink = events
-         print("Sync sleep data sink set: \(plugin?.syncSleepDataSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("SyncSleepDataStreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class SyncSportRecordStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("SyncSportRecordStreamHandler.onListen called")
-         plugin?.syncSportRecordSink = events
-         print("Sync sport record sink set: \(plugin?.syncSportRecordSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("SyncSportRecordStreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class GetAlarmClockInfoStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("GetAlarmClockInfoStreamHandler.onListen called")
-         plugin?.getAlarmClockInfoSink = events
-         print("Get alarm clock info sink set: \(plugin?.getAlarmClockInfoSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("GetAlarmClockInfoStreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class SyncBloodPressureStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("SyncBloodPressureStreamHandler.onListen called")
-         plugin?.syncBloodPressureSink = events
-         print("Sync blood pressure sink set: \(plugin?.syncBloodPressureSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("SyncBloodPressureStreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class SyncHeartDataStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("SyncHeartDataStreamHandler.onListen called")
-         plugin?.syncHeartDataSink = events
-         print("Sync heart data sink set: \(plugin?.syncHeartDataSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("SyncHeartDataStreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class SyncOxDataStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("SyncOxDataStreamHandler.onListen called")
-         plugin?.syncOxDataSink = events
-         print("Sync ox data sink set: \(plugin?.syncOxDataSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("SyncOxDataStreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class SyncHomeDataStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("SyncHomeDataStreamHandler.onListen called")
-         plugin?.syncHomeDataSink = events
-         print("Sync home data sink set: \(plugin?.syncHomeDataSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("SyncHomeDataStreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class SyncRealTimeECGStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("SyncRealTimeECGStreamHandler.onListen called")
-         plugin?.syncRealTimeECGSink = events
-         print("Sync real time ECG sink set: \(plugin?.syncRealTimeECGSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("SyncRealTimeECGStreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class GetDeviceFunStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("GetDeviceFunStreamHandler.onListen called")
-         plugin?.getDeviceFunSink = events
-         print("Get device fun sink set: \(plugin?.getDeviceFunSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("GetDeviceFunStreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class GetDeviceConfig1StreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("GetDeviceConfig1StreamHandler.onListen called")
-         plugin?.getDeviceConfig1Sink = events
-         print("Get device config1 sink set: \(plugin?.getDeviceConfig1Sink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("GetDeviceConfig1StreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class RegisterSomatosensoryGameCallbackStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("RegisterSomatosensoryGameCallbackStreamHandler.onListen called")
-         plugin?.registerSomatosensoryGameCallbackSink = events
-         print("Register somatosensory game callback sink set: \(plugin?.registerSomatosensoryGameCallbackSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("RegisterSomatosensoryGameCallbackStreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class RegisterSingleHeartOxBloodCallbackStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("RegisterSingleHeartOxBloodCallbackStreamHandler.onListen called")
-         plugin?.registerSingleHeartOxBloodCallbackSink = events
-         print("Register single heart ox blood callback sink set: \(plugin?.registerSingleHeartOxBloodCallbackSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("RegisterSingleHeartOxBloodCallbackStreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class RegisterMac3CallBackStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("RegisterMac3CallBackStreamHandler.onListen called")
-         plugin?.registerMac3CallBackSink = events
-         print("Register Mac3 callback sink set: \(plugin?.registerMac3CallBackSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("RegisterMac3CallBackStreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class RegisterGPSCallBackStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("RegisterGPSCallBackStreamHandler.onListen called")
-         plugin?.registerGPSCallBackSink = events
-         print("Register GPS callback sink set: \(plugin?.registerGPSCallBackSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("RegisterGPSCallBackStreamHandler.onCancel called")
-         return nil
-     }
- }
-
- class OnLoadingStreamHandler: NSObject, FlutterStreamHandler {
-     weak var plugin: MicrowearSdkPlugin?
-
-     init(plugin: MicrowearSdkPlugin) {
-         self.plugin = plugin
-     }
-
-     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-         print("OnLoadingStreamHandler.onListen called")
-         plugin?.onLoadingSink = events
-         print("On loading sink set: \(plugin?.onLoadingSink != nil)")
-         return nil
-     }
-
-     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-         print("OnLoadingStreamHandler.onCancel called")
-         return nil
-     }
- }
-
+}
+
+class BatteryLevelStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("BatteryLevelStreamHandler.onListen called")
+        plugin?.batteryLevelSink = events
+        print("Battery level sink set: \(plugin?.batteryLevelSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("BatteryLevelStreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class SyncHourStepStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("SyncHourStepStreamHandler.onListen called")
+        plugin?.syncHourStepSink = events
+        print("Sync hour step sink set: \(plugin?.syncHourStepSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("SyncHourStepStreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class SyncWeekDaySportsStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("SyncWeekDaySportsStreamHandler.onListen called")
+        plugin?.syncWeekDaySportsSink = events
+        print("Sync week day sports sink set: \(plugin?.syncWeekDaySportsSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("SyncWeekDaySportsStreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class DeviceDataReceivedStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("DeviceDataReceivedStreamHandler.onListen called")
+        plugin?.deviceDataReceivedSink = events
+        print("Device data received sink set: \(plugin?.deviceDataReceivedSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("DeviceDataReceivedStreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class SyncSleepDataStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("SyncSleepDataStreamHandler.onListen called")
+        plugin?.syncSleepDataSink = events
+        print("Sync sleep data sink set: \(plugin?.syncSleepDataSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("SyncSleepDataStreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class SyncSportRecordStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("SyncSportRecordStreamHandler.onListen called")
+        plugin?.syncSportRecordSink = events
+        print("Sync sport record sink set: \(plugin?.syncSportRecordSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("SyncSportRecordStreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class GetAlarmClockInfoStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("GetAlarmClockInfoStreamHandler.onListen called")
+        plugin?.getAlarmClockInfoSink = events
+        print("Get alarm clock info sink set: \(plugin?.getAlarmClockInfoSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("GetAlarmClockInfoStreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class SyncBloodPressureStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("SyncBloodPressureStreamHandler.onListen called")
+        plugin?.syncBloodPressureSink = events
+        print("Sync blood pressure sink set: \(plugin?.syncBloodPressureSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("SyncBloodPressureStreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class SyncHeartDataStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("SyncHeartDataStreamHandler.onListen called")
+        plugin?.syncHeartDataSink = events
+        print("Sync heart data sink set: \(plugin?.syncHeartDataSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("SyncHeartDataStreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class SyncOxDataStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("SyncOxDataStreamHandler.onListen called")
+        plugin?.syncOxDataSink = events
+        print("Sync ox data sink set: \(plugin?.syncOxDataSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("SyncOxDataStreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class SyncHomeDataStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("SyncHomeDataStreamHandler.onListen called")
+        plugin?.syncHomeDataSink = events
+        print("Sync home data sink set: \(plugin?.syncHomeDataSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("SyncHomeDataStreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class SyncRealTimeECGStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("SyncRealTimeECGStreamHandler.onListen called")
+        plugin?.syncRealTimeECGSink = events
+        print("Sync real time ECG sink set: \(plugin?.syncRealTimeECGSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("SyncRealTimeECGStreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class GetDeviceFunStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("GetDeviceFunStreamHandler.onListen called")
+        plugin?.getDeviceFunSink = events
+        print("Get device fun sink set: \(plugin?.getDeviceFunSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("GetDeviceFunStreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class GetDeviceConfig1StreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("GetDeviceConfig1StreamHandler.onListen called")
+        plugin?.getDeviceConfig1Sink = events
+        print("Get device config1 sink set: \(plugin?.getDeviceConfig1Sink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("GetDeviceConfig1StreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class RegisterSomatosensoryGameCallbackStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("RegisterSomatosensoryGameCallbackStreamHandler.onListen called")
+        plugin?.registerSomatosensoryGameCallbackSink = events
+        print("Register somatosensory game callback sink set: \(plugin?.registerSomatosensoryGameCallbackSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("RegisterSomatosensoryGameCallbackStreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class RegisterSingleHeartOxBloodCallbackStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("RegisterSingleHeartOxBloodCallbackStreamHandler.onListen called")
+        plugin?.registerSingleHeartOxBloodCallbackSink = events
+        print("Register single heart ox blood callback sink set: \(plugin?.registerSingleHeartOxBloodCallbackSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("RegisterSingleHeartOxBloodCallbackStreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class RegisterMac3CallBackStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("RegisterMac3CallBackStreamHandler.onListen called")
+        plugin?.registerMac3CallBackSink = events
+        print("Register Mac3 callback sink set: \(plugin?.registerMac3CallBackSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("RegisterMac3CallBackStreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class RegisterGPSCallBackStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("RegisterGPSCallBackStreamHandler.onListen called")
+        plugin?.registerGPSCallBackSink = events
+        print("Register GPS callback sink set: \(plugin?.registerGPSCallBackSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("RegisterGPSCallBackStreamHandler.onCancel called")
+        return nil
+    }
+}
+
+class OnLoadingStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: MicrowearSdkPlugin?
+
+    init(plugin: MicrowearSdkPlugin) {
+        self.plugin = plugin
+    }
+
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        print("OnLoadingStreamHandler.onListen called")
+        plugin?.onLoadingSink = events
+        print("On loading sink set: \(plugin?.onLoadingSink != nil)")
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        print("OnLoadingStreamHandler.onCancel called")
+        return nil
+    }
+}
