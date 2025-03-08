@@ -421,36 +421,41 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 case "startPushDial":
                     if let dialPath = data?["path"] as? String {
                         // Pastikan dialPath tidak nil
-                        let dialData: NSData? = nil // Ganti dengan data yang sesuai jika diperlukan
+                        let dialData: Data? = nil // Ganti dengan data yang sesuai jika diperlukan
                         let dialType = 1 // Ganti dengan type yang sesuai jika diperlukan
 
                         // Buat instance NJYAsyncCallback dengan progress
                         let callback = NJYAsyncCallback.create(nil,
-                                                               success: { (result: Any) in
-                                                                   // Handle success
-                                                                   print("Upgrade successful: \(result)")
-                                                                   var item = [String: Any]()
-                                                                   item["status"] = "onPushSuccess"
-                                                                   self.onLoadingSink?(item)
-                                                               },
-                                                               progress: { (progress: Float) in
-                                                                   // Handle progress
-                                                                   print("Progress: \(progress * 100)%")
-                                                                   var item = [String: Any]()
-                                                                   item["status"] = "onPushProgress"
-                                                                   item["progress"] = progress
-                                                                   self.onLoadingSink?(item)
-                                                               },
-                                                               failure: { (error: NSError) in
-                                                                   // Handle failure
-                                                                   print("Upgrade failed: \(error.localizedDescription)")
-                                                                   var item = [String: Any]()
-                                                                   item["status"] = "onPushError"
-                                                                   self.onLoadingSink?(item)
-                                                               })
+                            success: { (result: NSObject) in
+                                // Handle success
+                                print("Upgrade successful: \(result)")
+                                var item = [String: Any]()
+                                item["status"] = "onPushSuccess"
+                                self.onLoadingSink?(item)
+                            },
+                            progress: { (progress: Float) in
+                                // Handle progress
+                                print("Progress: \(progress * 100)%")
+                                var item = [String: Any]()
+                                item["status"] = "onPushProgress"
+                                item["progress"] = progress
+                                self.onLoadingSink?(item)
+                            },
+                            failure: { (error: Error) in
+                                // Handle failure
+                                print("Upgrade failed: \(error.localizedDescription)")
+                                var item = [String: Any]()
+                                item["status"] = "onPushError"
+                                self.onLoadingSink?(item)
+                            }
+                        )
 
                         // Panggil metode sendDialInstall
                         bleService.sendDialInstall(dialPath, data: dialData, type: dialType, callback: callback)
+                    } else {
+                        // Handle kasus ketika dialPath nil
+                        print("dialPath is nil")
+                    }
                     } else {
                         // Handle kasus ketika dialPath nil
                         print("dialPath is nil")
