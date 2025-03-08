@@ -274,6 +274,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                         print("About to send battery to Flutter")
                         var item = [String: Any]()
                         item["battery"] = result
+
                         batteryLevelSink(item)
                     } else {
                         print("batteryLevelSink nil")
@@ -421,16 +422,20 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 case "startPushDial":
                     if let dialPath = data?["path"] as? String {
 
-                        // Buat instance NJYAsyncCallback dengan progress
-                        let callback = NJYAsyncCallback.create(nil,
-                            success: { (result: AnyObject) in
+                        let fileManager = FileManager.default
+                        if(fileManager.fileExists(atPath: dialPath)){
+
+
+                            // Buat instance NJYAsyncCallback dengan progress
+                            let callback = NJYAsyncCallback.create(nil,
+                                                                   success: { (result: AnyObject) in
                                 // Handle success
                                 print("Upgrade successful: \(result)")
                                 var item = [String: Any]()
                                 item["status"] = "onPushSuccess"
                                 self.onLoadingSink?(item)
                             },
-                            progress: { (progress: Float) in
+                                                                   progress: { (progress: Float) in
                                 // Handle progress
                                 print("Progress: \(progress * 100)%")
                                 var item = [String: Any]()
@@ -438,21 +443,74 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                                 item["progress"] = progress
                                 self.onLoadingSink?(item)
                             },
-                            failure: { (error: Error) in
+                                                                   failure: { (error: Error) in
                                 // Handle failure
                                 print("Upgrade failed: \(error.localizedDescription)")
+                                print("dial path: \(dialPath)")
                                 var item = [String: Any]()
                                 item["status"] = "onPushError"
                                 self.onLoadingSink?(item)
                             }
-                        )
+                            )
 
-                        // Panggil metode sendDialInstall
-                        bleService.sendDialInstall(dialPath, data: Data(), type: 1, callback: callback)
+                            bleService.sendDialInstall(dialPath, data: Data(), type: 1, callback: callback)
+                        }else{
+                            print("tidak ada file di path")
+                        }
                     } else {
                         // Handle kasus ketika dialPath nil
                         print("dialPath is nil")
                     }
+                case "startPushCustomDial":
+                    print("startPushCustomDial")
+                    // Buat instance NJYAsyncCallback dengan progress
+
+                    let callback = NJYAsyncCallback.create(nil,
+                                                           success: { (result: AnyObject) in
+                        // Handle success
+                        print("Upgrade successful: \(result)")
+                        var item = [String: Any]()
+                        item["status"] = "onPushSuccess"
+                        self.onLoadingSink?(item)
+                    },
+                                                           progress: { (progress: Float) in
+                        // Handle progress
+                        print("Progress: \(progress * 100)%")
+                        var item = [String: Any]()
+                        item["status"] = "onPushProgress"
+                        item["progress"] = progress
+                        self.onLoadingSink?(item)
+                    },
+                                                           failure: { (error: Error) in
+                        // Handle failure
+                        print("Upgrade failed: \(error.localizedDescription)")
+                        var item = [String: Any]()
+                        item["status"] = "onPushError"
+                        self.onLoadingSink?(item)
+                    }
+                    )
+
+                    var path = ""
+                    var bigWidth = 320
+                    var bigHeight = 380
+                    var smallNeedWidth = 240
+                    var smallNeedHeight = 283
+                    var timePosition = 0
+                    var colors = "#FF0000"
+
+                    if let data = data {
+                        path = data["path"] as? String ?? path
+                        bigWidth = data["bigWidth"] as? Int ?? bigWidth
+                        bigHeight = data["bigHeight"] as? Int ?? bigHeight
+                        smallNeedWidth = data["smallNeedWidth"] as? Int ?? smallNeedWidth
+                        smallNeedHeight = data["smallNeedHeight"] as? Int ?? smallNeedHeight
+                        timePosition = data["timePosition"] as? Int ?? timePosition
+                        colors = data["colors"] as? String ?? colors
+                    }
+
+                    let nJY_DailInfoModel = NJY_DailInfoModel()
+
+                    bleService.sendCustomDialInstall(nJY_DailInfoModel, type: 1, callback: callback)
                 default:
                     print("Invalid otaType selected")
                 }
