@@ -420,13 +420,10 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 switch otaType {
                 case "startPushDial":
                     if let dialPath = data?["path"] as? String {
-                        // Pastikan dialPath tidak nil
-                        let dialData: Data? = nil // Ganti dengan data yang sesuai jika diperlukan
-                        let dialType = 1 // Ganti dengan type yang sesuai jika diperlukan
 
                         // Buat instance NJYAsyncCallback dengan progress
                         let callback = NJYAsyncCallback.create(nil,
-                            success: { (result: NSObject) in
+                            success: { (result: AnyObject) in
                                 // Handle success
                                 print("Upgrade successful: \(result)")
                                 var item = [String: Any]()
@@ -451,11 +448,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                         )
 
                         // Panggil metode sendDialInstall
-                        bleService.sendDialInstall(dialPath, data: dialData, type: dialType, callback: callback)
-                    } else {
-                        // Handle kasus ketika dialPath nil
-                        print("dialPath is nil")
-                    }
+                        bleService.sendDialInstall(dialPath, data: Data(), type: 1, callback: callback)
                     } else {
                         // Handle kasus ketika dialPath nil
                         print("dialPath is nil")
