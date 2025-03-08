@@ -56,106 +56,16 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
         super.init()
     }
 
-//    public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-//        print("onListen called with arguments: \(String(describing: arguments))")
-//
-//        deviceDataReceivedSink = events
-//
-//        batteryLevelSink = events
-//
-//        syncHourStepSink = events
-//
-//        syncWeekDaySportsSink = events
-//
-//        deviceConfigSink = events
-//
-//        syncSleepDataSink = events
-//
-//        syncSportRecordSink = events
-//
-//        getAlarmClockInfoSink = events
-//
-//        syncBloodPressureSink = events
-//
-//        syncHeartDataSink = events
-//
-//        syncOxDataSink = events
-//
-//        syncHomeDataSink = events
-//
-//        syncRealTimeECGSink = events
-//
-//        getDeviceFunSink = events
-//
-//        getDeviceConfig1Sink = events
-//
-//        registerConnectStatuesCallBackSink = events
-//
-//        registerSomatosensoryGameCallbackSink = events
-//
-//        registerSingleHeartOxBloodCallbackSink = events
-//
-//        registerMac3CallBackSink = events
-//
-//        registerGPSCallBackSink = events
-//
-//        onLoadingSink = events
-    ////
-    ////        switch arguments as? String {
-    ////        case MicrowearSdkPlugin.deviceDataReceivedChannelName:
-    ////            deviceDataReceivedSink = events
-    ////        case MicrowearSdkPlugin.batteryLevelChannelName:
-    ////            batteryLevelSink = events
-    ////        case MicrowearSdkPlugin.syncHourStepChannelName:
-    ////            syncHourStepSink = events
-    ////        case MicrowearSdkPlugin.syncWeekDaySportsChannelName:
-    ////            syncWeekDaySportsSink = events
-    ////        case MicrowearSdkPlugin.deviceConfigChannelName:
-    ////            deviceConfigSink = events
-    ////        case MicrowearSdkPlugin.syncSleepDataChannelName:
-    ////            syncSleepDataSink = events
-    ////        case MicrowearSdkPlugin.syncSportRecordChannelName:
-    ////            syncSportRecordSink = events
-    ////        case MicrowearSdkPlugin.getAlarmClockInfoChannelName:
-    ////            getAlarmClockInfoSink = events
-    ////        case MicrowearSdkPlugin.syncBloodPressureChannelName:
-    ////            syncBloodPressureSink = events
-    ////        case MicrowearSdkPlugin.syncHeartDataChannelName:
-    ////            syncHeartDataSink = events
-    ////        case MicrowearSdkPlugin.syncOxDataChannelName:
-    ////            syncOxDataSink = events
-    ////        case MicrowearSdkPlugin.syncHomeDataChannelName:
-    ////            syncHomeDataSink = events
-    ////        case MicrowearSdkPlugin.syncRealTimeECGChannelName:
-    ////            syncRealTimeECGSink = events
-    ////        case MicrowearSdkPlugin.getDeviceFunChannelName:
-    ////            getDeviceFunSink = events
-    ////        case MicrowearSdkPlugin.getDeviceConfig1ChannelName:
-    ////            getDeviceConfig1Sink = events
-    ////        case MicrowearSdkPlugin.registerConnectStatuesCallBackChannelName:
-    ////            print("Setting registerConnectStatuesCallBackSink")
-    ////              registerConnectStatuesCallBackSink = events
-    ////              print("registerConnectStatuesCallBackSink set successfully: \(registerConnectStatuesCallBackSink != nil)")
-    ////        case MicrowearSdkPlugin.registerSomatosensoryGameCallbackChannelName:
-    ////            registerSomatosensoryGameCallbackSink = events
-    ////        case MicrowearSdkPlugin.registerSingleHeartOxBloodCallbackChannelName:
-    ////            registerSingleHeartOxBloodCallbackSink = events
-    ////        case MicrowearSdkPlugin.registerMac3CallBackChannelName:
-    ////            registerMac3CallBackSink = events
-    ////        case MicrowearSdkPlugin.registerGPSCallBackChannelName:
-    ////            registerGPSCallBackSink = events
-    ////        case MicrowearSdkPlugin.onLoadingChannelName:
-    ////            onLoadingSink = events
-    ////        default:
-    ////            break
-    ////        }
-//
-//        return nil
-//    }
-//
-//    public func onCancel(withArguments arguments: Any?) -> FlutterError? {
-//        return nil
-//    }
+    func toDictionary<T: Encodable>(from model: T) -> [String: Any]? {
+        do {
+            let data = try JSONEncoder().encode(model)
+            let dictionary = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
+            return dictionary
+        } catch {
+            print("Error converting model to dictionary: \(error)")
+            return nil
+        }
+    }
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "microwear_sdk", binaryMessenger: registrar.messenger())
@@ -477,6 +387,28 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 print("Start ECG command sent") // Mirip dengan start ecg
             case 121: // MicrowearDeviceControl.deviceFun.value
                 print("Device function command sent")
+                let asyncCallback = NJYAsyncCallback<AnyObject>.create(self, success: { result in
+                    print("Get Device function  Success: \(result)")
+
+                    if let deviceFunModel: NJY_DeviceFunModel = result as? NJY_DeviceFunModel {
+                        print("Get Device function Success: \(deviceFunModel)")
+                        var item = [String: Any]()
+                        item["customVideoDial"] = result.customVideoDial
+                        item["customDialVersion"] = result.customDialVersion
+                        item["customSupportMedic"] = result.customSupportMedic
+                        item["customSupportGpsSport"] = result.customSupportGpsSport
+                        item["customSupportUserHeadLogo"] = result.customSupportUserHeadLogo
+                        item["customSupportAlbumw"] = result.customSupportAlbumw
+                        item["customSupportAlbumh"] = result.customSupportAlbumh
+                        item["customSupportLyric"] = result.customSupportLyric
+                        self.getDeviceFunSink?(item)
+                    } else {
+                        print("Get Device function Success: Unable to cast result to NJY_DeviceFunModel")
+                    }
+                }, failure: { error in
+                    print("Get Device function Failure: \(error.localizedDescription)")
+                })
+                bleService.getDeviceFun(asyncCallback)
             case 122: // MicrowearDeviceControl.watchCallInfo.value
                 print("Watch call info command sent")
             default:
