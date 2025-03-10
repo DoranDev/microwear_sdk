@@ -453,7 +453,16 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                             }
                             )
 
-                            bleService.sendDialInstall(dialPath, data: Data(), type: 1, callback: callback)
+                            let binaryFileURL = URL(fileURLWithPath: dialPath)
+                            do {
+                                let binaryData = try Data(contentsOf: binaryFileURL)
+                                print("Successfully loaded binary data: \(binaryData.count) bytes")
+                                // Use binaryData as needed
+                                bleService.sendDialInstall(dialPath, data: binaryData, type: 1, callback: callback)
+                            } catch {
+                                print("Error loading binary file: \(error)")
+                            }
+
                         }else{
                             print("tidak ada file di path")
                         }
@@ -509,6 +518,45 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                     }
 
                     let nJY_DailInfoModel = NJY_DailInfoModel()
+
+                    nJY_DailInfoModel.dateLocation = timePosition
+                    nJY_DailInfoModel.dateTopPosition = 0
+                    nJY_DailInfoModel.dateBelowPosition = 0
+                    if scanner.scanHexInt64(&hexNumber) {
+                        let r = Int((hexNumber >> 16) & 0xFF)  // Extract red component
+                        let g = Int((hexNumber >> 8) & 0xFF)   // Extract green component
+                        let b = Int(hexNumber & 0xFF)          // Extract blue component
+
+                        nJY_DailInfoModel.colorR = r
+                        nJY_DailInfoModel.colorG = g
+                        nJY_DailInfoModel.colorB = b
+
+                    } else {
+                        print("Failed to parse hex value")
+                    }
+
+                    nJY_DailInfoModel.screenHigh = bigHeight
+                    nJY_DailInfoModel.screenWidth = bigWidth
+                    nJY_DailInfoModel.imageHigh = smallNeedHeight
+                    nJY_DailInfoModel.imageWidth = smallNeedWidth
+                    let bgFileURL = URL(fileURLWithPath: dialPath)
+                    do {
+                        let bgData = try NSData(contentsOf: bgFileURL)
+                        print("Successfully loaded bg data: \(bgData.count) bytes")
+                        nJY_DailInfoModel.imageBg = bgData
+                    } catch {
+                        print("Error loading bg file: \(error)")
+                    }
+
+                    do {
+                        let thumbData = try NSData(contentsOf: bgFileURL)
+                        print("Successfully loaded bg data: \(thumbData.count) bytes")
+                        nJY_DailInfoModel.thumbnailImage = thumbData
+                    } catch {
+                        print("Error loading bg file: \(error)")
+                    }
+
+                    nJY_DailInfoModel.dailType = 0
 
                     bleService.sendCustomDialInstall(nJY_DailInfoModel, type: 1, callback: callback)
                 default:
