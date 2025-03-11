@@ -506,6 +506,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                     var smallNeedHeight = 283
                     var timePosition = 0
                     var colors = "#FF0000"
+                    var colorValue: UInt64 = 0
 
                     if let data = data {
                         path = data["path"] as? String ?? path
@@ -522,15 +523,17 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                     nJY_DailInfoModel.dateLocation = timePosition
                     nJY_DailInfoModel.dateTopPosition = 0
                     nJY_DailInfoModel.dateBelowPosition = 0
-                    if scanner.scanHexInt64(&hexNumber) {
-                        let r = Int((hexNumber >> 16) & 0xFF)  // Extract red component
-                        let g = Int((hexNumber >> 8) & 0xFF)   // Extract green component
-                        let b = Int(hexNumber & 0xFF)          // Extract blue component
+                    
+                    // Then adjust your scanning code:
+                    let scanner = Scanner(string: colors.replacingOccurrences(of: "#", with: ""))
+                    if scanner.scanHexInt64(&colorValue) {
+                        let r = Int((colorValue >> 16) & 0xFF)  // Extract red component
+                        let g = Int((colorValue >> 8) & 0xFF)   // Extract green component
+                        let b = Int(colorValue & 0xFF)          // Extract blue component
 
                         nJY_DailInfoModel.colorR = r
                         nJY_DailInfoModel.colorG = g
                         nJY_DailInfoModel.colorB = b
-
                     } else {
                         print("Failed to parse hex value")
                     }
@@ -539,19 +542,19 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                     nJY_DailInfoModel.screenWidth = bigWidth
                     nJY_DailInfoModel.imageHigh = smallNeedHeight
                     nJY_DailInfoModel.imageWidth = smallNeedWidth
-                    let bgFileURL = URL(fileURLWithPath: dialPath)
+                    let bgFileURL = URL(fileURLWithPath: path)
                     do {
                         let bgData = try NSData(contentsOf: bgFileURL)
-                        print("Successfully loaded bg data: \(bgData.count) bytes")
-                        nJY_DailInfoModel.imageBg = bgData
+                        print("Successfully loaded bg data: \(bgData?.count) bytes")
+                        nJY_DailInfoModel.imageBg = bgData! as Data
                     } catch {
                         print("Error loading bg file: \(error)")
                     }
 
                     do {
                         let thumbData = try NSData(contentsOf: bgFileURL)
-                        print("Successfully loaded bg data: \(thumbData.count) bytes")
-                        nJY_DailInfoModel.thumbnailImage = thumbData
+                        print("Successfully loaded bg data: \(thumbData?.count) bytes")
+                        nJY_DailInfoModel.thumbnailImage = thumbData as! Data
                     } catch {
                         print("Error loading bg file: \(error)")
                     }
