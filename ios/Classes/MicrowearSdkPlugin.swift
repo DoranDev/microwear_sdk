@@ -437,10 +437,10 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                             },
                                                                    progress: { (progress: Float) in
                                 // Handle progress
-                                print("Progress: \(progress * 100)%")
+                                print("Progress nya startPushDial:\(progress): \(progress * 100)%")
                                 var item = [String: Any]()
                                 item["status"] = "onPushProgress"
-                                item["progress"] = progress
+                                item["progress"] = progress * 100
                                 self.onLoadingSink?(item)
                             },
                                                                    failure: { (error: Error) in
@@ -520,10 +520,10 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
 
                     let nJY_DailInfoModel = NJY_DailInfoModel()
 
-                    nJY_DailInfoModel.dateLocation = timePosition
+                    nJY_DailInfoModel.dateLocation = 0
                     nJY_DailInfoModel.dateTopPosition = 0
                     nJY_DailInfoModel.dateBelowPosition = 0
-                    
+
                     // Then adjust your scanning code:
                     let scanner = Scanner(string: colors.replacingOccurrences(of: "#", with: ""))
                     if scanner.scanHexInt64(&colorValue) {
@@ -559,7 +559,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                         print("Error loading bg file: \(error)")
                     }
 
-                    nJY_DailInfoModel.dailType = 0
+                    nJY_DailInfoModel.dailType = 1
 
                     bleService.sendCustomDialInstall(nJY_DailInfoModel, type: 1, callback: callback)
                 default:
