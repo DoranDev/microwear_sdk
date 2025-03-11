@@ -487,7 +487,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                         print("Progress: \(progress * 100)%")
                         var item = [String: Any]()
                         item["status"] = "onPushProgress"
-                        item["progress"] = progress
+                        item["progress"] = progress * 100
                         self.onLoadingSink?(item)
                     },
                                                            failure: { (error: Error) in
@@ -542,9 +542,9 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                     nJY_DailInfoModel.screenWidth = bigWidth
                     nJY_DailInfoModel.imageHigh = smallNeedHeight
                     nJY_DailInfoModel.imageWidth = smallNeedWidth
-                    let bgFileURL = URL(fileURLWithPath: path)
+
                     do {
-                        let bgData = try NSData(contentsOf: bgFileURL)
+                        let bgData = try UIImage.getBitmapDataFromImageFile(atPath: path)
                         print("Successfully loaded bg data: \(bgData?.count) bytes")
                         nJY_DailInfoModel.imageBg = bgData! as Data
                     } catch {
@@ -552,14 +552,15 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                     }
 
                     do {
-                        let thumbData = try NSData(contentsOf: bgFileURL)
+                        let thumbData = try UIImage.getBitmapDataFromImageFile(atPath: path)
                         print("Successfully loaded bg data: \(thumbData?.count) bytes")
                         nJY_DailInfoModel.thumbnailImage = thumbData as! Data
                     } catch {
                         print("Error loading bg file: \(error)")
                     }
 
-                    nJY_DailInfoModel.dailType = 1
+                    nJY_DailInfoModel.dailType = 0
+
 
                     bleService.sendCustomDialInstall(nJY_DailInfoModel, type: 1, callback: callback)
                 default:
