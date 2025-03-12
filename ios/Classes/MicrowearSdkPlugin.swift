@@ -368,6 +368,29 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 print("Set phone system type command sent")
             case 105: // MicrowearDeviceControl.appRequestSync.value
                 print("Sync data command sent") // Mirip dengan sync data
+                let callBack = NJYAsyncCallback<AnyObject>.create(self, success: { result in
+
+                    do {
+                        let sysModel = result as! NJY_SysDataModel
+                        let currentTimeMillis = Int(Date().timeIntervalSince1970 * 1000)
+                        var item = [String: Any]()
+
+                        // Add data to the dictionary
+                        item["stepData"] = ["duration": 0.50, "timeMill": currentTimeMillis, "distance": sysModel.distance, "stepNum": sysModel.steps, "calData": sysModel.kcal]
+                        item["bloodOxyData"] = ["timeMill": currentTimeMillis, "bloodOxy": sysModel.spo2]
+                        item["heartData"] = ["timeMill": currentTimeMillis, "heartRate": sysModel.sbp]
+
+                        // Use the item dictionary...
+                        self.syncHomeDataSink?(item)
+                } catch let error {
+                        print("Error processing data: \(error.localizedDescription)")
+                    }
+
+                }, failure: { error in
+                    print("syncHomeDataSink Failure: \(error.localizedDescription)")
+                })
+
+                bleService.sendSysData(callBack)
             case 106: // MicrowearDeviceControl.findPhone.value
                 print("Find phone command sent")
 
@@ -643,7 +666,6 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
 
     func disconnectFromDevice(with bleAddress: String, result: @escaping FlutterResult) {
         let bleService = NJYBleService.sharedInstance()
-
         if let peripherals = bleService.bleModals as? [NJY_Peripherial] {
             for peripheral in peripherals {
                 if peripheral.mac == bleAddress {
@@ -653,6 +675,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 }
             }
         }
+        bleService.unbind();
         result(FlutterError(code: "DEVICE_NOT_FOUND", message: "Device with address \(bleAddress) not found", details: nil))
     }
 }
