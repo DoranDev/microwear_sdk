@@ -1,10 +1,10 @@
 package id.doran.microwear_sdk
 
-import android.content.Intent
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
@@ -735,8 +735,11 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
               listRaw.forEach { item ->
                 val week = item["week"] as Int
-                val tempData = item["tempData"] as Int
                 val weatherType = item["weatherType"] as Int
+                val tempData = item["tempData"] as Int
+                val highestTemp = item["highestTemp"] as Int
+                val minimumTemp = item["minimumTemp"] as Int
+                val tempLimit = item["tempLimit"] as Int
                 val pressure = item["pressure"] as String
                 val ultLevel = item["ultLevel"] as String
                 val humidity = item["humidity"] as Int
@@ -748,6 +751,9 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 val weatherData = NJJWeatherData()
                 weatherData.week = week
                 weatherData.tempData = tempData
+                weatherData.highestTemp = highestTemp
+                weatherData.minimumTemp = minimumTemp
+                weatherData.tempLimit = tempLimit
                 weatherData.weatherType = weatherType
                 weatherData.pressure = pressure
                 weatherData.ultLevel = ultLevel

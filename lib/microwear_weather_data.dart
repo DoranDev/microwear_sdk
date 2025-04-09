@@ -1,6 +1,9 @@
 class MicrowearWeatherData {
   int week;
   int tempData;
+  int highestTemp;
+  int minimumTemp;
+  int tempLimit;
   int weatherType;
   String pressure;
   String ultLevel;
@@ -13,6 +16,9 @@ class MicrowearWeatherData {
   MicrowearWeatherData({
     required this.week,
     required this.tempData,
+    required this.highestTemp,
+    required this.minimumTemp,
+    required this.tempLimit,
     required this.weatherType,
     required this.pressure,
     required this.ultLevel,
@@ -27,6 +33,9 @@ class MicrowearWeatherData {
     return {
       "week": week,
       "tempData": tempData,
+      "highestTemp": highestTemp,
+      "minimumTemp": minimumTemp,
+      "tempLimit": tempLimit,
       "weatherType": weatherType,
       "pressure": pressure,
       "ultLevel": ultLevel,
