@@ -1847,6 +1847,8 @@ class MicrowearSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       }
     })
 
+
+
     CallBackManager.getInstance().registerMac3CallBack(object :Mac3CallBack.ICallBack{
       override fun onSuccess(mac: String?) {
         LogUtil.d("onSuccess: $mac")
