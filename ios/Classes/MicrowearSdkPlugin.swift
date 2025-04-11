@@ -303,9 +303,66 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
             case 81: // MicrowearDeviceControl.sportData.value
                 print("Exercise data command sent")
             case 82: // MicrowearDeviceControl.weatherForecast.value
-                print("Real-time weather command sent") // Mirip dengan real time weather
+                print("Forecast weather command sent") // Mirip dengan real time weather
+                guard let weathers = args?["weathers"] as? [[String: Any]] else {
+                    break
+                }
+                
+                let forecastModel = NJY_WeatherForecastModel()
+                var infoModels = [NJY_WeatherForecastInfoModel]()
+                
+                for (index, weatherData) in weathers.enumerated() {
+                    let infoModel = NJY_WeatherForecastInfoModel()
+                    
+                    // Map the data from dictionary to model
+                    infoModel.week = weatherData["week"] as? Int ?? index
+                    infoModel.type = weatherData["weatherType"] as? Int ?? 0
+                    infoModel.temp_high = weatherData["highestTemp"] as? Int ?? 32
+                    infoModel.temp_low = weatherData["minimumTemp"] as? Int ?? 29
+                    infoModel.pressure = weatherData["pressure"] as? Int ?? 1013
+                    infoModel.ult_level = weatherData["ultLevel"] as? Int ?? 2
+                    infoModel.humidity = weatherData["humidity"] as? Int ?? 50
+                    infoModel.wind_dir = wind_diryType(rawValue: weatherData["windDirDay"] as? Int ?? 0) ?? wind_diryType.NONE
+                    infoModel.wind_lvl = weatherData["windScaleDay"] as? Int ?? 1
+                    infoModel.visibility = weatherData["vis"] as? Int ?? 10000
+                    infoModel.precipitation = weatherData["precip"] as? Int ?? 0
+                    
+                    infoModels.append(infoModel)
+                    
+                    // Stop after 7 days if there's more data
+                    if infoModels.count >= 7 {
+                        break
+                    }
+                }
+                
+                // Fill remaining days with default data if less than 7 days provided
+                while infoModels.count < 7 {
+                    let defaultModel = NJY_WeatherForecastInfoModel()
+                    defaultModel.week = infoModels.count
+                    defaultModel.type = 0
+                    defaultModel.temp_high = 31
+                    defaultModel.temp_low = 29
+                    // Set other default values...
+                    infoModels.append(defaultModel)
+                }
+                
+                forecastModel.infoModelList = infoModels
+                
+                bleService.sendWeatherForecast(forecastModel)
             case 83: // MicrowearDeviceControl.realTimeWeather.value
                 print("Real-time weather command sent")
+                let tempData = args?["tempData"] as? Int ?? 31
+                let weatherTypeRaw = args?["weatherType"] as? Int ?? 0
+                
+                let weatherModel = NJY_WeatherModel()
+                
+                // Konversi integer ke enum WeatherType
+                let weatherTypeNew = weatherType(rawValue: weatherTypeRaw) ?? weatherType.SUNNY
+                
+                weatherModel.curTemp = tempData
+                weatherModel.type = weatherTypeNew
+                
+                bleService.sendRealTimeWeather(weatherModel)
             case 84: // MicrowearDeviceControl.raiseWrist.value
                 print("Raise wrist to wake screen command sent")
                 let timeSetModel = NJY_TimeSetModel()
