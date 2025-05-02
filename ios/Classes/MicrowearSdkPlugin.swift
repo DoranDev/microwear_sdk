@@ -66,6 +66,8 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
             return nil
         }
     }
+    
+    private static let gpsCallbackHandler = GPSCallbackHandler()
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "microwear_sdk", binaryMessenger: registrar.messenger())
@@ -148,14 +150,19 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
         let registerMac3CallBackChannel = FlutterEventChannel(name: registerMac3CallBackChannelName, binaryMessenger: registrar.messenger())
         registerMac3CallBackChannel.setStreamHandler(registerMac3CallBackHandler)
 
-        let registerGPSCallBackHandler = RegisterGPSCallBackStreamHandler(plugin: instance)
+        
+        GPSManager.shared.registerCallback(gpsCallbackHandler)
+        let registerGPSCallBackHandler = RegisterGPSCallBackStreamHandler(plugin: instance,callback: gpsCallbackHandler)
         let registerGPSCallBackChannel = FlutterEventChannel(name: registerGPSCallBackChannelName, binaryMessenger: registrar.messenger())
         registerGPSCallBackChannel.setStreamHandler(registerGPSCallBackHandler)
 
         let onLoadingHandler = OnLoadingStreamHandler(plugin: instance)
         let onLoadingChannel = FlutterEventChannel(name: onLoadingChannelName, binaryMessenger: registrar.messenger())
         onLoadingChannel.setStreamHandler(onLoadingHandler)
+    
     }
+    
+ 
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let args = call.arguments as? [String: Any]
@@ -164,6 +171,8 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
         case "connect":
             let macAddress = args?["macAddress"] as? String ?? ""
             connectToDevice(with: macAddress, result: result)
+        case "reconnect":
+            bleService.reconnect()
         case "creteBond":
             let macAddress = args?["macAddress"] as? String ?? ""
             // TODO: Implement createBond functionality
@@ -205,6 +214,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 let notif = NJY_NotifModel()
                 notif.msgWhatsApp = 1
                 bleService.sendNotif(notif)
+              
             case 29: // MicrowearDeviceControl.ecgHr.value
                 print("Sync 24-hour blood oxygen data command sent") // Mirip dengan mesBo2
                 let asyncCallback = NJYAsyncCallback<AnyObject>.create(self, success: { result in
@@ -1139,15 +1149,18 @@ class RegisterMac3CallBackStreamHandler: NSObject, FlutterStreamHandler {
 
 class RegisterGPSCallBackStreamHandler: NSObject, FlutterStreamHandler {
     weak var plugin: MicrowearSdkPlugin?
+    weak var callback: GPSCallbackHandler?
 
-    init(plugin: MicrowearSdkPlugin) {
+    init(plugin: MicrowearSdkPlugin, callback: GPSCallbackHandler) {
         self.plugin = plugin
+        self.callback = callback
     }
 
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         print("RegisterGPSCallBackStreamHandler.onListen called")
         plugin?.registerGPSCallBackSink = events
         print("Register GPS callback sink set: \(plugin?.registerGPSCallBackSink != nil)")
+        callback?.setCallbackSink(events)
         return nil
     }
 

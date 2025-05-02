@@ -29,6 +29,11 @@ class MicrowearSdk {
     return result;
   }
 
+  Future<String> reconnectIOS() async {
+    final String result = await methodChannel.invokeMethod('reconnect');
+    return result;
+  }
+
   Future<String> stopService() async {
     final String result = await methodChannel.invokeMethod('stopService');
     return result;
