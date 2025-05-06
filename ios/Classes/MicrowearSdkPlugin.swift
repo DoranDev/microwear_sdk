@@ -309,7 +309,36 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
             case 79: // MicrowearDeviceControl.sleepData.value
                 print("Sleep data command sent")
             case 80: // MicrowearDeviceControl.sportRecord.value
-                print("Exercise record command sent")
+                print("sendTrainingData command sent")
+                let async3Callback = NJYAsyncCallback<AnyObject>.create(self, success: { result in
+                    if let model = result as?  NJY_SportRecordModel {
+                        print("Get sendTrainingData Success: \(model.debugDescription)")
+                        // Now you can access model's properties
+                        if let syncSportRecordSink = self.syncSportRecordSink {
+                            print("About to send sendTrainingData to Flutter")
+                            var item = [String: Any]()
+                            item["date"] = model.startTimeStamp
+                            item["duration"] = model.sportTime
+                            item["kcal"] = model.sportKcal
+                            item["timeMill"] = model.startTimeStamp
+                            item["distance"] = model.sportDistance
+                            item["heartRate"] = model.sportAvgHr
+                            item["stepNum"] = model.sportSteps
+                            item["model"] = model.sportType.rawValue
+                            print(item)
+                            syncSportRecordSink(item)
+                        } else {
+                            print("syncSportRecordSink nil")
+                        }
+                    } else {
+                        print("Received unexpected result type: \(type(of: result))")
+                    }
+
+                }, failure: { error in
+                    print("Get sendTrainingData Failure: \(error.localizedDescription)")
+                })
+                bleService.sendTrainingData(async3Callback)
+
             case 81: // MicrowearDeviceControl.sportData.value
                 print("Exercise data command sent")
             case 82: // MicrowearDeviceControl.weatherForecast.value
