@@ -467,7 +467,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 let callBack = NJYAsyncCallback<AnyObject>.create(self, success: { result in
 
                         let sysModel = result as! NJY_SysDataModel
-                    let currentTimeMillis = Date.now
+                    let currentTimeMillis = Date.now.ISO8601Format()
                         var item = [String: Any]()
 
                         // Add data to the dictionary
