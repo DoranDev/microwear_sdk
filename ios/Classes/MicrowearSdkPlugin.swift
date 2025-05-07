@@ -346,13 +346,13 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 guard let weathers = args?["weathers"] as? [[String: Any]] else {
                     break
                 }
-                
+
                 let forecastModel = NJY_WeatherForecastModel()
                 var infoModels = [NJY_WeatherForecastInfoModel]()
-                
+
                 for (index, weatherData) in weathers.enumerated() {
                     let infoModel = NJY_WeatherForecastInfoModel()
-                    
+
                     // Map the data from dictionary to model
                     infoModel.week = weatherData["week"] as? Int ?? index
                     infoModel.type = weatherData["weatherType"] as? Int ?? 0
@@ -365,15 +365,15 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                     infoModel.wind_lvl = weatherData["windScaleDay"] as? Int ?? 1
                     infoModel.visibility = weatherData["vis"] as? Int ?? 10000
                     infoModel.precipitation = weatherData["precip"] as? Int ?? 0
-                    
+
                     infoModels.append(infoModel)
-                    
+
                     // Stop after 7 days if there's more data
                     if infoModels.count >= 7 {
                         break
                     }
                 }
-                
+
                 // Fill remaining days with default data if less than 7 days provided
                 while infoModels.count < 7 {
                     let defaultModel = NJY_WeatherForecastInfoModel()
@@ -384,23 +384,23 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                     // Set other default values...
                     infoModels.append(defaultModel)
                 }
-                
+
                 forecastModel.infoModelList = infoModels
-                
+
                 bleService.sendWeatherForecast(forecastModel)
             case 83: // MicrowearDeviceControl.realTimeWeather.value
                 print("Real-time weather command sent")
                 let tempData = args?["tempData"] as? Int ?? 31
                 let weatherTypeRaw = args?["weatherType"] as? Int ?? 0
-                
+
                 let weatherModel = NJY_WeatherModel()
-                
+
                 // Konversi integer ke enum WeatherType
                 let weatherTypeNew = weatherType(rawValue: weatherTypeRaw) ?? weatherType.SUNNY
-                
+
                 weatherModel.curTemp = tempData
                 weatherModel.type = weatherTypeNew
-                
+
                 bleService.sendRealTimeWeather(weatherModel)
             case 84: // MicrowearDeviceControl.raiseWrist.value
                 print("Raise wrist to wake screen command sent")
@@ -466,9 +466,8 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 print("Sync data command sent") // Mirip dengan sync data
                 let callBack = NJYAsyncCallback<AnyObject>.create(self, success: { result in
 
-                    do {
                         let sysModel = result as! NJY_SysDataModel
-                        let currentTimeMillis = Int(Date().timeIntervalSince1970 * 1000)
+                    let currentTimeMillis = Date.now
                         var item = [String: Any]()
 
                         // Add data to the dictionary
@@ -477,10 +476,8 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                         item["heartData"] = ["timeMill": currentTimeMillis, "heartRate": sysModel.sbp]
 
                         // Use the item dictionary...
-                        self.syncHomeDataSink?(item)
-                } catch let error {
-                        print("Error processing data: \(error.localizedDescription)")
-                    }
+                        print(item)
+                        self.syncHomeDataSink!(item)
 
                 }, failure: { error in
                     print("syncHomeDataSink Failure: \(error.localizedDescription)")
