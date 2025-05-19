@@ -52,8 +52,75 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
 
     var macAddressCache = ""
 
+    enum GPSCommand: Int {
+        case requestPermission = 0      // Request GPS positioning permission
+        case countdown = 1             // Request countdown start
+        case start = 2                 // Request activity start
+        case sync = 3                  // Sync activity data
+        case pause = 4                 // Pause activity
+        case `continue` = 5            // Continue activity
+        case end = 6                   // End activity
+        case appBusy = 7               // APP is busy and cannot respond
+    }
+
+    // Notification names
+    let GPS_SPORT_STATUS_NOTIF = "GPS_SPORT_STATUS_NOTIF"
+    let GPS_SPORT_START_NOTIF = "GPS_SPORT_START_NOTIF"
+    let GPS_SPORT_PAUSE_NOTIF = "GPS_SPORT_PAUSE_NOTIF"
+    let GPS_SPORT_CONTINUE_NOTIF = "GPS_SPORT_CONTINUE_NOTIF"
+    let GPS_SPORT_END_NOTIF = "GPS_SPORT_END_NOTIF"
+
+
+    private func setupNotifications() {
+        NotificationCenter.default.addObserver(self,
+                                             selector: #selector(handleGPSNotification(_:)),
+                                             name: Notification.Name(GPS_SPORT_STATUS_NOTIF),
+                                             object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                             selector: #selector(handleGPSNotification(_:)),
+                                             name: Notification.Name(GPS_SPORT_START_NOTIF),
+                                             object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                             selector: #selector(handleGPSNotification(_:)),
+                                             name: Notification.Name(GPS_SPORT_PAUSE_NOTIF),
+                                             object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                             selector: #selector(handleGPSNotification(_:)),
+                                             name: Notification.Name(GPS_SPORT_CONTINUE_NOTIF),
+                                             object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                             selector: #selector(handleGPSNotification(_:)),
+                                             name: Notification.Name(GPS_SPORT_END_NOTIF),
+                                             object: nil)
+    }
+
+    @objc private func handleGPSNotification(_ notification: Notification) {
+        let name = notification.name.rawValue
+
+        if name == GPS_SPORT_START_NOTIF {
+            print("handleStartSportNotification()")
+        }
+        else if name == GPS_SPORT_PAUSE_NOTIF {
+            print("handlePauseSportNotification()")
+        }
+        else if name == GPS_SPORT_CONTINUE_NOTIF {
+            print("handleContinueSportNotification()")
+        }
+        else if name == GPS_SPORT_END_NOTIF {
+            print("handleEndSportNotification()")
+        }
+        else if name == GPS_SPORT_STATUS_NOTIF {
+            print("handleGPSStatusNotification(notification)")
+        }
+    }
+
     init(_ channel: FlutterMethodChannel) {
         super.init()
+        setupNotifications()
     }
 
     func toDictionary<T: Encodable>(from model: T) -> [String: Any]? {
