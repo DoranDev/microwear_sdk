@@ -93,28 +93,46 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                                              object: nil)
     }
 
+    var sportID: Int = 1
+
     @objc private func handleGPSNotification(_ notification: Notification) {
         let name = notification.name.rawValue
-
+        print("handleGPSNotification")
         var item = [String: Any]()
 
+        if name == KBLEGPSSPORT_NOTIF {
+            print("KBLEGPSSPORT_NOTIF(1)")
+            item["status"] = "onGPSPermission"
+            registerGPSCallBackSink?(item)
 
-        if name == KISBLEGPSSPORT_NOTIF {
-            print("KISBLEGPSSPORT_NOTIF(1)")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [self] in
+                print("Ini juga dijalankan setelah 1 detik")
+
+                item["status"] = "onGPSCountDown"
+                registerGPSCallBackSink?(item)
+            }
 
         }
-        else if name == KBLEGPSSPORT_NOTIF {
-            print("KBLEGPSSPORT_NOTIF(2)")
-            item["status"] = "onGPSPermission"
+        else if name == KISBLEGPSSPORT_NOTIF {
+            print("KISBLEGPSSPORT_NOTIF(2)")
+            item["status"] = "onGPSStart"
+            item["sportId"] = sportID
             registerGPSCallBackSink?(item)
         }
         else if name == KBLEGPSSPORTSTOP_NOTIF {
             print("KBLEGPSSPORTSTOP_NOTIF(3)")
+            item["status"] = "onGPSPause"
+            registerGPSCallBackSink?(item)
         }
         else if name == KBLEGPSSPORTCONTINUETO_NOTIF {
             print("KBLEGPSSPORTCONTINUETO_NOTIF(4)")
+            item["status"] = "onGPSContinue"
+            registerGPSCallBackSink?(item)
         }
         else if name == KBLEGPSSPORTEnd_NOTIF {
+            item["status"] = "onGPSEnd"
+            item["sportId"] = sportID
+            registerGPSCallBackSink?(item)
             print("KBLEGPSSPORTEnd_NOTIF (5)")
         }
     }
@@ -754,44 +772,37 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 print("gpsSport")
                 if data != nil {
                   let fun = data?["func"] as? String ?? ""
-                  let type = data?["type"] as? Int ?? 0
-                  let status = data?["status"] as? Int ?? 0
                     switch(fun){
                         case "startGPSStatus":
-                        print("command sent \(String(describing: data))")
+                        print("startGPSStatus command sent \(String(describing: data))")
 
                         let sportState = NJY_SportStateModel()
-                        sportState.cmdId = 1  // Example command ID
-                        sportState.aid = 1  // Example activity ID
+                        sportState.cmdId = 0 // Example command ID
+                        sportState.aid = sportID  // Example activity ID
 
                         // 2. Configure required info model
                         let sportInfo = NJY_SportInfoModel()
-                        sportInfo.sport_state = 1       // Active state
-                        sportInfo.sport_type = 3        // Running
+                        sportInfo.sport_state = 0      // Active state
+                        sportInfo.sport_type = sportID       // Running
+                        sportInfo.sport_gps = 0
+                        sportInfo.sport_hr = 0
                         sportInfo.sport_valid = 1       // Valid data
+                        sportInfo.sport_cadence = 0
+                        sportInfo.sport_stride = 0
+                        sportInfo.reserve3 = 0
                         sportInfo.sport_time = 0        // Start from 0 seconds
                         sportInfo.sport_distance = 0    // Start from 0 meters
                         sportInfo.sport_steps = 0       // Start from 0 steps
+                        sportInfo.sport_kcal = 0
+                        sportInfo.sport_speed = 0
 
                         sportState.infoModel = sportInfo
-
-                        // 3. Configure optional arrays (prevent nil crashes)
-                        sportState.matchSpeedList = []  // Empty array (not nil)
-
-                        // 4. Configure heart rate zones if needed
-                        let warmupZone = NJY_HrSectionModel()
-                        warmupZone.sectionType = 0  // Warmup
-                        warmupZone.sectionValue = 5 // 5 minutes
-
-                        let fatBurnZone = NJY_HrSectionModel()
-                        fatBurnZone.sectionType = 1  // Fat burn
-                        fatBurnZone.sectionValue = 10 // 10 minutes
-
-                        sportState.hrSectionList = [warmupZone, fatBurnZone]
-
-                        // 5. Send to BLE service
                         bleService.getGPSStart(sportState)
+                        case "syncGPSData":
+                        print("syncGPSData command sent \(String(describing: data))")
+
                         break
+
                     default:
                         print("command sent \(String(describing: data))")
                         print("no Function")
@@ -801,7 +812,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 }
 
             default:
-                print("Invalid row selected \(microwearDeviceControlValue)")
+                print("Invalid row selected \(String(describing: microwearDeviceControlValue))")
             }
         default:
             result(FlutterMethodNotImplemented)
