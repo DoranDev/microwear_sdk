@@ -63,60 +63,63 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
         case appBusy = 7               // APP is busy and cannot respond
     }
 
-    // Notification names
-    let GPS_SPORT_STATUS_NOTIF = "GPS_SPORT_STATUS_NOTIF"
-    let GPS_SPORT_START_NOTIF = "GPS_SPORT_START_NOTIF"
-    let GPS_SPORT_PAUSE_NOTIF = "GPS_SPORT_PAUSE_NOTIF"
-    let GPS_SPORT_CONTINUE_NOTIF = "GPS_SPORT_CONTINUE_NOTIF"
-    let GPS_SPORT_END_NOTIF = "GPS_SPORT_END_NOTIF"
 
 
-    private func setupNotifications() {
+
+    func setupNotifications() {
         NotificationCenter.default.addObserver(self,
                                              selector: #selector(handleGPSNotification(_:)),
-                                             name: Notification.Name(GPS_SPORT_STATUS_NOTIF),
+                                             name: Notification.Name(KISBLEGPSSPORT_NOTIF),
                                              object: nil)
 
         NotificationCenter.default.addObserver(self,
                                              selector: #selector(handleGPSNotification(_:)),
-                                             name: Notification.Name(GPS_SPORT_START_NOTIF),
+                                             name: Notification.Name(KBLEGPSSPORT_NOTIF),
                                              object: nil)
 
         NotificationCenter.default.addObserver(self,
                                              selector: #selector(handleGPSNotification(_:)),
-                                             name: Notification.Name(GPS_SPORT_PAUSE_NOTIF),
+                                             name: Notification.Name(KBLEGPSSPORTSTOP_NOTIF),
                                              object: nil)
 
         NotificationCenter.default.addObserver(self,
                                              selector: #selector(handleGPSNotification(_:)),
-                                             name: Notification.Name(GPS_SPORT_CONTINUE_NOTIF),
+                                             name: Notification.Name(KBLEGPSSPORTCONTINUETO_NOTIF),
                                              object: nil)
 
         NotificationCenter.default.addObserver(self,
                                              selector: #selector(handleGPSNotification(_:)),
-                                             name: Notification.Name(GPS_SPORT_END_NOTIF),
+                                             name: Notification.Name(KBLEGPSSPORTEnd_NOTIF),
                                              object: nil)
     }
 
     @objc private func handleGPSNotification(_ notification: Notification) {
         let name = notification.name.rawValue
 
-        if name == GPS_SPORT_START_NOTIF {
-            print("handleStartSportNotification()")
+        var item = [String: Any]()
+
+
+        if name == KISBLEGPSSPORT_NOTIF {
+            print("KISBLEGPSSPORT_NOTIF(1)")
+
         }
-        else if name == GPS_SPORT_PAUSE_NOTIF {
-            print("handlePauseSportNotification()")
+        else if name == KBLEGPSSPORT_NOTIF {
+            print("KBLEGPSSPORT_NOTIF(2)")
+            item["status"] = "onGPSPermission"
+            registerGPSCallBackSink?(item)
         }
-        else if name == GPS_SPORT_CONTINUE_NOTIF {
-            print("handleContinueSportNotification()")
+        else if name == KBLEGPSSPORTSTOP_NOTIF {
+            print("KBLEGPSSPORTSTOP_NOTIF(3)")
         }
-        else if name == GPS_SPORT_END_NOTIF {
-            print("handleEndSportNotification()")
+        else if name == KBLEGPSSPORTCONTINUETO_NOTIF {
+            print("KBLEGPSSPORTCONTINUETO_NOTIF(4)")
         }
-        else if name == GPS_SPORT_STATUS_NOTIF {
-            print("handleGPSStatusNotification(notification)")
+        else if name == KBLEGPSSPORTEnd_NOTIF {
+            print("KBLEGPSSPORTEnd_NOTIF (5)")
         }
     }
+
+
 
     init(_ channel: FlutterMethodChannel) {
         super.init()
@@ -133,8 +136,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
             return nil
         }
     }
-    
-    private static let gpsCallbackHandler = GPSCallbackHandler()
+
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "microwear_sdk", binaryMessenger: registrar.messenger())
@@ -217,19 +219,20 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
         let registerMac3CallBackChannel = FlutterEventChannel(name: registerMac3CallBackChannelName, binaryMessenger: registrar.messenger())
         registerMac3CallBackChannel.setStreamHandler(registerMac3CallBackHandler)
 
-        
-        GPSManager.shared.registerCallback(gpsCallbackHandler)
-        let registerGPSCallBackHandler = RegisterGPSCallBackStreamHandler(plugin: instance,callback: gpsCallbackHandler)
+
+        let registerGPSCallBackHandler = RegisterGPSCallBackStreamHandler(plugin: instance)
         let registerGPSCallBackChannel = FlutterEventChannel(name: registerGPSCallBackChannelName, binaryMessenger: registrar.messenger())
         registerGPSCallBackChannel.setStreamHandler(registerGPSCallBackHandler)
 
         let onLoadingHandler = OnLoadingStreamHandler(plugin: instance)
         let onLoadingChannel = FlutterEventChannel(name: onLoadingChannelName, binaryMessenger: registrar.messenger())
         onLoadingChannel.setStreamHandler(onLoadingHandler)
-    
+
+
+
     }
-    
- 
+
+
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let args = call.arguments as? [String: Any]
@@ -281,7 +284,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 let notif = NJY_NotifModel()
                 notif.msgWhatsApp = 1
                 bleService.sendNotif(notif)
-              
+
             case 29: // MicrowearDeviceControl.ecgHr.value
                 print("Sync 24-hour blood oxygen data command sent") // Mirip dengan mesBo2
                 let asyncCallback = NJYAsyncCallback<AnyObject>.create(self, success: { result in
@@ -567,8 +570,6 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
             case 112: // MicrowearDeviceControl.unbind.value
 
                 print("Unbind command sent")
-            case 120: // MicrowearDeviceControl.hrEcg.value
-                print("Start ECG command sent") // Mirip dengan start ecg
             case 121: // MicrowearDeviceControl.deviceFun.value
                 print("Device function command sent")
                 let asyncCallback = NJYAsyncCallback<AnyObject>.create(self, success: { result in
@@ -749,8 +750,58 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 default:
                     print("Invalid otaType selected")
                 }
+            case 124:
+                print("gpsSport")
+                if data != nil {
+                  let fun = data?["func"] as? String ?? ""
+                  let type = data?["type"] as? Int ?? 0
+                  let status = data?["status"] as? Int ?? 0
+                    switch(fun){
+                        case "startGPSStatus":
+                        print("command sent \(String(describing: data))")
+
+                        let sportState = NJY_SportStateModel()
+                        sportState.cmdId = 1  // Example command ID
+                        sportState.aid = 1  // Example activity ID
+
+                        // 2. Configure required info model
+                        let sportInfo = NJY_SportInfoModel()
+                        sportInfo.sport_state = 1       // Active state
+                        sportInfo.sport_type = 3        // Running
+                        sportInfo.sport_valid = 1       // Valid data
+                        sportInfo.sport_time = 0        // Start from 0 seconds
+                        sportInfo.sport_distance = 0    // Start from 0 meters
+                        sportInfo.sport_steps = 0       // Start from 0 steps
+
+                        sportState.infoModel = sportInfo
+
+                        // 3. Configure optional arrays (prevent nil crashes)
+                        sportState.matchSpeedList = []  // Empty array (not nil)
+
+                        // 4. Configure heart rate zones if needed
+                        let warmupZone = NJY_HrSectionModel()
+                        warmupZone.sectionType = 0  // Warmup
+                        warmupZone.sectionValue = 5 // 5 minutes
+
+                        let fatBurnZone = NJY_HrSectionModel()
+                        fatBurnZone.sectionType = 1  // Fat burn
+                        fatBurnZone.sectionValue = 10 // 10 minutes
+
+                        sportState.hrSectionList = [warmupZone, fatBurnZone]
+
+                        // 5. Send to BLE service
+                        bleService.getGPSStart(sportState)
+                        break
+                    default:
+                        print("command sent \(String(describing: data))")
+                        print("no Function")
+                        break
+                    }
+
+                }
+
             default:
-                print("Invalid row selected")
+                print("Invalid row selected \(microwearDeviceControlValue)")
             }
         default:
             result(FlutterMethodNotImplemented)
@@ -1242,18 +1293,14 @@ class RegisterMac3CallBackStreamHandler: NSObject, FlutterStreamHandler {
 
 class RegisterGPSCallBackStreamHandler: NSObject, FlutterStreamHandler {
     weak var plugin: MicrowearSdkPlugin?
-    weak var callback: GPSCallbackHandler?
 
-    init(plugin: MicrowearSdkPlugin, callback: GPSCallbackHandler) {
+    init(plugin: MicrowearSdkPlugin) {
         self.plugin = plugin
-        self.callback = callback
     }
 
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         print("RegisterGPSCallBackStreamHandler.onListen called")
         plugin?.registerGPSCallBackSink = events
-        print("Register GPS callback sink set: \(plugin?.registerGPSCallBackSink != nil)")
-        callback?.setCallbackSink(events)
         return nil
     }
 
