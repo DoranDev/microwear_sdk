@@ -94,6 +94,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
     }
 
     var sportID: Int = 1
+    var cmdID: Int = 0
 
     @objc private func handleGPSNotification(_ notification: Notification) {
         let name = notification.name.rawValue
@@ -105,7 +106,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
 
 
             let sportState = NJY_SportStateModel()
-            sportState.cmdId = 0 // Example command ID
+            sportState.cmdId = cmdID // Example command ID
             sportState.aid = sportID  // Example activity ID
 
             // 2. Configure required info model
@@ -162,7 +163,8 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
         }
         else if name == KBLEGPSSPORTSTOP_NOTIF {
             let sportState = NJY_SportStateModel()
-            sportState.cmdId = GPSCommand.pause.rawValue // Example command ID
+            self.cmdID = GPSCommand.pause.rawValue
+            sportState.cmdId = cmdID // Example command ID
             sportState.aid = sportID  // Example activity ID
 
             // 2. Configure required info model
@@ -189,7 +191,8 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
         }
         else if name == KBLEGPSSPORTCONTINUETO_NOTIF {
             let sportState = NJY_SportStateModel()
-            sportState.cmdId = GPSCommand.continue.rawValue // Example command ID
+            self.cmdID = GPSCommand.continue.rawValue
+            sportState.cmdId = cmdID // Example command ID
             sportState.aid = sportID  // Example activity ID
 
             // 2. Configure required info model
@@ -213,10 +216,12 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
             print("KBLEGPSSPORTCONTINUETO_NOTIF(4)")
             item["status"] = "onGPSContinue"
             registerGPSCallBackSink?(item)
+            self.cmdID = GPSCommand.sync.rawValue
         }
         else if name == KBLEGPSSPORTEnd_NOTIF {
             let sportState = NJY_SportStateModel()
-            sportState.cmdId = GPSCommand.end.rawValue // Example command ID
+            self.cmdID = GPSCommand.end.rawValue
+            sportState.cmdId = cmdID // Example command ID
             sportState.aid = sportID  // Example activity ID
 
             // 2. Configure required info model
@@ -884,7 +889,8 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                             print("startGPSStatus command sent \(String(describing: data))")
 
                             let sportState = NJY_SportStateModel()
-                            sportState.cmdId = 0 // Example command ID
+                            self.cmdID = GPSCommand.start.rawValue
+                            sportState.cmdId = cmdID // Example command ID
                             sportState.aid = sportID  // Example activity ID
 
                             // 2. Configure required info model
@@ -905,7 +911,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
 
                             sportState.infoModel = sportInfo
                             bleService.getGPSStart(sportState)
-
+                           self.cmdID = GPSCommand.sync.rawValue
                         case "syncGPSData":
                             print("syncGPSData command sent \(String(describing: data))")
                             let sportState = NJY_SportStateModel()
@@ -923,7 +929,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                             let sportSpeed = data?["sportSpeed"] as? Int ?? 0
                             let sportType = data?["sportType"] as? Int ?? 0
 
-                            sportState.cmdId = 3 // Example command ID
+                            sportState.cmdId = cmdID // Example command ID
                             sportState.aid = sportID  // Example activity ID
 
                             // 2. Configure required info model
