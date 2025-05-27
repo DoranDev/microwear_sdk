@@ -226,28 +226,28 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
         }
         else if name == KBLEGPSSPORTEnd_NOTIF {
              self.cmdIDX = 6
-            let sportState = NJY_SportStateModel()
-            sportState.cmdId = cmdIDX // Example command ID
-            sportState.aid = sportID  // Example activity ID
-
-            // 2. Configure required info model
-            let sportInfo = NJY_SportInfoModel()
-            sportInfo.sport_state = 0      // Active state
-            sportInfo.sport_type = sportID       // Running
-            sportInfo.sport_gps = 0
-            sportInfo.sport_hr = 0
-            sportInfo.sport_valid = 0       // Valid data
-            sportInfo.sport_cadence = 0
-            sportInfo.sport_stride = 0
-            sportInfo.reserve3 = 0
-            sportInfo.sport_time = 0        // Start from 0 seconds
-            sportInfo.sport_distance = 0    // Start from 0 meters
-            sportInfo.sport_steps = 0       // Start from 0 steps
-            sportInfo.sport_kcal = 0
-            sportInfo.sport_speed = 0
-
-            sportState.infoModel = sportInfo
-            bleService.getGPSStart(sportState)
+//            let sportState = NJY_SportStateModel()
+//            sportState.cmdId = cmdIDX // Example command ID
+//            sportState.aid = sportID  // Example activity ID
+//
+//            // 2. Configure required info model
+//            let sportInfo = NJY_SportInfoModel()
+//            sportInfo.sport_state = 0      // Active state
+//            sportInfo.sport_type = sportID       // Running
+//            sportInfo.sport_gps = 0
+//            sportInfo.sport_hr = 0
+//            sportInfo.sport_valid = 0       // Valid data
+//            sportInfo.sport_cadence = 0
+//            sportInfo.sport_stride = 0
+//            sportInfo.reserve3 = 0
+//            sportInfo.sport_time = 0        // Start from 0 seconds
+//            sportInfo.sport_distance = 0    // Start from 0 meters
+//            sportInfo.sport_steps = 0       // Start from 0 steps
+//            sportInfo.sport_kcal = 0
+//            sportInfo.sport_speed = 0
+//
+//            sportState.infoModel = sportInfo
+//            bleService.getGPSStart(sportState)
             item["status"] = "onGPSEnd"
             item["sportId"] = sportID
             registerGPSCallBackSink?(item)
