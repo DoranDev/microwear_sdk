@@ -131,7 +131,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
             sportState.infoModel = sportInfo
 
 
-            var asyncGPSCallbacks = NJYAsyncCallback<AnyObject>.create(
+            let asyncGPSCallbacks = NJYAsyncCallback<AnyObject>.create(
                 self,
                 success: { result in
                     if let model = result as? NJY_SportStateModel {
