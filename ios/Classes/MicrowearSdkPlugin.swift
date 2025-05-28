@@ -93,7 +93,8 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                                              object: nil)
     }
 
-    var sportID: Int = 1
+    var aid: Int = 1
+    var sportID: Int = 140
     var cmdIDX: Int {
         get { UserDefaults.standard.integer(forKey: "cmdIDX") }
         set { UserDefaults.standard.set(newValue, forKey: "cmdIDX") }
@@ -110,11 +111,11 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
             self.cmdIDX = 0
             let sportState = NJY_SportStateModel()
             sportState.cmdId = cmdIDX // Example command ID
-            sportState.aid = sportID  // Example activity ID
+            sportState.aid = aid  // Example activity ID
 
             // 2. Configure required info model
             let sportInfo = NJY_SportInfoModel()
-            sportInfo.sport_state = 0      // Active state
+            sportInfo.sport_state = 1     // Active state
             sportInfo.sport_type = sportID      //
             sportInfo.sport_gps = 0
             sportInfo.sport_hr = 0
@@ -131,7 +132,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
             sportState.infoModel = sportInfo
 
 
-            let asyncGPSCallbacks = NJYAsyncCallback<AnyObject>.create(
+            let asyncGPSCallback = NJYAsyncCallback<AnyObject>.create(
                 self,
                 success: { result in
                     if let model = result as? NJY_SportStateModel {
@@ -148,7 +149,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                     print("getGPSSynData Failure: \(error.localizedDescription)")
                 })
 
-            bleService.getGPSSynData(sportState, callback: asyncGPSCallbacks)
+            bleService.getGPSSynData(sportState, callback: asyncGPSCallback)
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [self] in
                 print("Ini juga dijalankan setelah 2 detik")
@@ -897,11 +898,11 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
 
                             let sportState = NJY_SportStateModel()
                         sportState.cmdId = cmd // Example command ID
-                            sportState.aid = sportID  // Example activity ID
+                            sportState.aid = aid  // Example activity ID
 
                             // 2. Configure required info model
                             let sportInfo = NJY_SportInfoModel()
-                            sportInfo.sport_state = 0      // Active state
+                            sportInfo.sport_state = 1      // Active state
                             sportInfo.sport_type = sportID       // Running
                             sportInfo.sport_gps = 1
                             sportInfo.sport_hr = 0
@@ -934,7 +935,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                             let sportType = data?["sportType"] as? Int ?? 0
 
                         sportState.cmdId = cmd// Example command ID
-                            sportState.aid = sportID  // Example activity ID
+                            sportState.aid = aid  // Example activity ID
 
                             // 2. Configure required info model
                             let sportInfo = NJY_SportInfoModel()
@@ -948,10 +949,14 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                             sportInfo.sport_stride = sportStride
                             sportInfo.reserve3 = 0
                             sportInfo.sport_time = sportTime        // Start from 0 seconds
-                            sportInfo.sport_distance = sportDistance    // Start from 0 meters
-                            sportInfo.sport_steps = sportSteps       // Start from 0 steps
-                            sportInfo.sport_kcal = sportKcal
                             sportInfo.sport_speed = sportSpeed
+//                            sportInfo.sport_distance = sportDistance    // Start from 0 meters
+//                            sportInfo.sport_steps = sportSteps       // Start from 0 steps
+//                            sportInfo.sport_kcal = sportKcal
+
+                        sportInfo.sport_steps = 10000       // Start from 0 steps
+                        sportInfo.sport_kcal = 10000
+                        sportInfo.sport_distance = 10000
 
                             sportState.infoModel = sportInfo
                             let asyncGPSCallback = NJYAsyncCallback<AnyObject>.create(
@@ -960,7 +965,8 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                                 if let model = result as? NJY_SportStateModel {
                                     print("Get getGPSSynDataPlay Success: aid:\(model.aid) cmdId:\(model.cmdId)")
                                     // Now you can access model's properties
-                                    self.sportID = model.aid
+                                   // self.aid = model.aid
+                                    self.sportID = model.infoModel.sport_type
                                 } else {
                                     print("Received unexpected result type: \(type(of: result))")
                                 }
@@ -969,7 +975,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                             })
                       //  if sportTime % 5 == 0 {
                             bleService.getGPSSynData(sportState, callback: asyncGPSCallback)
-                       // }
+                      //  }
                         break
 
                     default:
