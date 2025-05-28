@@ -253,7 +253,11 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
             item["sportId"] = sportID
             registerGPSCallBackSink?(item)
             print("KBLEGPSSPORTEnd_NOTIF (6)")
+        }else{
+            print("GAK KEDETEKSI \(name)")
         }
+
+
     }
 
 
@@ -904,7 +908,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                             let sportInfo = NJY_SportInfoModel()
                             sportInfo.sport_state = 1      // Active state
                             sportInfo.sport_type = sportID       // Running
-                            sportInfo.sport_gps = 1
+                            sportInfo.sport_gps = 0
                             sportInfo.sport_hr = 0
                             sportInfo.sport_valid = 1       // Valid data
                             sportInfo.sport_cadence = 0
@@ -941,7 +945,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                             let sportInfo = NJY_SportInfoModel()
                             sportInfo.sport_state = 1   // Active state
                             sportInfo.sport_type = sportID       // Running
-                            sportInfo.sport_gps = 1
+                            sportInfo.sport_gps = 0
 
                             sportInfo.sport_hr = sportHr
                             sportInfo.sport_valid = sportValid      // Valid data
@@ -950,16 +954,16 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                             sportInfo.reserve3 = 0
                             sportInfo.sport_time = sportTime        // Start from 0 seconds
                             sportInfo.sport_speed = sportSpeed
-//                            sportInfo.sport_distance = sportDistance    // Start from 0 meters
-//                            sportInfo.sport_steps = sportSteps       // Start from 0 steps
-//                            sportInfo.sport_kcal = sportKcal
+                            sportInfo.sport_distance = sportDistance    // Start from 0 meters
+                            sportInfo.sport_steps = sportSteps       // Start from 0 steps
+                            sportInfo.sport_kcal = sportKcal
 
-                        sportInfo.sport_steps = 10000       // Start from 0 steps
-                        sportInfo.sport_kcal = 10000
-                        sportInfo.sport_distance = 10000
+//                        sportInfo.sport_steps = 10000       // Start from 0 steps
+//                        sportInfo.sport_kcal = 10000
+//                        sportInfo.sport_distance = 10000
 
                             sportState.infoModel = sportInfo
-                            let asyncGPSCallback = NJYAsyncCallback<AnyObject>.create(
+                            let asyncGPSCallbacka = NJYAsyncCallback<AnyObject>.create(
                             self,
                             success: { result in
                                 if let model = result as? NJY_SportStateModel {
@@ -973,9 +977,9 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                             }, failure: { error in
                                 print("getGPSSynDataPlay Failure: \(error.localizedDescription)")
                             })
-                      //  if sportTime % 5 == 0 {
-                            bleService.getGPSSynData(sportState, callback: asyncGPSCallback)
-                      //  }
+                        if sportTime % 5 == 0 {
+                            bleService.getGPSSynData(sportState, callback: asyncGPSCallbacka)
+                        }
                         break
 
                     default:
