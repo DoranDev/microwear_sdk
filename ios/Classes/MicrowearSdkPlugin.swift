@@ -977,9 +977,9 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                             }, failure: { error in
                                 print("getGPSSynDataPlay Failure: \(error.localizedDescription)")
                             })
-                        if sportTime % 5 == 0 {
+                       // if sportTime % 5 == 0 {
                             bleService.getGPSSynData(sportState, callback: asyncGPSCallbacka)
-                        }
+                       // }
                         break
 
                     default:
