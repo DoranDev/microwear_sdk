@@ -188,7 +188,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [self] in
                     print("onGPSCountDown dijalankan setelah 1 detik")
 
-                    item["status"] = "onGPSCountDown"
+                    item["status"] = "onGPSCountdown"
                     self.registerGPSCallBackSink?(item)
                 }
 
