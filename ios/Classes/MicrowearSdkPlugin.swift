@@ -104,7 +104,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
         DispatchQueue.main.async { [weak self] in
               guard let self = self else { return }
 
-              print("Thread check: \(Thread.isMainThread ? "Main" : "Background")")
+            print("Thread check: \(Thread.isMainThread ? "Main" : "Background")")
                // Handle notifikasi di main thread
             let name = notification.name.rawValue
             print("handleGPSNotification")
@@ -185,8 +185,8 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                     self.bleService.getGPSSynData(sportState, callback: asyncGPSCallback)
                 }
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [self] in
-                    print("onGPSCountDown dijalankan setelah 2 detik")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [self] in
+                    print("onGPSCountDown dijalankan setelah 1 detik")
 
                     item["status"] = "onGPSCountDown"
                     self.registerGPSCallBackSink?(item)
@@ -196,9 +196,48 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
             else if name == KISBLEGPSSPORT_NOTIF {
                 self.cmdIDX = 3
                 print("KISBLEGPSSPORT_NOTIF(2)")
-                item["status"] = "onGPSStart"
-                item["sportId"] = self.sportID
-                self.registerGPSCallBackSink?(item)
+                let sportState = NJY_SportStateModel()
+                sportState.cmdId = 2 // Example command ID
+                sportState.aid = aid  // Example activity ID
+
+                // 2. Configure required info model
+                let sportInfo = NJY_SportInfoModel()
+                sportInfo.sport_state = 0     // Active state
+                sportInfo.sport_type = self.sportID      //
+                sportInfo.sport_gps = 0
+                sportInfo.sport_hr = 0
+                sportInfo.sport_valid = 0      // Valid data
+                sportInfo.sport_cadence = 0
+                sportInfo.sport_stride = 0
+                sportInfo.reserve3 = 0
+                sportInfo.sport_time = 0        // Start from 0 seconds
+                sportInfo.sport_distance = 0    // Start from 0 meters
+                sportInfo.sport_steps = 0       // Start from 0 steps
+                sportInfo.sport_kcal = 0
+                sportInfo.sport_speed = 0
+    //
+                sportState.infoModel = sportInfo
+
+
+                let asyncGPSCallback = NJYAsyncCallback<AnyObject>.create(
+                    self,
+                    success: { [self] result in
+                        if let model = result as? NJY_SportStateModel {
+                            print("Get start Success: aid:\(model.aid) cmdId:\(model.cmdId)")
+                        } else {
+                            print("Received unexpected result type: \(type(of: result))")
+                        }
+                }, failure: { error in
+                    print("getGPSSynData start Failure: \(error.localizedDescription)")
+                })
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [self] in
+                    print("onGPSStart dijalankan setelah 3 detik")
+
+                    item["status"] = "onGPSStart"
+                    item["sportId"] = self.sportID
+                    self.registerGPSCallBackSink?(item)
+                }
+
 
             }
             else if name == KBLEGPSSPORTSTOP_NOTIF {
@@ -969,7 +1008,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
 
                             let sportKcal = data?["sportKcal"] as? Int ?? 0
                             let sportHr = data?["sportHr"] as? Int ?? 0
-                            let sportValid = data?["sportValid"] as? Int ?? 0
+                            let sportValid = data?["sportValid"] as? Int ?? 1
                             let sportTime = data?["sportTime"] as? Int ?? 0
                             let sportStride = data?["sportStride"] as? Int ?? 0
                             let sportCadence = data?["sportCadence"] as? Int ?? 0
@@ -1019,8 +1058,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                             })
                         DispatchQueue.main.async {
                             if sportTime % 1 == 0 {
-                                NJYBleService.sharedInstance().getGPSSynData(sportState, callback: asyncGPSCallbacka)
-
+                                self.bleService.getGPSSynData(sportState, callback: asyncGPSCallbacka)
                             }
                         }
                         break
