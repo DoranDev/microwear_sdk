@@ -101,189 +101,196 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
     }
 
     @objc private func handleGPSNotification(_ notification: Notification) {
-        let name = notification.name.rawValue
-        print("handleGPSNotification")
-        var item = [String: Any]()
+        DispatchQueue.main.async { [weak self] in
+              guard let self = self else { return }
 
-        if name == KBLEGPSSPORT_NOTIF {
-            print("KBLEGPSSPORT_NOTIF(0)")
+              print("Thread check: \(Thread.isMainThread ? "Main" : "Background")")
+               // Handle notifikasi di main thread
+            let name = notification.name.rawValue
+            print("handleGPSNotification")
+            var item = [String: Any]()
 
-            item["status"] = "onGPSPermission"
-            self.registerGPSCallBackSink?(item)
+            if name == KBLEGPSSPORT_NOTIF {
+                print("KBLEGPSSPORT_NOTIF(0)")
 
-            self.cmdIDX = 0
-            let sportState = NJY_SportStateModel()
-            sportState.cmdId = cmdIDX // Example command ID
-            sportState.aid = 0  // Example activity ID
+                item["status"] = "onGPSPermission"
+                self.registerGPSCallBackSink?(item)
 
-            // 2. Configure required info model
-            let sportInfo = NJY_SportInfoModel()
-            sportInfo.sport_state = 1     // Active state
-            sportInfo.sport_type = sportID      //
-            sportInfo.sport_gps = 0
-            sportInfo.sport_hr = 0
-            sportInfo.sport_valid = 0      // Valid data
-            sportInfo.sport_cadence = 0
-            sportInfo.sport_stride = 0
-            sportInfo.reserve3 = 0
-            sportInfo.sport_time = 0        // Start from 0 seconds
-            sportInfo.sport_distance = 0    // Start from 0 meters
-            sportInfo.sport_steps = 0       // Start from 0 steps
-            sportInfo.sport_kcal = 0
-            sportInfo.sport_speed = 0
-//
-            sportState.infoModel = sportInfo
+                self.cmdIDX = 0
+                let sportState = NJY_SportStateModel()
+                sportState.cmdId = self.cmdIDX // Example command ID
+                sportState.aid = 0  // Example activity ID
+
+                // 2. Configure required info model
+                let sportInfo = NJY_SportInfoModel()
+                sportInfo.sport_state = 0     // Active state
+                sportInfo.sport_type = self.sportID      //
+                sportInfo.sport_gps = 0
+                sportInfo.sport_hr = 0
+                sportInfo.sport_valid = 0      // Valid data
+                sportInfo.sport_cadence = 0
+                sportInfo.sport_stride = 0
+                sportInfo.reserve3 = 0
+                sportInfo.sport_time = 0        // Start from 0 seconds
+                sportInfo.sport_distance = 0    // Start from 0 meters
+                sportInfo.sport_steps = 0       // Start from 0 steps
+                sportInfo.sport_kcal = 0
+                sportInfo.sport_speed = 0
+    //
+                sportState.infoModel = sportInfo
 
 
-            let asyncGPSCallback = NJYAsyncCallback<AnyObject>.create(
-                self,
-                success: { [self] result in
-                    if let model = result as? NJY_SportStateModel {
-                        print("Get getGPSSynData Success: aid:\(model.aid) cmdId:\(model.cmdId)")
-                        if(model.cmdId == 1){
-                            // Now you can access model's properties
-                            self.sportID = model.infoModel.sport_type
-                            self.aid = model.aid
-                            let sportState = NJY_SportStateModel()
-                            sportState.cmdId = 0 // Example command ID
-                            sportState.aid = model.aid  // Example activity ID
-
-                            // 2. Configure required info model
-                            let sportInfo = NJY_SportInfoModel()
-                            sportInfo.sport_state = 0     // Active state
-                            sportInfo.sport_type = model.infoModel.sport_type       // Running
-                            sportInfo.sport_gps = 0
-                            sportInfo.sport_hr = 0
-                            sportInfo.sport_valid = 1       // Valid data
-                            sportInfo.sport_cadence = 0
-                            sportInfo.sport_stride = 0
-                            sportInfo.reserve3 = 0
-                            sportInfo.sport_time = 0        // Start from 0 seconds
-                            sportInfo.sport_distance = 0    // Start from 0 meters
-                            sportInfo.sport_steps = 0       // Start from 0 steps
-                            sportInfo.sport_kcal = 0
-                            sportInfo.sport_speed = 0
-
-                            sportState.infoModel = sportInfo
-                            bleService.getGPSStart(sportState)
-                            item["status"] = "onGPSPermission"
-                            self.registerGPSCallBackSink?(item)
+                let asyncGPSCallback = NJYAsyncCallback<AnyObject>.create(
+                    self,
+                    success: { [self] result in
+                        if let model = result as? NJY_SportStateModel {
+                            print("Get getGPSSynData Success: aid:\(model.aid) cmdId:\(model.cmdId)")
+                            if(model.cmdId == 1){
+                                // Now you can access model's properties
+                                self.sportID = model.infoModel.sport_type
+                               // self.aid = model.aid
+    //                            let sportState = NJY_SportStateModel()
+    //                            sportState.cmdId = 1// Example command ID
+    //                            sportState.aid = model.aid  // Example activity ID
+    //
+    //                            // 2. Configure required info model
+    //                            let sportInfo = NJY_SportInfoModel()
+    //                            sportInfo.sport_state = 1     // Active state
+    //                            sportInfo.sport_type = model.infoModel.sport_type       // Running
+    //                            sportInfo.sport_gps = 0
+    //                            sportInfo.sport_hr = 0
+    //                            sportInfo.sport_valid = 1       // Valid data
+    //                            sportInfo.sport_cadence = 0
+    //                            sportInfo.sport_stride = 0
+    //                            sportInfo.reserve3 = 0
+    //                            sportInfo.sport_time = 0        // Start from 0 seconds
+    //                            sportInfo.sport_distance = 0    // Start from 0 meters
+    //                            sportInfo.sport_steps = 0       // Start from 0 steps
+    //                            sportInfo.sport_kcal = 0
+    //                            sportInfo.sport_speed = 0
+    //
+    //                            sportState.infoModel = sportInfo
+    //                            bleService.getGPSStart(sportState)
+                                item["status"] = "onGPSPermission"
+                                self.registerGPSCallBackSink?(item)
+                            }
+                        } else {
+                            print("Received unexpected result type: \(type(of: result))")
                         }
-                    } else {
-                        print("Received unexpected result type: \(type(of: result))")
-                    }
-                }, failure: { error in
-                    print("getGPSSynData Failure: \(error.localizedDescription)")
-                })
+                    }, failure: { error in
+                        print("getGPSSynData Failure: \(error.localizedDescription)")
+                    })
 
-            bleService.getGPSSynData(sportState, callback: asyncGPSCallback)
+                DispatchQueue.main.async {
+                    self.bleService.getGPSSynData(sportState, callback: asyncGPSCallback)
+                }
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [self] in
-                print("Ini juga dijalankan setelah 2 detik")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [self] in
+                    print("onGPSCountDown dijalankan setelah 2 detik")
 
-                item["status"] = "onGPSCountDown"
-                registerGPSCallBackSink?(item)
+                    item["status"] = "onGPSCountDown"
+                    self.registerGPSCallBackSink?(item)
+                }
+
             }
+            else if name == KISBLEGPSSPORT_NOTIF {
+                self.cmdIDX = 3
+                print("KISBLEGPSSPORT_NOTIF(2)")
+                item["status"] = "onGPSStart"
+                item["sportId"] = self.sportID
+                self.registerGPSCallBackSink?(item)
 
-        }
-        else if name == KISBLEGPSSPORT_NOTIF {
-            self.cmdIDX = 3
-            print("KISBLEGPSSPORT_NOTIF(2)")
-            item["status"] = "onGPSStart"
-            item["sportId"] = sportID
-            registerGPSCallBackSink?(item)
+            }
+            else if name == KBLEGPSSPORTSTOP_NOTIF {
+                self.cmdIDX =  4
+    //            let sportState = NJY_SportStateModel()
+    //            sportState.cmdId = cmdIDX // Example command ID
+    //            sportState.aid = sportID  // Example activity ID
+    //
+    //            // 2. Configure required info model
+    //            let sportInfo = NJY_SportInfoModel()
+    //            sportInfo.sport_state = 0      // Active state
+    //            sportInfo.sport_type = sportID       // Running
+    //            sportInfo.sport_gps = 0
+    //            sportInfo.sport_hr = 0
+    //            sportInfo.sport_valid = 1       // Valid data
+    //            sportInfo.sport_cadence = 0
+    //            sportInfo.sport_stride = 0
+    //            sportInfo.reserve3 = 0
+    //            sportInfo.sport_time = 0        // Start from 0 seconds
+    //            sportInfo.sport_distance = 0    // Start from 0 meters
+    //            sportInfo.sport_steps = 0       // Start from 0 steps
+    //            sportInfo.sport_kcal = 0
+    //            sportInfo.sport_speed = 0
+    //
+    //            sportState.infoModel = sportInfo
+    //            bleService.getGPSStart(sportState)
+                print("KBLEGPSSPORTSTOP_NOTIF(3)")
+                item["status"] = "onGPSPause"
+                self.registerGPSCallBackSink?(item)
+            }
+            else if name == KBLEGPSSPORTCONTINUETO_NOTIF {
 
-        }
-        else if name == KBLEGPSSPORTSTOP_NOTIF {
-            self.cmdIDX =  4
-//            let sportState = NJY_SportStateModel()
-//            sportState.cmdId = cmdIDX // Example command ID
-//            sportState.aid = sportID  // Example activity ID
-//
-//            // 2. Configure required info model
-//            let sportInfo = NJY_SportInfoModel()
-//            sportInfo.sport_state = 0      // Active state
-//            sportInfo.sport_type = sportID       // Running
-//            sportInfo.sport_gps = 0
-//            sportInfo.sport_hr = 0
-//            sportInfo.sport_valid = 1       // Valid data
-//            sportInfo.sport_cadence = 0
-//            sportInfo.sport_stride = 0
-//            sportInfo.reserve3 = 0
-//            sportInfo.sport_time = 0        // Start from 0 seconds
-//            sportInfo.sport_distance = 0    // Start from 0 meters
-//            sportInfo.sport_steps = 0       // Start from 0 steps
-//            sportInfo.sport_kcal = 0
-//            sportInfo.sport_speed = 0
-//
-//            sportState.infoModel = sportInfo
-//            bleService.getGPSStart(sportState)
-            print("KBLEGPSSPORTSTOP_NOTIF(3)")
-            item["status"] = "onGPSPause"
-            registerGPSCallBackSink?(item)
-        }
-        else if name == KBLEGPSSPORTCONTINUETO_NOTIF {
+                 self.cmdIDX = 5
 
-             self.cmdIDX = 5
-
-//            let sportState = NJY_SportStateModel()
-//            sportState.cmdId = cmdIDX // Example command ID
-//            sportState.aid = sportID  // Example activity ID
-//
-//            // 2. Configure required info model
-//            let sportInfo = NJY_SportInfoModel()
-//            sportInfo.sport_state = 0      // Active state
-//            sportInfo.sport_type = sportID       // Running
-//            sportInfo.sport_gps = 0
-//            sportInfo.sport_hr = 0
-//            sportInfo.sport_valid = 1       // Valid data
-//            sportInfo.sport_cadence = 0
-//            sportInfo.sport_stride = 0
-//            sportInfo.reserve3 = 0
-//            sportInfo.sport_time = 0        // Start from 0 seconds
-//            sportInfo.sport_distance = 0    // Start from 0 meters
-//            sportInfo.sport_steps = 0       // Start from 0 steps
-//            sportInfo.sport_kcal = 0
-//            sportInfo.sport_speed = 0
-//
-//            sportState.infoModel = sportInfo
-//            bleService.getGPSStart(sportState)
-            print("KBLEGPSSPORTCONTINUETO_NOTIF(5)")
-            item["status"] = "onGPSContinue"
-            registerGPSCallBackSink?(item)
-        }
-        else if name == KBLEGPSSPORTEnd_NOTIF {
-             self.cmdIDX = 6
-//            let sportState = NJY_SportStateModel()
-//            sportState.cmdId = cmdIDX // Example command ID
-//            sportState.aid = sportID  // Example activity ID
-//
-//            // 2. Configure required info model
-//            let sportInfo = NJY_SportInfoModel()
-//            sportInfo.sport_state = 0      // Active state
-//            sportInfo.sport_type = sportID       // Running
-//            sportInfo.sport_gps = 0
-//            sportInfo.sport_hr = 0
-//            sportInfo.sport_valid = 0       // Valid data
-//            sportInfo.sport_cadence = 0
-//            sportInfo.sport_stride = 0
-//            sportInfo.reserve3 = 0
-//            sportInfo.sport_time = 0        // Start from 0 seconds
-//            sportInfo.sport_distance = 0    // Start from 0 meters
-//            sportInfo.sport_steps = 0       // Start from 0 steps
-//            sportInfo.sport_kcal = 0
-//            sportInfo.sport_speed = 0
-//
-//            sportState.infoModel = sportInfo
-//            bleService.getGPSStart(sportState)
-            item["status"] = "onGPSEnd"
-            item["sportId"] = sportID
-            registerGPSCallBackSink?(item)
-            print("KBLEGPSSPORTEnd_NOTIF (6)")
-        }else{
-            print("GAK KEDETEKSI \(name)")
-        }
-
+    //            let sportState = NJY_SportStateModel()
+    //            sportState.cmdId = cmdIDX // Example command ID
+    //            sportState.aid = sportID  // Example activity ID
+    //
+    //            // 2. Configure required info model
+    //            let sportInfo = NJY_SportInfoModel()
+    //            sportInfo.sport_state = 0      // Active state
+    //            sportInfo.sport_type = sportID       // Running
+    //            sportInfo.sport_gps = 0
+    //            sportInfo.sport_hr = 0
+    //            sportInfo.sport_valid = 1       // Valid data
+    //            sportInfo.sport_cadence = 0
+    //            sportInfo.sport_stride = 0
+    //            sportInfo.reserve3 = 0
+    //            sportInfo.sport_time = 0        // Start from 0 seconds
+    //            sportInfo.sport_distance = 0    // Start from 0 meters
+    //            sportInfo.sport_steps = 0       // Start from 0 steps
+    //            sportInfo.sport_kcal = 0
+    //            sportInfo.sport_speed = 0
+    //
+    //            sportState.infoModel = sportInfo
+    //            bleService.getGPSStart(sportState)
+                print("KBLEGPSSPORTCONTINUETO_NOTIF(5)")
+                item["status"] = "onGPSContinue"
+                self.registerGPSCallBackSink?(item)
+            }
+            else if name == KBLEGPSSPORTEnd_NOTIF {
+                 self.cmdIDX = 6
+    //            let sportState = NJY_SportStateModel()
+    //            sportState.cmdId = cmdIDX // Example command ID
+    //            sportState.aid = sportID  // Example activity ID
+    //
+    //            // 2. Configure required info model
+    //            let sportInfo = NJY_SportInfoModel()
+    //            sportInfo.sport_state = 0      // Active state
+    //            sportInfo.sport_type = sportID       // Running
+    //            sportInfo.sport_gps = 0
+    //            sportInfo.sport_hr = 0
+    //            sportInfo.sport_valid = 0       // Valid data
+    //            sportInfo.sport_cadence = 0
+    //            sportInfo.sport_stride = 0
+    //            sportInfo.reserve3 = 0
+    //            sportInfo.sport_time = 0        // Start from 0 seconds
+    //            sportInfo.sport_distance = 0    // Start from 0 meters
+    //            sportInfo.sport_steps = 0       // Start from 0 steps
+    //            sportInfo.sport_kcal = 0
+    //            sportInfo.sport_speed = 0
+    //
+    //            sportState.infoModel = sportInfo
+    //            bleService.getGPSStart(sportState)
+                item["status"] = "onGPSEnd"
+                item["sportId"] = self.sportID
+                self.registerGPSCallBackSink?(item)
+                print("KBLEGPSSPORTEnd_NOTIF (6)")
+            }else{
+                print("GAK KEDETEKSI \(name)")
+            }
+           }
 
     }
 
@@ -292,6 +299,10 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
     init(_ channel: FlutterMethodChannel) {
         super.init()
         setupNotifications()
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     func toDictionary<T: Encodable>(from model: T) -> [String: Any]? {
@@ -306,10 +317,12 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
     }
 
 
+
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "microwear_sdk", binaryMessenger: registrar.messenger())
         let instance = MicrowearSdkPlugin(channel)
         registrar.addMethodCallDelegate(instance, channel: channel)
+        registrar.addApplicationDelegate(instance)
 
         let deviceDataReceivedHandler = DeviceDataReceivedStreamHandler(plugin: instance)
         let deviceDataReceivedChannel = FlutterEventChannel(name: deviceDataReceivedChannelName, binaryMessenger: registrar.messenger())
@@ -925,28 +938,30 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                         case "startGPSStatus":
                             print("startGPSStatus command sent \(String(describing: data))")
 
-//                            let sportState = NJY_SportStateModel()
-//                        sportState.cmdId = 0 // Example command ID
-//                            sportState.aid = aid  // Example activity ID
-//
-//                            // 2. Configure required info model
-//                            let sportInfo = NJY_SportInfoModel()
-//                            sportInfo.sport_state = 0     // Active state
-//                            sportInfo.sport_type = sportID       // Running
-//                            sportInfo.sport_gps = 0
-//                            sportInfo.sport_hr = 0
-//                            sportInfo.sport_valid = 1       // Valid data
-//                            sportInfo.sport_cadence = 0
-//                            sportInfo.sport_stride = 0
-//                            sportInfo.reserve3 = 0
-//                            sportInfo.sport_time = 0        // Start from 0 seconds
-//                            sportInfo.sport_distance = 0    // Start from 0 meters
-//                            sportInfo.sport_steps = 0       // Start from 0 steps
-//                            sportInfo.sport_kcal = 0
-//                            sportInfo.sport_speed = 0
-//
-//                            sportState.infoModel = sportInfo
-//                            bleService.getGPSStart(sportState)
+                            let sportState = NJY_SportStateModel()
+                           sportState.cmdId = 0 // Example command ID
+                            sportState.aid = aid  // Example activity ID
+
+                            // 2. Configure required info model
+                            let sportInfo = NJY_SportInfoModel()
+                            sportInfo.sport_state = 0     // Active state
+                            sportInfo.sport_type = sportID       // Running
+                            sportInfo.sport_gps = 0
+                            sportInfo.sport_hr = 0
+                            sportInfo.sport_valid = 1       // Valid data
+                            sportInfo.sport_cadence = 0
+                            sportInfo.sport_stride = 0
+                            sportInfo.reserve3 = 0
+                            sportInfo.sport_time = 0        // Start from 0 seconds
+                            sportInfo.sport_distance = 0    // Start from 0 meters
+                            sportInfo.sport_steps = 0       // Start from 0 steps
+                            sportInfo.sport_kcal = 0
+                            sportInfo.sport_speed = 0
+
+                            sportState.infoModel = sportInfo
+                        DispatchQueue.main.async {
+                            self.bleService.getGPSStart(sportState)
+                        }
                         break
                         case "syncGPSData":
                             print("syncGPSData command sent \(String(describing: data))")
@@ -963,12 +978,12 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                             let sportSpeed = data?["sportSpeed"] as? Int ?? 0
                             let sportType = data?["sportType"] as? Int ?? 0
 
-                        sportState.cmdId = cmd// Example command ID
+                            sportState.cmdId = cmd// Example command ID
                             sportState.aid = aid  // Example activity ID
 
                             // 2. Configure required info model
                             let sportInfo = NJY_SportInfoModel()
-                            sportInfo.sport_state = 1   // Active state
+                            sportInfo.sport_state = 0   // Active state
                             sportInfo.sport_type = sportID       // Running
                             sportInfo.sport_gps = 0
 
@@ -1002,8 +1017,11 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                             }, failure: { error in
                                 print("getGPSSynDataPlay Failure: \(error.localizedDescription)")
                             })
-                        if sportTime % 1 == 0 {
-                            bleService.getGPSSynData(sportState, callback: asyncGPSCallbacka)
+                        DispatchQueue.main.async {
+                            if sportTime % 1 == 0 {
+                                NJYBleService.sharedInstance().getGPSSynData(sportState, callback: asyncGPSCallbacka)
+
+                            }
                         }
                         break
 
