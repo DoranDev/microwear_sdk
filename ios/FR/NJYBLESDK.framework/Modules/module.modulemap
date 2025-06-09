@@ -1,5 +1,5 @@
-framework module SpeexKit {
-  umbrella header "SpeexKit.h"
+framework module NJYBleService {
+  umbrella header "NJYBleService.h"
 
   export *
   module * { export * }
