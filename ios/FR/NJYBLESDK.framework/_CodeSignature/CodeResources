@@ -10,7 +10,7 @@
 		</data>
 		<key>Frameworks/RTKLEFoundation.framework/RTKLEFoundation</key>
 		<data>
-		syT6epF/1naSnP71BOJ5lGzvlJA=
+		ORxOBR87xtaotdY+GNnDzT6YAOs=
 		</data>
 		<key>Frameworks/RTKLEFoundation.framework/_CodeSignature/CodeResources</key>
 		<data>
@@ -22,7 +22,7 @@
 		</data>
 		<key>Frameworks/RTKOTASDK.framework/RTKOTASDK</key>
 		<data>
-		oJhM2LXF9cN2zCPmL6hQlFRcst4=
+		0u7kK62br9o1obCcqObvbeW7v8E=
 		</data>
 		<key>Frameworks/RTKOTASDK.framework/_CodeSignature/CodeResources</key>
 		<data>
@@ -34,7 +34,7 @@
 		</data>
 		<key>Headers/NJYBleService.h</key>
 		<data>
-		10mJi2rTlaXB5BnTAaeNL5bgYc4=
+		DcHLg5r1a1oO1tQlSVVVkx5sdZ0=
 		</data>
 		<key>Headers/NJY_AReceiptCodeModel.h</key>
 		<data>
@@ -58,7 +58,7 @@
 		</data>
 		<key>Headers/NJY_DailInfoModel.h</key>
 		<data>
-		PVxsePXNrmb/7tOul/xfd6p5bck=
+		qnllfzbyJjVNz4d9ST7tsFgzoFA=
 		</data>
 		<key>Headers/NJY_DeviceConfigModel.h</key>
 		<data>
@@ -172,13 +172,25 @@
 		<data>
 		i8MXADCbI9mJFmyfZ5Z4cF3fMXw=
 		</data>
+		<key>Headers/NJY_WxModel.h</key>
+		<data>
+		1fOVOjKPtp9L+y4yScgGYu/BPGc=
+		</data>
+		<key>Headers/PA_SmokeRecordModel.h</key>
+		<data>
+		rx02GlzXAtIWBXrAo78h7RHvW+U=
+		</data>
+		<key>Headers/PA_SmokeTypePower.h</key>
+		<data>
+		IYfNa6MaRNZnIIzuVZJTxJj1Glk=
+		</data>
 		<key>Headers/testSDK.h</key>
 		<data>
 		K6R3IhtbznVnSuHEZFGh+FuiAqg=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		anBq9AqC+uY5Or9q7cqxmjckQ+o=
+		vIIP3s9Q0diH/pIugiECmY2oTG8=
 		</data>
 		<key>en.lproj/Localizable.strings</key>
 		<dict>
@@ -225,11 +237,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			syT6epF/1naSnP71BOJ5lGzvlJA=
+			ORxOBR87xtaotdY+GNnDzT6YAOs=
 			</data>
 			<key>hash2</key>
 			<data>
-			z9nj8lcyDk22IXX48nlGDkKgp9WOg1zqreDZiLOwkKI=
+			1XWjbeCUj3yCKkyCp/bzCSlipo1ix5QCyRhA234M8Is=
 			</data>
 		</dict>
 		<key>Frameworks/RTKLEFoundation.framework/_CodeSignature/CodeResources</key>
@@ -258,11 +270,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			oJhM2LXF9cN2zCPmL6hQlFRcst4=
+			0u7kK62br9o1obCcqObvbeW7v8E=
 			</data>
 			<key>hash2</key>
 			<data>
-			BHKR+2IH2t3kSJrvqqtcIhQjFZw7OF71vhZKG6lhrhs=
+			RsME2PD/OrKiAEfEmbT+CWWe4U2siZjZ76kqHzk41Yg=
 			</data>
 		</dict>
 		<key>Frameworks/RTKOTASDK.framework/_CodeSignature/CodeResources</key>
@@ -291,11 +303,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			10mJi2rTlaXB5BnTAaeNL5bgYc4=
+			DcHLg5r1a1oO1tQlSVVVkx5sdZ0=
 			</data>
 			<key>hash2</key>
 			<data>
-			xjL/e1XdXlhhS8CLlIud6uwXZh/qpNwdxlrwgXrBM70=
+			taDGeWcuXygtS26nXP7X5C7Gh3F+iYQsVPjQhd8tMBM=
 			</data>
 		</dict>
 		<key>Headers/NJY_AReceiptCodeModel.h</key>
@@ -357,11 +369,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			PVxsePXNrmb/7tOul/xfd6p5bck=
+			qnllfzbyJjVNz4d9ST7tsFgzoFA=
 			</data>
 			<key>hash2</key>
 			<data>
-			LSC5x3LJufI5KwM1zJ00SO8MDGC4yItME3BpXtMYRpY=
+			Ojg3r1kVbq72+wK3aYaKKIk7sJRq8VO1GVHt+GjWkC4=
 			</data>
 		</dict>
 		<key>Headers/NJY_DeviceConfigModel.h</key>
@@ -670,6 +682,39 @@
 			<key>hash2</key>
 			<data>
 			+JVJbDEIkQyVfXGfEXxc7gxZA/Dq67g+zK1aJOHwsRo=
+			</data>
+		</dict>
+		<key>Headers/NJY_WxModel.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			1fOVOjKPtp9L+y4yScgGYu/BPGc=
+			</data>
+			<key>hash2</key>
+			<data>
+			mc+taKypY/auBKhcRFo8kmGIq6RSk9rb7kEMSJdlMfg=
+			</data>
+		</dict>
+		<key>Headers/PA_SmokeRecordModel.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			rx02GlzXAtIWBXrAo78h7RHvW+U=
+			</data>
+			<key>hash2</key>
+			<data>
+			x6gjG8g9mXRjiRr6lcwwVd6Gu4R3Go7aA8S0PuCjkGg=
+			</data>
+		</dict>
+		<key>Headers/PA_SmokeTypePower.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			IYfNa6MaRNZnIIzuVZJTxJj1Glk=
+			</data>
+			<key>hash2</key>
+			<data>
+			gkhL/M3S6yOf0KStqOiu71OG4aeF8c39BkwQwGmbgKI=
 			</data>
 		</dict>
 		<key>Headers/testSDK.h</key>
