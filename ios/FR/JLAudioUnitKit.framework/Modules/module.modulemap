@@ -1,5 +1,5 @@
-framework module JLAudioUnitKit {
-  umbrella header "JLAudioUnitKit.h"
+framework module NJYBleService {
+  umbrella header "NJYBleService.h"
   export *
 
   module * { export * }
