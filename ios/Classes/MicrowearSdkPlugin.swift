@@ -354,7 +354,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                     if let model = result as? NJY_SportStateModel {
                         print("Get getGPSSynData Success: aid:\(model.aid) cmdId:\(model.cmdId)")
                         if(model.cmdId == 1){
-                            self.sportID = model.infoModel.sport_type
+                            self.sportID = model.aid
                             print("START")
                             var sportState1 = NJY_SportStateModel()
                             sportState1.cmdId = GPSCommand.requestPermission.rawValue
@@ -365,7 +365,7 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                             self.registerGPSCallBackSink?(item)
 
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [self] in
-                                print("onGPSCountDown dijalankan setelah 1 detik")
+//                                print("onGPSCountDown dijalankan setelah 1 detik")
 
                                 item["status"] = "onGPSCountdown"
                                 self.registerGPSCallBackSink?(item)
@@ -440,13 +440,13 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
 
         workoutTimer.onTick = { currentTick, elapsed in
             print("✅ [TICK #\(currentTick)] \(String(format: "%.2f", elapsed)) detik")
+            print("sportID: \(self.sportID)")
             var sportStates = NJY_SportStateModel()
             sportStates.cmdId = 3
             sportStates.aid = 1
-            // 2. Configure required info model
             var sportInfo2 = NJY_SportInfoModel()
             sportInfo2.sport_state = 0
-            sportInfo2.sport_type = 0
+            sportInfo2.sport_type = self.sportID
             sportInfo2.sport_gps = 0
 
             sportInfo2.sport_hr = self.sportHr
@@ -459,7 +459,6 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
             sportInfo2.sport_distance = self.sportDistance
             sportInfo2.sport_steps = self.sportSteps
             sportInfo2.sport_kcal = self.sportKcal
-            print("awal getGPSSynDataPlay sportState: aid:\(sportStates.aid) cmdId:\(sportStates.cmdId)")
             sportStates.infoModel = sportInfo2
             DispatchQueue.main.async {
 
@@ -468,15 +467,10 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                     self.bleService.getGPSSynData(sportStates, callback: NJYAsyncCallback<AnyObject>.create(
                         nil,
                         success: { result in
-                            // Attempt to cast the generic 'result' to NJY_SportStateModel.
                             if let model = result as? NJY_SportStateModel {
-                                print("Get getGPSSynDataPlay sportState: aid:\(model.aid) cmdId:\(model.cmdId)")
-
-
-                                self.sportID = model.infoModel.sport_type
+                                print("getGPSSynData sportState: aid:\(model.aid) cmdId:\(model.cmdId)")
 
                             } else {
-                                // Handle unexpected result types.
                                 print("Received unexpected result type: \(type(of: result))")
                             }
                         },
@@ -1145,11 +1139,11 @@ public class MicrowearSdkPlugin: NSObject, FlutterPlugin {
                     let fun = data?["func"] as? String ?? ""
                     switch(fun){
                     case "startGPSStatus":
-                        print("startGPSStatus command sent \(String(describing: data))")
+                     //   print("startGPSStatus command sent \(String(describing: data))")
 
                         break
                     case "syncGPSData":
-                        print("syncGPSData command sent \(String(describing: data))")
+                      //  print("syncGPSData command sent \(String(describing: data))")
                         var sportStates = NJY_SportStateModel()
 
                         sportKcal = data?["sportKcal"] as? Int ?? 0
