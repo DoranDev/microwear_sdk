@@ -19,7 +19,7 @@ A new Flutter project.
   'FR/RTKOTASDK.xcframework',
   'FR/NJYBLESDK.framework',
   'FR/RTKLEFoundation.xcframework',
-  'FR/SpeexKit.framework'
+  'FR/SpeexKit.framework',
   'FR/JLAudioUnitKit.framework'
 #   'FR/SpotifyiOS.xcframework'
   s.platform = :ios, '12.0'
