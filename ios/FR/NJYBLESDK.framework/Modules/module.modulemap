@@ -1,4 +1,4 @@
-framework module NJYBleService {
+framework module NJYBLESDK {
   umbrella header "NJYBleService.h"
 
   export *
